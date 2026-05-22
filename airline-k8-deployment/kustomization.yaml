@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: airline
+
+resources:
+  - flight-search-service/deployment.yaml
+  - flight-search-service/service.yaml
+  - flight-search-service/configmap.yaml
+  - flight-search-service/pvc.yaml
+  - booking-api/deployment.yaml
+  - booking-api/service.yaml
+  - booking-api/configmap.yaml
+  - booking-api/pvc.yaml
+  - payment-processor/deployment.yaml
+  - payment-processor/service.yaml
+  - payment-processor/configmap.yaml
+  - payment-processor/pvc.yaml
+  - inventory-service/deployment.yaml
+  - inventory-service/service.yaml
+  - inventory-service/configmap.yaml
+  - inventory-service/pvc.yaml
+  - orphaned-resources/orphaned-pvc.yaml
+  - orphaned-resources/untracked-configmap.yaml

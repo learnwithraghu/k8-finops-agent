@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: airline
+  labels:
+    environment: prod
+    owner: payments-team
+data:
+  PAYMENT_GATEWAY: "stripe"
+  CURRENCY: "USD"

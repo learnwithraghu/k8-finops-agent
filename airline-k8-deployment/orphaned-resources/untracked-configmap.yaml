@@ -1,0 +1,10 @@
+# ConfigMap in default namespace with no labels
+# This represents untracked resources
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: untracked-config
+  namespace: default
+  # No labels - will be flagged as unknown
+data:
+  key: "value"

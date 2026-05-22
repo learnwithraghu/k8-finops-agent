@@ -1,0 +1,16 @@
+# Orphaned PVC - not mounted by any pod
+# This represents wasted storage that should be detected
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: orphaned-data-pvc
+  namespace: airline
+  labels:
+    # Minimal labels - likely untracked
+    app: old-service
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

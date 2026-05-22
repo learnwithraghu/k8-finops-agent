@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flight-search-service
+  namespace: airline
+  labels:
+    app: flight-search
+    # Intentionally missing: cost-center, owner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flight-search
+  template:
+    metadata:
+      labels:
+        app: flight-search
+        # Missing required tags
+    spec:
+      containers:
+      - name: flight-search
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
