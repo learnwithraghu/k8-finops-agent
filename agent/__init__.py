@@ -6,7 +6,7 @@ __author__ = "FinOps Team"
 from agent.scanner import K8sScanner, K8sResource
 from agent.cost_calculator import CostCalculator, CostBreakdown
 from agent.untracked_money import UntrackedMoneyDetector, UntrackedMoney, UntrackedCategory
-from agent.analyzer import BedrockAnalyzer, MockAnalyzer, AIRecommendation
+from agent.analyzer import BedrockAnalyzer, MockAnalyzer, AIRecommendation, IssueDraft
 from agent.github_client import GitHubIssueClient, MockGitHubClient
 
 __all__ = [
@@ -20,6 +20,7 @@ __all__ = [
     'BedrockAnalyzer',
     'MockAnalyzer',
     'AIRecommendation',
+    'IssueDraft',
     'GitHubIssueClient',
     'MockGitHubClient',
 ]

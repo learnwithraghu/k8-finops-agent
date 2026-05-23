@@ -48,26 +48,36 @@ cd k8-finops-agent
 ## Step 2: Create Environment File
 
 ```bash
-# Copy the example environment file
+# Copy the local example environment file
 cp .env.example .env
 
-# Edit .env with your credentials
+# Or use the EC2 example on Amazon Linux
+# cp .env.ec2.example .env
+
+# Edit .env if needed
 nano .env
 ```
 
-**Required variables in `.env`:**
+**Common variables in `.env`:**
 ```bash
-# AWS Configuration (for Bedrock)
-AWS_ACCESS_KEY_ID=your_aws_access_key_here
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key_here
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_SESSION_TOKEN=
 AWS_REGION=us-east-1
-
-# GitHub Configuration
-GITHUB_TOKEN=ghp_your_github_token_here
+GITHUB_TOKEN=...
 GITHUB_REPO=your-org/tech-debt
-
-# Infrastructure
 INSTANCE_TYPE=t2.medium
+AWS_PRICING_REGION=us-east-1
+KUBECONFIG_PATH=~/.kube/config
+TARGET_NAMESPACE=airline
+PRICING_CONFIG=config/pricing.yaml
+TAGGING_RULES=config/tagging-rules.yaml
+BEDROCK_MAX_TOKENS=1024
+BEDROCK_TEMPERATURE=0.3
+LOG_LEVEL=DEBUG
+DRY_RUN=true
+USE_MOCK=true
+USE_MOCK_GITHUB=true
 ```
 
 ## Step 3: Create a Kind Cluster

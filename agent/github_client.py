@@ -10,7 +10,7 @@ from github.GithubException import GithubException
 
 from agent.scanner import K8sResource
 from agent.untracked_money import UntrackedMoney
-from agent.analyzer import AIRecommendation
+from agent.analyzer import IssueDraft, AIRecommendation
 
 logger = logging.getLogger(__name__)
 
@@ -205,50 +205,41 @@ By properly tagging this resource, you can track **${untracked.untracked_amount:
 
     def create_issue(
         self,
-        resource: K8sResource,
-        untracked: UntrackedMoney,
-        recommendation: Optional[AIRecommendation] = None,
+        issue_draft: IssueDraft,
         dry_run: bool = False
     ) -> Optional[Dict[str, Any]]:
-        """Create a GitHub issue for a violation."""
+        """Create a GitHub issue from a Bedrock draft."""
         if not self._connected:
             logger.error("GitHub client not connected")
             return None
 
-        # Check for existing issue
-        existing = self._check_existing_issue(resource)
-        if existing:
-            logger.info(f"Skipping duplicate issue for {resource.name}")
+        if not issue_draft.should_create_issue:
+            logger.info(f"Skipping issue per Bedrock decision: {issue_draft.title}")
             return {
-                'issue_number': existing.number,
-                'url': existing.html_url,
-                'status': 'duplicate'
+                'title': issue_draft.title,
+                'status': 'skipped'
             }
 
-        title = self._generate_issue_title(resource, untracked)
-        body = self._generate_issue_body(resource, untracked, recommendation)
-        labels = self._get_labels(untracked, recommendation)
-
         if dry_run:
-            logger.info(f"[DRY RUN] Would create issue: {title}")
+            logger.info(f"[DRY RUN] Would create issue: {issue_draft.title}")
             return {
-                'title': title,
-                'labels': labels,
+                'title': issue_draft.title,
+                'labels': issue_draft.labels,
                 'status': 'dry_run'
             }
 
         try:
             issue = self.repo.create_issue(
-                title=title,
-                body=body,
-                labels=labels
+                title=issue_draft.title,
+                body=issue_draft.body,
+                labels=issue_draft.labels
             )
-            logger.info(f"Created issue #{issue.number}: {title}")
+            logger.info(f"Created issue #{issue.number}: {issue_draft.title}")
             return {
                 'issue_number': issue.number,
                 'url': issue.html_url,
-                'title': title,
-                'labels': labels,
+                'title': issue_draft.title,
+                'labels': issue_draft.labels,
                 'status': 'created'
             }
         except GithubException as e:
@@ -257,29 +248,29 @@ By properly tagging this resource, you can track **${untracked.untracked_amount:
 
     def create_issues_batch(
         self,
-        violations: List[tuple],
+        issue_drafts: List[IssueDraft],
         dry_run: bool = False
     ) -> Dict[str, Any]:
-        """Create issues for multiple violations."""
+        """Create issues for multiple Bedrock drafts."""
         results = {
             'created': [],
             'duplicates': [],
             'failed': [],
-            'total': len(violations)
+            'total': len(issue_drafts)
         }
 
-        for resource, untracked, recommendation in violations:
-            result = self.create_issue(resource, untracked, recommendation, dry_run)
+        for draft in issue_drafts:
+            result = self.create_issue(draft, dry_run)
             if result:
                 if result.get('status') == 'created':
                     results['created'].append(result)
-                elif result.get('status') == 'duplicate':
+                elif result.get('status') == 'skipped':
                     results['duplicates'].append(result)
                 elif result.get('status') == 'dry_run':
-                    results['created'].append(result)  # Count as created in dry run
+                    results['created'].append(result)
             else:
                 results['failed'].append({
-                    'resource': f"{resource.namespace}/{resource.name}",
+                    'resource': draft.title,
                     'error': 'Failed to create issue'
                 })
 
@@ -304,44 +295,51 @@ class MockGitHubClient:
 
     def create_issue(
         self,
-        resource,
-        untracked,
-        recommendation=None,
-        dry_run=False
+        issue_draft: IssueDraft,
+        dry_run: bool = False
     ) -> Optional[Dict[str, Any]]:
         """Mock create issue - just logs."""
         if not self._connected:
             logger.error("Mock GitHub client not connected")
             return None
 
-        title = f"[FinOps] {resource.namespace}/{resource.name} - {untracked.category.value.upper()}"
+        if not issue_draft.should_create_issue:
+            logger.info(f"[MOCK] Skipping issue per Bedrock decision: {issue_draft.title}")
+            return {
+                'issue_number': len(self._issues) + 1,
+                'url': f"https://github.com/{self.repo_name}/issues/{len(self._issues) + 1}",
+                'title': issue_draft.title,
+                'status': 'skipped'
+            }
 
-        logger.info(f"[MOCK] Would create issue: {title}")
-        logger.info(f"[MOCK]   - Monthly Cost: ${untracked.monthly_cost:.2f}")
-        logger.info(f"[MOCK]   - Untracked: ${untracked.untracked_amount:.2f}")
-        if recommendation:
-            logger.info(f"[MOCK]   - Suggested cost-center: {recommendation.suggested_cost_center}")
-            logger.info(f"[MOCK]   - Suggested owner: {recommendation.suggested_owner}")
+        logger.info(f"[MOCK] Would create issue: {issue_draft.title}")
+        logger.info(f"[MOCK]   - Priority: {issue_draft.priority}")
+        logger.info(f"[MOCK]   - Reasoning: {issue_draft.reasoning}")
+        logger.info(f"[MOCK]   - Suggested cost-center: {issue_draft.suggested_cost_center}")
+        logger.info(f"[MOCK]   - Suggested owner: {issue_draft.suggested_owner}")
 
         return {
             'issue_number': len(self._issues) + 1,
             'url': f"https://github.com/{self.repo_name}/issues/{len(self._issues) + 1}",
-            'title': title,
+            'title': issue_draft.title,
             'status': 'mock_created'
         }
 
-    def create_issues_batch(self, violations, dry_run=False) -> Dict[str, Any]:
+    def create_issues_batch(self, issue_drafts, dry_run=False) -> Dict[str, Any]:
         """Mock batch create."""
         results = {
             'created': [],
             'duplicates': [],
             'failed': [],
-            'total': len(violations)
+            'total': len(issue_drafts)
         }
 
-        for resource, untracked, recommendation in violations:
-            result = self.create_issue(resource, untracked, recommendation, dry_run)
+        for draft in issue_drafts:
+            result = self.create_issue(draft, dry_run)
             if result:
-                results['created'].append(result)
+                if result.get('status') == 'mock_created':
+                    results['created'].append(result)
+                elif result.get('status') == 'skipped':
+                    results['duplicates'].append(result)
 
         return results

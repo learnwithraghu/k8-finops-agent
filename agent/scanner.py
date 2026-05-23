@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+from pathlib import Path
 import logging
 
 from kubernetes import client, config
@@ -45,7 +46,8 @@ class K8sScanner:
         """Connect to Kubernetes cluster."""
         try:
             if self.kubeconfig_path:
-                config.load_kube_config(config_file=self.kubeconfig_path)
+                kubeconfig_file = str(Path(self.kubeconfig_path).expanduser())
+                config.load_kube_config(config_file=kubeconfig_file)
             else:
                 config.load_kube_config()
 

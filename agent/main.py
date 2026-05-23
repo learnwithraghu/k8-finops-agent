@@ -67,7 +67,19 @@ class FinOpsAgent:
         else:
             model_id = self.config.get('bedrock_model_id')
             region = self.config.get('aws_region', 'us-east-1')
-            self.analyzer = BedrockAnalyzer(model_id, region)
+            role_arn = self.config.get('aws_role_arn')
+            session_token = self.config.get('aws_session_token')
+            max_tokens = self.config.get('bedrock_max_tokens', 1024)
+            temperature = self.config.get('bedrock_temperature', 0.3)
+            self.analyzer = BedrockAnalyzer(
+                model_id=model_id,
+                region=region,
+                role_arn=role_arn,
+                session_token=session_token,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                tagging_rules=getattr(self.detector, 'rules', {})
+            )
 
         if not self.analyzer.connect():
             logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
@@ -114,33 +126,41 @@ class FinOpsAgent:
         violations = self.detector.get_high_impact_violations(resources, threshold)
         logger.info(f"Found {len(violations)} high-impact violations")
 
-        # Analyze with AI
+        # Analyze with AI / Bedrock
         if violations:
-            logger.info("Getting AI recommendations...")
-            ai_results = []
+            logger.info("Generating Bedrock issue drafts...")
+            issue_drafts = []
             for untracked in violations:
-                recommendation = self.analyzer.analyze_resource(
+                draft = self.analyzer.analyze_resource(
                     untracked.resource,
                     untracked
                 )
-                ai_results.append((untracked.resource, untracked, recommendation))
+                if draft and draft.should_create_issue:
+                    issue_drafts.append(draft)
+                elif draft:
+                    logger.info(f"Skipping issue per Bedrock decision: {draft.title}")
 
             # Create GitHub issues
             dry_run = self.config.get('dry_run', False)
             if dry_run:
                 logger.info("[DRY RUN] Would create issues for violations")
 
-            logger.info("Creating GitHub issues...")
-            results = self.github.create_issues_batch(ai_results, dry_run)
+            if issue_drafts:
+                logger.info("Creating GitHub issues...")
+                results = self.github.create_issues_batch(issue_drafts, dry_run)
 
-            logger.info(f"Issues created: {len(results['created'])}")
-            logger.info(f"Duplicates skipped: {len(results['duplicates'])}")
-            logger.info(f"Failed: {len(results['failed'])}")
+                logger.info(f"Issues created: {len(results['created'])}")
+                logger.info(f"Duplicates skipped: {len(results['duplicates'])}")
+                logger.info(f"Failed: {len(results['failed'])}")
+                issues_created = len(results['created'])
+            else:
+                logger.info("No actionable issue drafts returned by Bedrock")
+                issues_created = 0
 
             return {
                 'analysis': analysis,
                 'violations': len(violations),
-                'issues_created': len(results['created']),
+                'issues_created': issues_created,
                 'report': report
             }
 
@@ -157,7 +177,7 @@ def load_config() -> dict:
     # Load .env file if it exists
     env_path = Path('.env')
     if env_path.exists():
-        load_dotenv()
+        load_dotenv(override=True)
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
@@ -165,6 +185,10 @@ def load_config() -> dict:
         'pricing_config': os.getenv('PRICING_CONFIG'),
         'tagging_rules': os.getenv('TAGGING_RULES'),
         'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
+        'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
+        'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
+        'aws_role_arn': os.getenv('AWS_ROLE_ARN'),
+        'aws_session_token': os.getenv('AWS_SESSION_TOKEN'),
         'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
         'github_token': os.getenv('GITHUB_TOKEN'),
         'github_repo': os.getenv('GITHUB_REPO'),
