@@ -40,6 +40,10 @@ env/
 .env
 .env.local
 .env.*.local
+.env_backup
+.env.prod
+.env.staging
+.env.dev
 
 # Logs
 *.log
@@ -79,6 +83,25 @@ Thumbs.db
 !.kilo/plans/
 !.kilo/commands/
 !.kilo/agents/
+
+# AWS credentials (local configuration only, never commit)
+.aws/
+
+# Certificates and keys (never commit)
+*.pem
+*.key
+*.pfx
+*.crt
+*.cert
+*.p12
+*.jks
+
+# Application config files with secrets
+auth.json
+config.json
+secrets.json
+secrets.yaml
+secrets.yml
 
 # Keep example files
 !.env.example

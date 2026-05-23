@@ -1,3 +1,0 @@
-region: us-east-1
-model_id: anthropic.claude-3-sonnet-20240229-v1:0
-tracker_url: http://localhost:8080/issues
