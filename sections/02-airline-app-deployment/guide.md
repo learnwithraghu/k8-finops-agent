@@ -64,61 +64,42 @@ kubectl apply -k sections/02-airline-app-deployment/manifests/airline-k8-deploym
 
 Kustomize will apply each service into its own namespace.
 
-## Step 3: Verify the namespaces
+## Step 3: Verify one namespace
 ```bash
 kubectl get namespace booking-api
-kubectl get namespace flight-search
-kubectl get namespace inventory
-kubectl get namespace payment
-```
-
-## Step 4: See everything created
-```bash
 kubectl get all -n booking-api
-kubectl get all -n flight-search
-kubectl get all -n inventory
-kubectl get all -n payment
 ```
 
-## Step 5: Inspect each resource type
+## Step 4: Verify a different namespace
+```bash
+kubectl get namespace flight-search
+kubectl get all -n flight-search
+```
+
+## Step 5: Inspect other resource types in different namespaces
 ### Deployments
 ```bash
 kubectl get deployments -n booking-api
-kubectl get deployments -n flight-search
-kubectl get deployments -n inventory
-kubectl get deployments -n payment
 ```
 
 ### Pods
 ```bash
-kubectl get pods -n booking-api -o wide
 kubectl get pods -n flight-search -o wide
-kubectl get pods -n inventory -o wide
-kubectl get pods -n payment -o wide
 ```
 
 ### Services
 ```bash
-kubectl get services -n booking-api
-kubectl get services -n flight-search
 kubectl get services -n inventory
-kubectl get services -n payment
 ```
 
 ### ConfigMaps
 ```bash
-kubectl get configmaps -n booking-api
-kubectl get configmaps -n flight-search
-kubectl get configmaps -n inventory
 kubectl get configmaps -n payment
 ```
 
 ### PVCs
 ```bash
 kubectl get pvc -n booking-api
-kubectl get pvc -n flight-search
-kubectl get pvc -n inventory
-kubectl get pvc -n payment
 ```
 
 ## Step 6: Describe a workload
@@ -171,32 +152,6 @@ You should see:
 - services created in their own namespaces
 - configmaps present for each service
 - PVCs present for each workload
-
-## Common issues
-### Pod stuck in Pending
-- check events with `kubectl describe pod`
-- check PVC binding
-- check image pull status
-
-### Service exists but app is unreachable
-- confirm selectors match pod labels
-- confirm pods are running
-- confirm you are checking the correct namespace
-
-### Nothing appears after apply
-- confirm Section 01 is complete
-- confirm you are using the repo root
-- confirm the kustomization path is correct
-
-## Final check
-Run these before moving on:
-
-```bash
-kubectl get all -n booking-api
-kubectl get all -n flight-search
-kubectl get all -n inventory
-kubectl get all -n payment
-```
 
 ## Handoff to Section 03
 Once the app is deployed and verified, move to:

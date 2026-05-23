@@ -1,18 +1,18 @@
 # Section 04 Goal: Local Python Agent
 
 ## Goal
-Build the first local Python agent that connects to the cluster, scans resources, and generates a basic report.
+Build the first local Python agent that connects to Kubernetes, scans resources, and produces a FinOps report.
 
 ## Scope
 - Read cluster resources
-- Calculate or estimate cost impact
-- Detect untracked or orphaned resources
-- Produce a local report
+- Load tagging and pricing config
+- Detect missing tags and orphaned resources
+- Produce a local report in mock mode
 
 ## Out of scope
-- LLM decision flow
+- Bedrock decision flow
 - Issue tracker writes
 - Kubernetes deployment of the agent
 
 ## Success criteria
-The learner can run the agent locally and see a useful report without AI assistance.
+The learner can run the agent locally, see a useful report, and explain why some resources should become tech debt items.

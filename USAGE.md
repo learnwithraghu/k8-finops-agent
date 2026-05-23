@@ -71,7 +71,6 @@ GITHUB_REPO=your-org/tech-debt
 INSTANCE_TYPE=t2.medium
 AWS_PRICING_REGION=us-east-1
 KUBECONFIG_PATH=~/.kube/config
-TARGET_NAMESPACE=airline
 PRICING_CONFIG=sections/04-local-python-agent/config/pricing.yaml
 TAGGING_RULES=sections/04-local-python-agent/config/tagging-rules.yaml
 BEDROCK_MAX_TOKENS=1024
@@ -319,7 +318,7 @@ sections/
 ├── 04-local-python-agent/
 │   ├── agent/
 │   ├── config/
-│   └── local-usage.md
+│   └── guide.md
 ├── 05-bedrock-decision-flow/
 ├── 06-issue-tracker-service/
 ├── 07-agent-to-tracker-integration/

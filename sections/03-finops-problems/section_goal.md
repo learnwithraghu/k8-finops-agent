@@ -1,12 +1,13 @@
 # Section 03 Goal: Reveal the Problem
 
 ## Goal
-Show why the cluster is hard to govern at scale by surfacing tagging gaps, orphaned resources, and ownership ambiguity.
+Show why the cluster is hard to govern at scale by surfacing missing tags, inconsistent ownership, and orphaned resources.
 
 ## Scope
+- Compare well-tagged and poorly tagged workloads
 - Demonstrate missing tags/labels/annotations
 - Highlight orphaned or unused resources
-- Show deployments that are still running but have unclear ownership
+- Show where ownership is unclear
 - Frame the FinOps and operational pain
 
 ## Out of scope
@@ -15,4 +16,4 @@ Show why the cluster is hard to govern at scale by surfacing tagging gaps, orpha
 - Issue creation
 
 ## Success criteria
-The learner understands the exact problems the agent must later solve.
+The learner can identify at least one good workload, one bad workload, one orphaned resource, and one untracked resource that should later become a tech-debt item.

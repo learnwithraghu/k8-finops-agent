@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
+import yaml
 from dotenv import load_dotenv
 
 from agent.scanner import K8sScanner
@@ -46,7 +47,8 @@ class FinOpsAgent:
 
         # Initialize scanner
         kubeconfig = self.config.get('kubeconfig_path')
-        self.scanner = K8sScanner(kubeconfig_path=kubeconfig)
+        excluded_namespaces = self.config.get('excluded_namespaces', [])
+        self.scanner = K8sScanner(kubeconfig_path=kubeconfig, excluded_namespaces=excluded_namespaces)
         if not self.scanner.connect():
             logger.error("Failed to connect to Kubernetes")
             return False
@@ -107,7 +109,7 @@ class FinOpsAgent:
 
         # Scan resources
         target_ns = self.config.get('target_namespace')
-        logger.info(f"Scanning resources in namespace: {target_ns or 'all'}")
+        logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
         resources = self.scanner.scan_all(target_ns)
         logger.info(f"Found {len(resources)} resources")
 
@@ -179,11 +181,22 @@ def load_config() -> dict:
     if env_path.exists():
         load_dotenv(override=True)
 
+    tagging_rules_path = os.getenv('TAGGING_RULES')
+    excluded_namespaces = []
+    if tagging_rules_path:
+        try:
+            rules_file = Path(tagging_rules_path).expanduser()
+            if rules_file.exists():
+                with open(rules_file, 'r') as f:
+                    tagging_rules_data = yaml.safe_load(f) or {}
+                excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
+        except Exception:
+            excluded_namespaces = []
+
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'target_namespace': os.getenv('TARGET_NAMESPACE'),
         'pricing_config': os.getenv('PRICING_CONFIG'),
-        'tagging_rules': os.getenv('TAGGING_RULES'),
+        'tagging_rules': tagging_rules_path,
         'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
         'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
         'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
@@ -197,6 +210,7 @@ def load_config() -> dict:
         'min_cost_threshold': float(os.getenv('MIN_COST_THRESHOLD', '1.0')),
         'use_mock': os.getenv('USE_MOCK', 'false').lower() == 'true',
         'use_mock_github': os.getenv('USE_MOCK_GITHUB', 'false').lower() == 'true',
+        'excluded_namespaces': excluded_namespaces,
     }
 
 
@@ -225,7 +239,7 @@ def main():
     # Override with command line args
     if args.kubeconfig:
         config['kubeconfig_path'] = args.kubeconfig
-    if args.namespace:
+    if args.namespace is not None:
         config['target_namespace'] = args.namespace
     if args.dry_run:
         config['dry_run'] = True
