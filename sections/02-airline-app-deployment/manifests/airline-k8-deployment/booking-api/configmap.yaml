@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: booking-api-config
+  namespace: booking-api
+  labels:
+    app.kubernetes.io/name: booking-api
+    cost-center: booking-engine
+data:
+  MAX_BOOKINGS_PER_MINUTE: "100"
+  SESSION_TIMEOUT: "1800"

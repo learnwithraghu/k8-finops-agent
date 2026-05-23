@@ -1,12 +1,14 @@
 # K8s FinOps Agent - Step-by-Step Usage Guide
 
+> Teaching flow is now organized under `sections/`. Use the section guides and `section_goal.md` files as the source of truth.
+
 This guide walks you through setting up and running the K8s FinOps Agent from scratch.
 
 ## Quick Start (Automated)
 
 ```bash
 # Run the automated setup script
-./setup.sh
+bash sections/01-cluster-foundation/commands/setup.sh
 ```
 
 This script will:
@@ -19,10 +21,10 @@ This script will:
 
 **Setup script options:**
 ```bash
-./setup.sh --help          # Show help
-./setup.sh --mock          # Setup for mock mode (no AWS/GitHub)
-./setup.sh --cleanup       # Full cleanup (cluster + image)
-./setup.sh --skip-build    # Skip Docker image build
+bash sections/01-cluster-foundation/commands/setup.sh --help          # Show help
+bash sections/01-cluster-foundation/commands/setup.sh --mock          # Setup for mock mode (no AWS/GitHub)
+bash sections/01-cluster-foundation/commands/setup.sh --cleanup       # Full cleanup (cluster + image)
+bash sections/01-cluster-foundation/commands/setup.sh --skip-build    # Skip Docker image build
 ```
 
 ## Prerequisites
@@ -51,8 +53,8 @@ cd k8-finops-agent
 # Copy the local example environment file
 cp .env.example .env
 
-# Or use the EC2 example on Amazon Linux
-# cp .env.ec2.example .env
+# Use the local example on your MacBook
+# cp .env.example .env
 
 # Edit .env if needed
 nano .env
@@ -70,8 +72,8 @@ INSTANCE_TYPE=t2.medium
 AWS_PRICING_REGION=us-east-1
 KUBECONFIG_PATH=~/.kube/config
 TARGET_NAMESPACE=airline
-PRICING_CONFIG=config/pricing.yaml
-TAGGING_RULES=config/tagging-rules.yaml
+PRICING_CONFIG=sections/04-local-python-agent/config/pricing.yaml
+TAGGING_RULES=sections/04-local-python-agent/config/tagging-rules.yaml
 BEDROCK_MAX_TOKENS=1024
 BEDROCK_TEMPERATURE=0.3
 LOG_LEVEL=DEBUG
@@ -94,14 +96,20 @@ kubectl get nodes
 ## Step 4: Deploy Airline Services
 
 ```bash
-# Create the airline namespace
-kubectl create namespace airline
+# Create the four service namespaces
+kubectl create namespace booking-api
+kubectl create namespace flight-search
+kubectl create namespace inventory
+kubectl create namespace payment
 
 # Deploy all airline services
-kubectl apply -k airline-k8-deployment/
+kubectl apply -k sections/02-airline-app-deployment/manifests/airline-k8-deployment/
 
 # Verify deployments
-kubectl get all -n airline
+kubectl get all -n booking-api
+kubectl get all -n flight-search
+kubectl get all -n inventory
+kubectl get all -n payment
 ```
 
 **Expected output:**
@@ -109,7 +117,6 @@ kubectl get all -n airline
 - booking-api (missing environment, compliance)
 - payment-processor (missing tier, application)
 - inventory-service (properly tagged - baseline)
-- orphaned-pvc (not mounted)
 
 ## Step 5: Build the FinOps Agent Docker Image
 
@@ -188,7 +195,7 @@ Check your GitHub repository for new issues:
 
 ```bash
 # Delete airline services
-kubectl delete -k airline-k8-deployment/
+kubectl delete -k sections/02-airline-app-deployment/manifests/airline-k8-deployment/
 
 # Delete Kind cluster
 kind delete cluster --name finops-cluster
@@ -265,7 +272,7 @@ docker run --rm \
 kind load docker-image k8-finops-agent:latest --name finops-cluster
 
 # Deploy the agent job
-kubectl apply -f demo/manifests/agent-job.yaml
+kubectl apply -f sections/08-k8-native-agent/cronjob/agent-job.yaml
 
 # Check job logs
 kubectl logs -l job-name=finops-agent-scan
@@ -297,31 +304,26 @@ python -m pytest tests/
 ## File Structure Reference
 
 ```
-k8-finops-agent/
-├── agent/                      # Agent code
-│   ├── __init__.py
-│   ├── main.py                 # Entry point
-│   ├── scanner.py              # K8s scanner
-│   ├── cost_calculator.py      # Cost engine
-│   ├── untracked_money.py      # Untracked detection
-│   ├── analyzer.py             # Bedrock AI
-│   └── github_client.py        # GitHub integration
-├── airline-k8-deployment/      # Airline services
-│   ├── flight-search-service/
-│   ├── booking-api/
-│   ├── payment-processor/
-│   ├── inventory-service/
-│   └── orphaned-resources/
-├── config/                     # Configuration
-│   ├── pricing.yaml
-│   └── tagging-rules.yaml
-├── demo/                       # Demo scripts
-│   └── deploy.sh
-├── setup.sh                    # Automated setup script
-├── Dockerfile
-├── requirements.txt
-├── .env.example
-└── USAGE.md                    # This file
+sections/
+├── 01-cluster-foundation/
+│   ├── commands/
+│   │   └── setup.sh
+│   └── section_goal.md
+├── 02-airline-app-deployment/
+│   └── manifests/
+│       └── airline-k8-deployment/
+├── 03-finops-problems/
+│   ├── idea.md
+│   └── manifests/
+│       └── orphaned-resources/
+├── 04-local-python-agent/
+│   ├── agent/
+│   ├── config/
+│   └── local-usage.md
+├── 05-bedrock-decision-flow/
+├── 06-issue-tracker-service/
+├── 07-agent-to-tracker-integration/
+└── 08-k8-native-agent/
 ```
 
 ## Next Steps
@@ -335,5 +337,5 @@ k8-finops-agent/
 
 For issues or questions:
 - Check logs with `--log-level DEBUG`
-- Review agent code in `agent/` directory
-- Check configuration in `config/` directory
+- Review agent code in `sections/04-local-python-agent/agent/`
+- Check configuration in `sections/04-local-python-agent/config/`
