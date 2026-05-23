@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FinOps Issue Tracker</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div>
+        <p class="eyebrow">Section 06</p>
+        <h1>FinOps Issue Tracker</h1>
+        <p class="subtitle">A simple Jira-style board for findings, ownership, and status updates.</p>
+      </div>
+      <div class="header-actions">
+        <a class="button secondary" href="/docs" target="_blank" rel="noreferrer">Swagger /docs</a>
+        <button id="refreshBtn" class="button">Refresh</button>
+      </div>
+    </header>
+
+    <p class="callout">Create issues programmatically with <code>POST /create-issue</code>. Drag cards between columns or click a card to open details.</p>
+
+    <main class="workspace">
+      <section class="board-panel panel">
+        <div class="panel-head">
+          <h2>Board</h2>
+          <span>backlog → to do → in progress → done</span>
+        </div>
+        <div class="board" id="board"></div>
+      </section>
+
+      <aside id="issueDrawer" class="issue-drawer hidden" aria-hidden="true">
+        <div class="issue-drawer-shell panel">
+          <div class="issue-drawer-head">
+            <div>
+              <p class="drawer-eyebrow">Issue details</p>
+              <h2 id="selectedLabel">Select a ticket</h2>
+            </div>
+            <button type="button" id="closeDrawerBtn" class="icon-button" aria-label="Close drawer">×</button>
+          </div>
+
+          <div id="selectedIssue" class="detail-empty">Click a card to open it.</div>
+
+          <form id="updateForm" class="detail-form hidden">
+            <input type="hidden" name="id" />
+            <div class="drawer-section">
+              <div class="drawer-section-title">Ticket state</div>
+              <div class="two-col">
+                <label>Status
+                  <select name="status">
+                    <option value="backlog">backlog</option>
+                    <option value="todo">to do</option>
+                    <option value="in_progress">in progress</option>
+                    <option value="done">done</option>
+                  </select>
+                </label>
+                <label>Assignee
+                  <input name="assignee" placeholder="Enter assignee" />
+                </label>
+              </div>
+            </div>
+            <button type="submit">Save changes</button>
+          </form>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

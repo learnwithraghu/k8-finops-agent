@@ -1,18 +1,20 @@
 # Section 06 Goal: Issue Tracker Service
 
 ## Goal
-Deploy the issue tracker service and document the API contract the agent will use to create work items.
+Build a simple Jira-style Kanban board with FastAPI so FinOps findings can be created programmatically, opened, assigned, and moved.
 
 ## Scope
-- Deploy the issue tracker container/image
-- Show the FastAPI docs or equivalent API documentation
-- Define the `/raise-issue` endpoint payload shape
-- Explain how the tracker behaves like a lightweight Jira-style destination
+- Build and run the tracker container locally
+- Serve a simple Kanban board UI
+- Expose `/create-issue` as the main creation endpoint
+- Expose `/issue/{id}` to open a ticket
+- Allow assignment and status movement
+- Show the API response and docs
 
 ## Out of scope
-- Cluster scanning logic
+- Kubernetes scan logic
 - Bedrock prompt engineering
-- Kubernetes-native scheduling
+- Kubernetes-native deployment
 
 ## Success criteria
-The learner knows exactly how to send a valid issue payload to the tracker.
+The learner can create a ticket through `/issue`, open it in the UI, assign it, and move it across the board.
