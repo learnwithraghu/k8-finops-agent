@@ -94,18 +94,18 @@ What to look for:
 
 ## Step 8: Run the agent across the cluster
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --mock-github --dry-run --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --log-level DEBUG
 ```
 
 What to look for:
 - the agent scans all non-system namespaces by default
 - system namespaces are skipped using `excluded_namespaces` from the tagging rules
 - the report should show the problems from Section 03
-- no real GitHub issues are created
+- no issue tracker is involved yet
 
 ## Step 9: Run the agent against one namespace
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --mock-github --dry-run --namespace booking-api --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --namespace booking-api --log-level DEBUG
 ```
 
 What to look for:
@@ -115,7 +115,7 @@ What to look for:
 
 ## Step 10: Try a different namespace
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --mock-github --dry-run --namespace inventory --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --namespace inventory --log-level DEBUG
 ```
 
 What to look for:
@@ -124,13 +124,12 @@ What to look for:
 
 ## Step 11: Raise the threshold for high-impact findings
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --mock-github --dry-run --threshold 20 --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --mock --threshold 20 --log-level DEBUG
 ```
-
 What to look for:
 - fewer findings should qualify as high impact
 - this shows how tuning changes the output
-- useful when demonstrating why some issues become Jira tickets first
+- useful when demonstrating why some issues become tracker items first
 
 ## What the report should show
 Look for these sections in the output:

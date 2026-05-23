@@ -14,7 +14,6 @@ from agent.scanner import K8sScanner
 from agent.cost_calculator import CostCalculator
 from agent.untracked_money import UntrackedMoneyDetector
 from agent.analyzer import BedrockAnalyzer, MockAnalyzer
-from agent.github_client import GitHubIssueClient, MockGitHubClient
 
 # Configure logging
 def setup_logging(log_level: str = "INFO"):
@@ -39,7 +38,8 @@ class FinOpsAgent:
         self.calculator = None
         self.detector = None
         self.analyzer = None
-        self.github = None
+        self.analyzer_mode = "unknown"
+        self.recommendations_generated = 0
 
     def initialize(self) -> bool:
         """Initialize all components."""
@@ -65,6 +65,7 @@ class FinOpsAgent:
         use_mock = self.config.get('use_mock', False)
         if use_mock:
             self.analyzer = MockAnalyzer()
+            self.analyzer_mode = "mock"
             logger.info("Using mock analyzer")
         else:
             model_id = self.config.get('bedrock_model_id')
@@ -86,20 +87,10 @@ class FinOpsAgent:
         if not self.analyzer.connect():
             logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
             self.analyzer = MockAnalyzer()
-
-        # Initialize GitHub client (real or mock)
-        use_mock_github = self.config.get('use_mock_github', False)
-        if use_mock_github:
-            self.github = MockGitHubClient()
-            logger.info("Using mock GitHub client")
+            self.analyzer_mode = "mock-fallback"
         else:
-            token = self.config.get('github_token')
-            repo = self.config.get('github_repo')
-            self.github = GitHubIssueClient(token, repo)
-
-        if not self.github.connect():
-            logger.warning("Failed to connect to GitHub, falling back to mock client")
-            self.github = MockGitHubClient()
+            if not use_mock:
+                self.analyzer_mode = "bedrock"
 
         return True
 
@@ -122,6 +113,10 @@ class FinOpsAgent:
         print("\n" + "=" * 80)
         print(report)
         print("=" * 80 + "\n")
+        logger.info(f"Analyzer mode: {self.analyzer_mode}")
+        if self.analyzer_mode == "bedrock":
+            logger.info("LLM-powered output generated from Bedrock")
+            logger.info(f"Bedrock inference profile ARN: {self.config.get('bedrock_model_id')}")
 
         # Get high-impact violations
         threshold = self.config.get('min_cost_threshold', 1.0)
@@ -129,47 +124,29 @@ class FinOpsAgent:
         logger.info(f"Found {len(violations)} high-impact violations")
 
         # Analyze with AI / Bedrock
+        recommendations_generated = 0
         if violations:
-            logger.info("Generating Bedrock issue drafts...")
-            issue_drafts = []
+            if self.analyzer_mode == "bedrock":
+                logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
+            else:
+                logger.info("Generating recommendation drafts with mock analyzer")
+
+            drafts = []
             for untracked in violations:
                 draft = self.analyzer.analyze_resource(
                     untracked.resource,
                     untracked
                 )
-                if draft and draft.should_create_issue:
-                    issue_drafts.append(draft)
-                elif draft:
-                    logger.info(f"Skipping issue per Bedrock decision: {draft.title}")
+                if draft:
+                    drafts.append(draft)
 
-            # Create GitHub issues
-            dry_run = self.config.get('dry_run', False)
-            if dry_run:
-                logger.info("[DRY RUN] Would create issues for violations")
-
-            if issue_drafts:
-                logger.info("Creating GitHub issues...")
-                results = self.github.create_issues_batch(issue_drafts, dry_run)
-
-                logger.info(f"Issues created: {len(results['created'])}")
-                logger.info(f"Duplicates skipped: {len(results['duplicates'])}")
-                logger.info(f"Failed: {len(results['failed'])}")
-                issues_created = len(results['created'])
-            else:
-                logger.info("No actionable issue drafts returned by Bedrock")
-                issues_created = 0
-
-            return {
-                'analysis': analysis,
-                'violations': len(violations),
-                'issues_created': issues_created,
-                'report': report
-            }
+            recommendations_generated = len(drafts)
+            logger.info(f"Prepared {recommendations_generated} recommendation drafts")
 
         return {
             'analysis': analysis,
-            'violations': 0,
-            'issues_created': 0,
+            'violations': len(violations),
+            'recommendations_generated': recommendations_generated,
             'report': report
         }
 
@@ -179,7 +156,7 @@ def load_config() -> dict:
     # Load .env file if it exists
     env_path = Path('.env')
     if env_path.exists():
-        load_dotenv(override=True)
+        load_dotenv()
 
     tagging_rules_path = os.getenv('TAGGING_RULES')
     excluded_namespaces = []
@@ -203,13 +180,10 @@ def load_config() -> dict:
         'aws_role_arn': os.getenv('AWS_ROLE_ARN'),
         'aws_session_token': os.getenv('AWS_SESSION_TOKEN'),
         'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
-        'github_token': os.getenv('GITHUB_TOKEN'),
-        'github_repo': os.getenv('GITHUB_REPO'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
         'dry_run': os.getenv('DRY_RUN', 'false').lower() == 'true',
         'min_cost_threshold': float(os.getenv('MIN_COST_THRESHOLD', '1.0')),
         'use_mock': os.getenv('USE_MOCK', 'false').lower() == 'true',
-        'use_mock_github': os.getenv('USE_MOCK_GITHUB', 'false').lower() == 'true',
         'excluded_namespaces': excluded_namespaces,
     }
 
@@ -221,7 +195,6 @@ def main():
     parser.add_argument('--namespace', '-n', help='Target namespace')
     parser.add_argument('--dry-run', '-d', action='store_true', help='Dry run mode')
     parser.add_argument('--mock', '-m', action='store_true', help='Use mock analyzer')
-    parser.add_argument('--mock-github', action='store_true', help='Use mock GitHub client')
     parser.add_argument('--threshold', '-t', type=float, default=1.0, help='Minimum cost threshold')
     parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
 
@@ -245,10 +218,13 @@ def main():
         config['dry_run'] = True
     if args.mock:
         config['use_mock'] = True
-    if args.mock_github:
-        config['use_mock_github'] = True
     if args.threshold:
         config['min_cost_threshold'] = args.threshold
+
+    # Prefer Bedrock automatically when a profile ARN is configured.
+    # Section 04 can still force mock mode with --mock.
+    if not args.mock and config.get('bedrock_model_id'):
+        config['use_mock'] = False
 
     # Initialize and run agent
     agent = FinOpsAgent(config)
@@ -260,7 +236,7 @@ def main():
         results = agent.run_scan()
         logger.info("FinOps scan completed successfully")
         logger.info(f"Total untracked: ${results['analysis']['total_untracked']}/month")
-        logger.info(f"Issues created: {results['issues_created']}")
+        logger.info(f"Recommendation drafts prepared: {results['recommendations_generated']}")
     except Exception as e:
         logger.error(f"Scan failed: {e}", exc_info=True)
         sys.exit(1)

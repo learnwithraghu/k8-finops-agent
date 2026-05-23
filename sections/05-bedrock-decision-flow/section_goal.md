@@ -1,10 +1,11 @@
 # Section 05 Goal: Bedrock Decision Flow
 
 ## Goal
-Enhance the local agent with Bedrock so the report becomes clearer, more contextual, and more decision-oriented.
+Enhance the local agent with Bedrock so the report becomes cleaner, more contextual, and more decision-oriented.
 
 ## Scope
 - Add Bedrock integration
+- Use an Inference Profile ARN as the Bedrock `modelId`
 - Feed scan results into a prompt
 - Improve the report with AI-guided structure and recommendations
 - Compare raw output vs Bedrock output

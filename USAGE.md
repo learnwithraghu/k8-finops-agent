@@ -66,8 +66,6 @@ AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
 AWS_SESSION_TOKEN=
 AWS_REGION=us-east-1
-GITHUB_TOKEN=...
-GITHUB_REPO=your-org/tech-debt
 INSTANCE_TYPE=t2.medium
 AWS_PRICING_REGION=us-east-1
 KUBECONFIG_PATH=~/.kube/config
@@ -290,7 +288,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Run agent locally
-python -m agent.main --mock --mock-github
+python -m agent.main --mock
 ```
 
 ### Run Tests
