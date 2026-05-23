@@ -11,6 +11,7 @@ This repo is organized as a teaching flow under `sections/`.
 6. Issue tracker service
 7. Agent to tracker integration
 8. Kubernetes-native agent
+9. Simple agent example
 
 Start with `sections/README.md` and the matching `section_goal.md` files.
 
