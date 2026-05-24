@@ -1,0 +1,34 @@
+# EC2 instance pricing (on-demand, us-east-1)
+# Prices as of 2024 - update as needed
+
+ec2:
+  t2.medium:
+    hourly_usd: 0.0464
+    vcpu: 2
+    memory_gb: 4
+    # Monthly cost: 0.0464 * 730 = ~$33.87/month
+
+# EBS storage pricing
+storage:
+  gp3:
+    gb_per_month_usd: 0.08
+  gp2:
+    gb_per_month_usd: 0.10
+
+# Cost allocation settings
+allocation:
+  # How to distribute costs when resource lacks tags
+  default_cost_center: "unallocated"
+  default_owner: "unknown"
+
+  # Untracked money thresholds
+  warning_threshold_usd: 10.0    # Warn if untracked > $10/month
+  critical_threshold_usd: 50.0   # Critical if untracked > $50/month
+
+# Calculation constants
+constants:
+  hours_per_month: 730
+  # t2.medium has 2 vCPUs = 2000 millicores
+  total_millicores: 2000
+  # t2.medium has 4GB = 4096 Mi
+  total_memory_mi: 4096

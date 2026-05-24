@@ -126,7 +126,6 @@ parser.add_argument('--log-level', '-l', ...)
 - `AWS_REGION`
 - `GITHUB_TOKEN`
 - `GITHUB_REPO`
-- `INSTANCE_TYPE`
 - `KUBECONFIG_PATH`
 - `TARGET_NAMESPACE`
 - `LOG_LEVEL`
@@ -135,8 +134,6 @@ parser.add_argument('--log-level', '-l', ...)
 - `BEDROCK_MODEL_ID`
 - `BEDROCK_MAX_TOKENS`
 - `BEDROCK_TEMPERATURE`
-- `USE_MOCK`
-- `USE_MOCK_GITHUB`
 
 ### Key Files to Reference
 - `agent/main.py` - CLI arguments and entry point

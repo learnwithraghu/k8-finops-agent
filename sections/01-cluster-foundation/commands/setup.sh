@@ -366,7 +366,7 @@ print_next_steps() {
     echo -e "   ${YELLOW}docker run --rm -v ~/.kube/config:/home/finops/.kube/config:ro --env-file .env k8-finops-agent:latest${NC}"
     echo ""
     echo "5. Or run in mock mode:"
-    echo -e "   ${YELLOW}docker run --rm -v ~/.kube/config:/home/finops/.kube/config:ro -e USE_MOCK=true -e USE_MOCK_GITHUB=true k8-finops-agent:latest${NC}"
+    echo -e "   ${YELLOW}docker run --rm -v ~/.kube/config:/home/finops/.kube/config:ro --env-file .env k8-finops-agent:latest --mock${NC}"
     echo ""
     echo "For the full lesson, use: sections/01-cluster-foundation/guide.md"
 }
@@ -488,7 +488,7 @@ main() {
         echo ""
         print_header "Mock Mode Enabled"
         echo "To run without AWS/GitHub credentials:"
-        echo -e "   ${YELLOW}docker run --rm -v ~/.kube/config:/home/finops/.kube/config:ro -e USE_MOCK=true -e USE_MOCK_GITHUB=true k8-finops-agent:latest${NC}"
+        echo -e "   ${YELLOW}docker run --rm -v ~/.kube/config:/home/finops/.kube/config:ro --env-file .env k8-finops-agent:latest --mock${NC}"
     fi
 }
 

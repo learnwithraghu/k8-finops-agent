@@ -1,0 +1,79 @@
+# Tagging Rules Configuration
+# Airline booking context tagging standards
+
+# Required tags that must be present on all resources
+required_tags:
+  - owner
+  - environment
+  - cost-center
+  - application
+  - tier
+
+# Alternative Kubernetes label keys (checked in addition to above)
+label_mappings:
+  owner:
+    - app.kubernetes.io/owner
+    - owner
+  environment:
+    - app.kubernetes.io/env
+    - environment
+    - env
+  cost-center:
+    - app.kubernetes.io/cost-center
+    - cost-center
+    - costcenter
+  application:
+    - app.kubernetes.io/name
+    - app
+    - application
+  tier:
+    - app.kubernetes.io/tier
+    - tier
+  compliance:
+    - compliance-level
+    - compliance
+
+# Airline booking context cost centers
+cost_centers:
+  - booking-engine      # Core booking logic
+  - payment             # Payment processing
+  - inventory           # Flight/hotel inventory
+  - customer-service    # Support tools
+  - analytics           # Data/analytics
+  - platform            # Shared infrastructure
+
+# Valid environments
+environments:
+  - dev
+  - staging
+  - prod
+
+# Valid tiers
+tiers:
+  - frontend
+  - backend
+  - database
+  - cache
+  - messaging
+
+# Compliance levels
+compliance_levels:
+  - pci-dss      # Payment Card Industry
+  - sox          # Sarbanes-Oxley
+  - standard     # No special compliance
+
+# Resource types to scan
+resource_types:
+  - Deployment
+  - Service
+  - ConfigMap
+  - PersistentVolumeClaim
+  - Ingress
+  - Pod
+
+# Namespaces to exclude from scanning (system namespaces)
+excluded_namespaces:
+  - kube-system
+  - kube-public
+  - kube-node-lease
+  - local-path-storage

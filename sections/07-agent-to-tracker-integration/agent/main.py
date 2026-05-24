@@ -105,28 +105,25 @@ class FinOpsAgent:
         self.calculator = CostCalculator(self.config.get("pricing_config"))
         self.detector = UntrackedMoneyDetector(self.calculator, self.config.get("tagging_rules"))
 
-        use_mock = self.config.get("use_mock", False)
-        if use_mock:
+        force_mock = self.config.get("force_mock", False)
+        if force_mock:
             self.analyzer = MockAnalyzer()
             self.analyzer_mode = "mock"
-            logger.info("Using mock analyzer")
+            logger.info("Using mock analyzer (--mock flag)")
         else:
             self.analyzer = BedrockAnalyzer(
                 model_id=self.config.get("bedrock_model_id"),
                 region=self.config.get("aws_region", "us-east-1"),
-                role_arn=self.config.get("aws_role_arn"),
-                session_token=self.config.get("aws_session_token"),
                 max_tokens=self.config.get("bedrock_max_tokens", 1024),
                 temperature=self.config.get("bedrock_temperature", 0.3),
                 tagging_rules=getattr(self.detector, "rules", {}),
             )
-
-        if not self.analyzer.connect():
-            logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
-            self.analyzer = MockAnalyzer()
-            self.analyzer_mode = "mock-fallback"
-        elif not use_mock:
-            self.analyzer_mode = "bedrock"
+            if self.analyzer.connect():
+                self.analyzer_mode = "bedrock"
+            else:
+                logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
+                self.analyzer = MockAnalyzer()
+                self.analyzer_mode = "mock-fallback"
 
         self.tracker = IssueTrackerClient(
             base_url=self.config.get("issue_tracker_url", "http://localhost:8085"),
@@ -233,15 +230,12 @@ def load_config() -> dict:
         "bedrock_model_id": os.getenv("BEDROCK_MODEL_ID"),
         "bedrock_max_tokens": int(os.getenv("BEDROCK_MAX_TOKENS", "1024")),
         "bedrock_temperature": float(os.getenv("BEDROCK_TEMPERATURE", "0.3")),
-        "aws_role_arn": os.getenv("AWS_ROLE_ARN"),
-        "aws_session_token": os.getenv("AWS_SESSION_TOKEN"),
         "aws_region": os.getenv("AWS_REGION", "us-east-1"),
         "issue_tracker_url": os.getenv("ISSUE_TRACKER_URL", "http://localhost:8085"),
         "issue_tracker_timeout": int(os.getenv("ISSUE_TRACKER_TIMEOUT", "10")),
         "log_level": os.getenv("LOG_LEVEL", "INFO"),
         "dry_run": os.getenv("DRY_RUN", "false").lower() == "true",
         "min_cost_threshold": float(os.getenv("MIN_COST_THRESHOLD", "1.0")),
-        "use_mock": os.getenv("USE_MOCK", "false").lower() == "true",
         "excluded_namespaces": [],
     }
 
@@ -271,14 +265,11 @@ def main() -> None:
     if args.dry_run:
         config["dry_run"] = True
     if args.mock:
-        config["use_mock"] = True
+        config["force_mock"] = True
     if args.threshold:
         config["min_cost_threshold"] = args.threshold
     if args.issue_tracker_url:
         config["issue_tracker_url"] = args.issue_tracker_url
-
-    if not args.mock and config.get("bedrock_model_id"):
-        config["use_mock"] = False
 
     agent = FinOpsAgent(config)
     if not agent.initialize():

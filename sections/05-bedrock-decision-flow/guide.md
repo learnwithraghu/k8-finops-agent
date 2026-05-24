@@ -22,13 +22,23 @@ You should already have:
 - a working Kind cluster
 - the airline app deployed
 - the local agent working in mock mode
+- an AWS account with Bedrock access
 
-## Where the Bedrock changes live
-- `sections/05-bedrock-decision-flow/agent-changes/`
+Bedrock uses your AWS credentials. Configure them with:
+```bash
+aws configure
+```
+
+This writes to `~/.aws/credentials` and `~/.aws/config`. The agent picks them up automatically — no access keys go in `.env`.
+
+## Where the agent code lives
+- `sections/05-bedrock-decision-flow/agent/`
+
+This is the same scanner, calculator, and detector from Section 04, now with the Bedrock analyzer wired in.
 
 ## Step 1: Read the Bedrock analyzer
 ```bash
-cat sections/05-bedrock-decision-flow/agent-changes/analyzer.py
+cat sections/05-bedrock-decision-flow/agent/analyzer.py
 ```
 
 What to look for:
@@ -37,17 +47,7 @@ What to look for:
 - the fallback path when Bedrock is unavailable
 - the `modelId` value being passed into Bedrock
 
-## Step 2: Read the section notes
-```bash
-cat sections/05-bedrock-decision-flow/agent-changes/README.md
-```
-
-What to look for:
-- this folder only contains Bedrock-specific changes
-- no issue tracker or Kubernetes deployment belongs here
-- the tracker comes later in Section 06
-
-## Step 3: Set the Bedrock profile in `.env`
+## Step 2: Set the Bedrock profile in `.env`
 Open the environment file:
 ```bash
 nano .env
@@ -55,26 +55,26 @@ nano .env
 
 What to look for:
 - set `BEDROCK_MODEL_ID` to your **Inference Profile ARN**
-- keep `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-- use `AWS_SESSION_TOKEN` only if your credentials are temporary
-- Bedrock needs real AWS credentials, not placeholders
+- only `BEDROCK_MODEL_ID`, `BEDROCK_MAX_TOKENS`, and `BEDROCK_TEMPERATURE` are needed
+- AWS credentials are picked up automatically from `aws configure` / `~/.aws/credentials`
+- no access keys or session tokens belong in `.env`
 
 Example:
 ```env
 BEDROCK_MODEL_ID=arn:aws:bedrock:us-east-1:123456789012:inference-profile/example
 ```
 
-## Step 4: Confirm the environment values
+## Step 3: Confirm the environment values
 ```bash
-grep -nE '^(BEDROCK_MODEL_ID|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|AWS_SESSION_TOKEN|AWS_REGION)=' .env
+grep -nE '^(BEDROCK_MODEL_ID|BEDROCK_MAX_TOKENS|BEDROCK_TEMPERATURE|AWS_REGION)=' .env
 ```
 
 What to look for:
 - the profile ARN should be in `BEDROCK_MODEL_ID`
-- no bearer token is needed
-- AWS credentials should already be present
+- no bearer token, access key, or secret key is needed
+- AWS credentials come from your configured profile (`aws configure`)
 
-## Step 5: Look at the plain local report
+## Step 4: Look at the plain local report
 Use the Section 04 run as your baseline.
 
 What to look for:
@@ -82,9 +82,9 @@ What to look for:
 - it lists findings, but does not decide what matters most
 - this is the gap Bedrock will help close
 
-## Step 6: Run the agent with Bedrock enabled
+## Step 5: Run the agent with Bedrock enabled
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --log-level INFO
+PYTHONPATH=sections/05-bedrock-decision-flow python -m agent.main --log-level INFO
 ```
 
 What to look for:
@@ -95,7 +95,7 @@ What to look for:
 - no issue tracker is involved yet
 - if Bedrock fails, check the AWS credentials and profile ARN first
 
-## Step 7: Read the Bedrock output
+## Step 6: Read the Bedrock output
 What to look for:
 - the report should feel cleaner and more decision-oriented
 - the reasoning should be easier to present to a team
@@ -104,7 +104,7 @@ What to look for:
 - this is the handoff point: the next step is tracking, not more scanning
 
 ## What to notice
-- AWS access keys are enough for Bedrock auth
+- credentials are picked up from `aws configure` / `~/.aws/credentials` — no access keys in `.env`
 - the inference profile ARN is used in place of a model id value
 - no bearer token is involved
 - the same scan data can produce a cleaner decision layer

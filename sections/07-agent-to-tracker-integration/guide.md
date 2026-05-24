@@ -58,7 +58,7 @@ What to look for:
 
 ## Step 3: Run the agent with Bedrock enabled
 ```bash
-PYTHONPATH=sections/04-local-python-agent python sections/07-agent-to-tracker-integration/agent/main.py --log-level INFO
+PYTHONPATH=sections/07-agent-to-tracker-integration python sections/07-agent-to-tracker-integration/agent/main.py --log-level INFO
 ```
 
 What to look for:
@@ -69,7 +69,7 @@ What to look for:
 
 ## Step 4: Use mock mode if you want a local-only demo
 ```bash
-PYTHONPATH=sections/04-local-python-agent python sections/07-agent-to-tracker-integration/agent/main.py --mock --log-level INFO
+PYTHONPATH=sections/07-agent-to-tracker-integration python sections/07-agent-to-tracker-integration/agent/main.py --mock --log-level INFO
 ```
 
 What to look for:

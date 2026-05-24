@@ -47,16 +47,12 @@ class BedrockAnalyzer:
         self,
         model_id: Optional[str] = None,
         region: Optional[str] = None,
-        role_arn: Optional[str] = None,
-        session_token: Optional[str] = None,
         max_tokens: int = 1024,
         temperature: float = 0.3,
         tagging_rules: Optional[Dict[str, Any]] = None,
     ):
         self.model_id = model_id or "anthropic.claude-3-5-haiku-20241022-v1:0"
         self.region = region or "us-east-1"
-        self.role_arn = role_arn
-        self.session_token = session_token
         self.max_tokens = max_tokens
         self.temperature = temperature
         self.tagging_rules = tagging_rules or {}
@@ -64,31 +60,12 @@ class BedrockAnalyzer:
         self._connected = False
 
     def connect(self) -> bool:
-        """Connect to AWS Bedrock (optionally by assuming a role)."""
+        """Connect to AWS Bedrock using default credential chain (aws configure / ~/.aws/credentials)."""
         try:
-            session_kwargs = {"region_name": self.region}
-            if self.session_token:
-                session_kwargs["aws_session_token"] = self.session_token
-
-            session = boto3.Session(**session_kwargs)
-
-            if self.role_arn:
-                sts = session.client("sts")
-                assumed = sts.assume_role(
-                    RoleArn=self.role_arn,
-                    RoleSessionName="k8-finops-agent"
-                )["Credentials"]
-                session = boto3.Session(
-                    aws_access_key_id=assumed["AccessKeyId"],
-                    aws_secret_access_key=assumed["SecretAccessKey"],
-                    aws_session_token=assumed["SessionToken"],
-                    region_name=self.region,
-                )
-                logger.info(f"Assumed role for Bedrock access: {self.role_arn}")
-
+            session = boto3.Session(region_name=self.region)
             self.bedrock_runtime = session.client("bedrock-runtime", region_name=self.region)
             self._connected = True
-            logger.info(f"Connected to AWS Bedrock ({self.model_id})")
+            logger.info(f"Connected to AWS Bedrock using inference profile ARN: {self.model_id}")
             return True
         except Exception as e:
             logger.error(f"Failed to connect to Bedrock: {e}")
@@ -96,6 +73,9 @@ class BedrockAnalyzer:
 
     def _build_prompt(self, resource: K8sResource, untracked: UntrackedMoney) -> str:
         """Build prompt for AI issue drafting."""
+        logger.info(
+            f"Sending resource to Bedrock: {resource.namespace}/{resource.name} ({resource.kind})"
+        )
         return f"""You are a FinOps agent for a Kubernetes-based airline platform.
 
 Review the following resource and produce a GitHub issue draft.
@@ -297,7 +277,7 @@ Rules:
 
     def generate_summary_report(self, untracked_analysis: Dict[str, Any]) -> str:
         """Generate a human-readable summary report."""
-        report = f"""# FinOps Analysis Report
+        report = f"""# FinOps Analysis Report (LLM Powered - Mock)
 
 ## Cost Summary
 - **Total Monthly Cost**: ${untracked_analysis['total_monthly_cost']}
@@ -420,7 +400,7 @@ class MockAnalyzer:
         }
 
     def generate_summary_report(self, untracked_analysis: Dict[str, Any]) -> str:
-        report = f"""# FinOps Analysis Report (Mock Mode)
+        report = f"""# FinOps Analysis Report (LLM Powered - Bedrock)
 
 ## Cost Summary
 - **Total Monthly Cost**: ${untracked_analysis['total_monthly_cost']}

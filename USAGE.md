@@ -62,21 +62,16 @@ nano .env
 
 **Common variables in `.env`:**
 ```bash
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-AWS_SESSION_TOKEN=
 AWS_REGION=us-east-1
-INSTANCE_TYPE=t2.medium
-AWS_PRICING_REGION=us-east-1
 KUBECONFIG_PATH=~/.kube/config
 PRICING_CONFIG=sections/04-local-python-agent/config/pricing.yaml
 TAGGING_RULES=sections/04-local-python-agent/config/tagging-rules.yaml
+BEDROCK_MODEL_ID=anthropic.claude-3-5-haiku-20241022-v1:0
 BEDROCK_MAX_TOKENS=1024
 BEDROCK_TEMPERATURE=0.3
 LOG_LEVEL=DEBUG
 DRY_RUN=true
-USE_MOCK=true
-USE_MOCK_GITHUB=true
+MIN_COST_THRESHOLD=1.0
 ```
 
 ## Step 3: Create a Kind Cluster
@@ -137,15 +132,15 @@ docker run --rm \
   k8-finops-agent:latest
 ```
 
-### Option B: Run in Mock Mode (no AWS/GitHub required)
+### Option B: Run in Mock Mode (no AWS required)
 
 ```bash
-# Run with mock analyzer and mock GitHub client
+# Run with mock analyzer using --mock flag
 docker run --rm \
   -v ~/.kube/config:/home/finops/.kube/config:ro \
-  -e USE_MOCK=true \
-  -e USE_MOCK_GITHUB=true \
-  k8-finops-agent:latest
+  --env-file .env \
+  k8-finops-agent:latest \
+  --mock
 ```
 
 ### Option C: Dry Run (scan only, no issues created)
