@@ -77,6 +77,49 @@ function closeDrawer() {
   issueDrawerEl.setAttribute('aria-hidden', 'true');
 }
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(text));
+  return div.innerHTML;
+}
+
+function renderMarkdown(text) {
+  if (!text) return '';
+  let html = escapeHtml(text);
+
+  html = html.replace(/^### (.+)$/gm, '<h4 class="jira-h4">$1</h4>');
+  html = html.replace(/^## (.+)$/gm, '<h3 class="jira-h3">$1</h3>');
+
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/`([^`]+)`/g, '<code class="jira-code">$1</code>');
+
+  html = html.replace(/^- (.+)$/gm, '<li class="jira-li">$1</li>');
+  html = html.replace(/^\d+\. (.+)$/gm, '<li class="jira-li">$1</li>');
+
+  html = html.replace(/(<li class="jira-li">.*?<\/li>(\s|$))+/gs, (match) => {
+    return '<ul class="jira-list">' + match + '</ul>';
+  });
+
+  html = html.replace(/^-{3,}$/gm, '<hr class="jira-hr" />');
+
+  html = html.replace(/\n\n/g, '</p><p class="jira-p">');
+  html = html.replace(/\n/g, '<br />');
+
+  html = '<p class="jira-p">' + html + '</p>';
+
+  html = html.replace(/<p class="jira-p"><\/p>/g, '');
+
+  const listRE = /(<ul class="jira-list">(?:\s|.)*?<\/ul>)/g;
+  html = html.replace(listRE, (match) => {
+    const cleaned = match
+      .replace(/<br \/>/g, '')
+      .replace(/<\/p><p class="jira-p">/g, '');
+    return cleaned;
+  });
+
+  return html;
+}
+
 function renderIssueDetails(issue) {
   if (!issue) {
     selectedLabelEl.textContent = 'Select a ticket';
@@ -87,18 +130,74 @@ function renderIssueDetails(issue) {
   }
 
   openDrawer();
-  selectedLabelEl.textContent = `${issue.key} • ${issue.status}`;
+  selectedLabelEl.textContent = `${issue.key}`;
+
+  const costStr = `$${Number(issue.cost_impact || 0).toFixed(2)}/mo`;
+  const labels = (issue.labels && issue.labels.length) ? issue.labels : [];
+
   selectedIssueEl.innerHTML = `
-    <div class="detail-view">
-      <div class="detail-row"><strong>Title</strong><span>${issue.title}</span></div>
-      <div class="detail-row"><strong>Summary</strong><span>${issue.summary || '-'}</span></div>
-      <div class="detail-row"><strong>Body</strong><span>${issue.body || '-'}</span></div>
-      <div class="detail-row"><strong>Namespace</strong><span>${issue.namespace || '-'}</span></div>
-      <div class="detail-row"><strong>Resource</strong><span>${issue.resource_kind || '-'} / ${issue.resource_name || '-'}</span></div>
-      <div class="detail-row"><strong>Priority</strong><span>${issue.priority}</span></div>
-      <div class="detail-row"><strong>Owner</strong><span>${issue.suggested_owner || '-'}</span></div>
-      <div class="detail-row"><strong>Assignee</strong><span>${issue.assignee || '-'}</span></div>
-      <div class="detail-row"><strong>Reasoning</strong><span>${issue.reasoning || '-'}</span></div>
+    <div class="jira-ticket">
+      <div class="jira-badges">
+        <span class="jira-status status-${issue.status}">${issue.status.replace('_', ' ')}</span>
+        ${chip(issue.priority, `priority-${issue.priority}`)}
+        ${chip(costStr)}
+      </div>
+
+      <h2 class="jira-title">${issue.title}</h2>
+
+      <div class="jira-body">
+        <div class="jira-description">
+          <div class="jira-section-label">Description</div>
+          <div class="jira-description-body">${renderMarkdown(issue.body || issue.summary || '—')}</div>
+        </div>
+
+        <aside class="jira-sidebar">
+          <div class="jira-field-group">
+            <div class="jira-field">
+              <span class="jira-field-label">Status</span>
+              <span class="jira-field-value">${issue.status.replace('_', ' ')}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Priority</span>
+              <span class="jira-field-value">${issue.priority}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Assignee</span>
+              <span class="jira-field-value">${issue.assignee || 'Unassigned'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Suggested Owner</span>
+              <span class="jira-field-value">${issue.suggested_owner || '—'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Cost Center</span>
+              <span class="jira-field-value">${issue.suggested_cost_center || '—'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Category</span>
+              <span class="jira-field-value">${issue.category || '—'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Namespace</span>
+              <span class="jira-field-value">${issue.namespace || '—'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Resource</span>
+              <span class="jira-field-value">${issue.resource_kind || '—'} / ${issue.resource_name || '—'}</span>
+            </div>
+            <div class="jira-field">
+              <span class="jira-field-label">Source</span>
+              <span class="jira-field-value">${issue.source || '—'}</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      ${labels.length ? `
+      <div class="jira-labels-section">
+        <span class="jira-section-label">Labels</span>
+        <div class="jira-labels">${labels.map(l => `<span class="jira-label">${escapeHtml(l)}</span>`).join('')}</div>
+      </div>` : ''}
     </div>
   `;
 
