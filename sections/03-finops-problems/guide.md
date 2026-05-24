@@ -20,11 +20,11 @@ Complete Sections 01 and 02 first.
 You should already have:
 - a working Kind cluster
 - the airline app deployed
-- the four namespaces from Section 01
+- the five namespaces: `booking-api`, `flight-search`, `inventory`, `payment`, `airline`
+- the problem resources (orphaned PVC, untracked ConfigMap) already in the cluster from Section 02
 
 ## Where the problem data lives
 - Tagging rules: `sections/03-finops-problems/examples/tagging-rules.yaml`
-- Orphaned resources: `sections/03-finops-problems/manifests/orphaned-resources/`
 
 ## Step 1: Read the tagging rules
 ```bash
@@ -116,56 +116,7 @@ What to look for:
 - it should be easier to trace back to a team
 - this is another FinOps gap
 
-## Step 10: Create a demo namespace for orphaned storage
-```bash
-kubectl create namespace airline
-```
-
-What to look for:
-- this namespace is only for the problem demo
-- it helps you show resources that exist without a real owner
-
-## Step 11: Apply the orphaned PVC
-```bash
-kubectl apply -f sections/03-finops-problems/manifests/orphaned-resources/orphaned-pvc.yaml
-```
-
-What to look for:
-- the PVC is intentionally not tied to an app
-- it represents wasted or suspicious storage
-- this is the kind of thing a scan should flag
-
-## Step 12: Apply the untracked ConfigMap
-```bash
-kubectl apply -f sections/03-finops-problems/manifests/orphaned-resources/untracked-configmap.yaml
-```
-
-What to look for:
-- it lives in `default`
-- it has no labels
-- it is easy to miss during manual reviews
-
-## Step 13: Verify the orphaned PVC
-```bash
-kubectl get pvc -n airline
-```
-
-What to look for:
-- the PVC exists
-- nothing in the app owns it
-- it should feel suspicious now that you know the app layout
-
-## Step 14: Verify the untracked ConfigMap
-```bash
-kubectl get configmap -n default untracked-config
-```
-
-What to look for:
-- the resource exists in the default namespace
-- there are no labels to help identify ownership
-- this is a classic “hidden tech debt” example
-
-## Step 15: Scan deployments for label gaps
+## Step 10: Scan deployments for label gaps
 ```bash
 kubectl get deployments -A --show-labels
 ```
@@ -175,7 +126,7 @@ What to look for:
 - notice how inconsistent the metadata is
 - this is where large clusters become hard to manage
 
-## Step 16: Scan services for label gaps
+## Step 11: Scan services for label gaps
 ```bash
 kubectl get services -A --show-labels
 ```
@@ -185,7 +136,7 @@ What to look for:
 - service metadata often gets overlooked
 - ownership gaps are easier to see across the whole cluster
 
-## Step 17: Scan PVCs
+## Step 12: Scan PVCs
 ```bash
 kubectl get pvc -A
 ```
@@ -195,7 +146,7 @@ What to look for:
 - check which claims look suspicious or incomplete
 - orphaned storage is a cost problem and an audit problem
 
-## Step 18: Scan ConfigMaps
+## Step 13: Scan ConfigMaps
 ```bash
 kubectl get configmaps -A --show-labels
 ```

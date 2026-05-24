@@ -108,7 +108,12 @@ kubectl create namespace inventory
 kubectl create namespace payment
 ```
 
-### 14) Verify namespaces
+### 14) Create the airline namespace
+```bash
+kubectl create namespace airline
+```
+
+### 15) Verify namespaces
 ```bash
 kubectl get namespaces
 ```
@@ -116,12 +121,12 @@ kubectl get namespaces
 ## Final validation
 Run these checks at the end of the section.
 
-### 15) Confirm kubectl access works
+### 16) Confirm kubectl access works
 ```bash
 kubectl auth can-i get pods -A
 ```
 
-### 16) Confirm there are no app workloads yet
+### 17) Confirm there are no app workloads yet
 ```bash
 kubectl get pods -A
 ```
@@ -130,7 +135,7 @@ kubectl get pods -A
 You should have:
 - one Kind cluster: `finops-cluster`
 - working `kubectl cluster-info`
-- these namespaces: `booking-api`, `flight-search`, `inventory`, `payment`
+- these namespaces: `booking-api`, `flight-search`, `inventory`, `payment`, `airline`
 - no app deployments yet
 
 ## Handoff to Section 02

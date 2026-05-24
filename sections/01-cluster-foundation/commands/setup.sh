@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 CLUSTER_NAME="finops-cluster"
-NAMESPACES=("booking-api" "flight-search" "inventory" "payment")
+NAMESPACES=("booking-api" "flight-search" "inventory" "payment" "airline")
 IMAGE_NAME="k8-finops-agent"
 
 # Helper functions

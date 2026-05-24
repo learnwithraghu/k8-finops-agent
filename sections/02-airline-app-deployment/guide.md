@@ -18,11 +18,12 @@ Complete Section 01 first.
 You should already have:
 - a working Kind cluster
 - kubectl access
-- the four namespaces created in Section 01:
+- the five namespaces created in Section 01:
   - `booking-api`
   - `flight-search`
   - `inventory`
   - `payment`
+  - `airline`
 
 ## What gets deployed
 The airline app contains:
@@ -55,14 +56,18 @@ Then inspect the Kustomize file:
 cat sections/02-airline-app-deployment/manifests/airline-k8-deployment/kustomization.yaml
 ```
 
-## Step 2: Deploy the app
-Apply the whole app at once:
+## Step 2: Create the airline namespace and deploy the app
+First, create the namespace for problem-demo resources:
+```bash
+kubectl create namespace airline
+```
 
+Then apply the whole app at once:
 ```bash
 kubectl apply -k sections/02-airline-app-deployment/manifests/airline-k8-deployment/
 ```
 
-Kustomize will apply each service into its own namespace.
+Kustomize will apply each service into its own namespace, plus the problem resources (orphaned PVC, untracked ConfigMap) that Section 03 will inspect.
 
 ## Step 3: Verify one namespace
 ```bash

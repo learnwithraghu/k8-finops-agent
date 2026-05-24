@@ -6,3 +6,4 @@ resources:
   - booking-api
   - payment-processor
   - inventory-service
+  - problem-resources
