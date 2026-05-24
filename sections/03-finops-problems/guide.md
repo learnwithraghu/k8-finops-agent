@@ -116,7 +116,18 @@ What to look for:
 - it should be easier to trace back to a team
 - this is another FinOps gap
 
-## Step 10: Scan deployments for label gaps
+## Step 10: Inspect the analytics service in the default namespace
+```bash
+kubectl get deployment analytics-collector -n default -o yaml
+```
+
+What to look for:
+- the service lives in `default` — no namespace isolation at all
+- no labels like `owner`, `cost-center`, `environment`, or `tier`
+- this is completely invisible to any team-based cost tracking
+- common in real clusters: teams deploy quickly and never create a namespace
+
+## Step 11: Scan deployments for label gaps
 ```bash
 kubectl get deployments -A --show-labels
 ```
@@ -126,7 +137,7 @@ What to look for:
 - notice how inconsistent the metadata is
 - this is where large clusters become hard to manage
 
-## Step 11: Scan services for label gaps
+## Step 12: Scan services for label gaps
 ```bash
 kubectl get services -A --show-labels
 ```
@@ -136,7 +147,7 @@ What to look for:
 - service metadata often gets overlooked
 - ownership gaps are easier to see across the whole cluster
 
-## Step 12: Scan PVCs
+## Step 13: Scan PVCs
 ```bash
 kubectl get pvc -A
 ```
@@ -146,7 +157,7 @@ What to look for:
 - check which claims look suspicious or incomplete
 - orphaned storage is a cost problem and an audit problem
 
-## Step 13: Scan ConfigMaps
+## Step 14: Scan ConfigMaps
 ```bash
 kubectl get configmaps -A --show-labels
 ```
@@ -163,15 +174,16 @@ What to look for:
 - `inventory` is the closest to a good baseline
 - the `airline` PVC has no workload consuming it
 - the `default` ConfigMap is untracked and easy to miss
+- `analytics-collector` in `default` has no ownership labels — completely invisible to FinOps
 
 This is the kind of drift an agent should detect and turn into a tech-debt Jira issue later.
 
 ## Expected outcome
 You should be able to point to:
-- one reasonably tagged workload
-- one poorly tagged workload
+- one reasonably tagged workload (inventory)
+- one poorly tagged workload (flight-search, payment)
 - one orphaned resource
-- one untracked resource in the default namespace
+- an untracked resource in the default namespace
 
 ## Handoff to Section 04
 Once the problem is clear, move to:

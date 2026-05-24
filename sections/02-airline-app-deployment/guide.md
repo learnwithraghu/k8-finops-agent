@@ -31,6 +31,7 @@ The airline app contains:
 - `booking-api` in namespace `booking-api`
 - `payment-processor` in namespace `payment`
 - `inventory-service` in namespace `inventory`
+- `analytics-collector` in namespace `default` (commonly seen in real clusters — teams skip namespace creation, and services end up in `default` with no ownership metadata)
 
 Each service has:
 - a Deployment
@@ -67,21 +68,32 @@ Then apply the whole app at once:
 kubectl apply -k sections/02-airline-app-deployment/manifests/airline-k8-deployment/
 ```
 
-Kustomize will apply each service into its own namespace, plus the problem resources (orphaned PVC, untracked ConfigMap) that Section 03 will inspect.
+Kustomize will apply each service into its own namespace, plus the problem resources (orphaned PVC, untracked ConfigMap) and the analytics-collector in `default` namespace — all of which Section 03 will inspect.
 
-## Step 3: Verify one namespace
+## Step 3: Check the default namespace
+The analytics-collector landed in `default` because no dedicated namespace was set. This happens often in real clusters:
+```bash
+kubectl get all -n default
+```
+
+What to look for:
+- analytics-collector is mixed with Kubernetes system pods
+- no ownership metadata or cost-center labels
+- this is the kind of drift that makes FinOps hard
+
+## Step 4: Verify one namespace
 ```bash
 kubectl get namespace booking-api
 kubectl get all -n booking-api
 ```
 
-## Step 4: Verify a different namespace
+## Step 5: Verify a different namespace
 ```bash
 kubectl get namespace flight-search
 kubectl get all -n flight-search
 ```
 
-## Step 5: Inspect other resource types in different namespaces
+## Step 6: Inspect other resource types in different namespaces
 ### Deployments
 ```bash
 kubectl get deployments -n booking-api
@@ -107,7 +119,7 @@ kubectl get configmaps -n payment
 kubectl get pvc -n booking-api
 ```
 
-## Step 6: Describe a workload
+## Step 7: Describe a workload
 Pick one service and inspect it fully:
 
 ```bash
@@ -121,19 +133,19 @@ kubectl get pods -n flight-search
 kubectl describe pod -n flight-search <pod-name>
 ```
 
-## Step 7: Check logs
+## Step 8: Check logs
 ```bash
 kubectl logs -n flight-search deploy/flight-search-service
 ```
 
-## Step 8: Exec into a running container
+## Step 9: Exec into a running container
 If the image supports shell access:
 
 ```bash
 kubectl exec -it -n flight-search deploy/flight-search-service -- sh
 ```
 
-## Step 9: Inspect the YAML for learning
+## Step 10: Inspect the YAML for learning
 ```bash
 kubectl get deployment flight-search-service -n flight-search -o yaml
 kubectl get service flight-search-service -n flight-search -o yaml
