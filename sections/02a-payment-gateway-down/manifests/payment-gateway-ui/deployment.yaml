@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-gateway
+  namespace: payment
+  labels:
+    app: payment-gateway
+    # Intentionally missing: owner, team, cost-center, tier, environment
+    # This is the point — no one knows who to call when this breaks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-gateway
+  template:
+    metadata:
+      labels:
+        app: payment-gateway
+    spec:
+      containers:
+        - name: payment-gateway
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          volumeMounts:
+            - name: ui-config
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+            - name: ui-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: ui-config
+          configMap:
+            name: payment-gateway-ui-config

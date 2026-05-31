@@ -1,0 +1,955 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-gateway-ui-config
+  namespace: payment
+  labels:
+    app: payment-gateway
+    # Intentionally missing: owner, team, cost-center, tier, environment
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        sendfile on;
+        keepalive_timeout 65;
+
+        server {
+            listen 80;
+            server_name _;
+
+            location / {
+                root /usr/share/nginx/html;
+                index index.html;
+            }
+
+            location /api/ {
+                proxy_pass http://payment-gateway-api:8080/;
+                proxy_connect_timeout 5s;
+                proxy_read_timeout 5s;
+                proxy_send_timeout 5s;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+            }
+        }
+    }
+
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AirPay — Secure Payment Gateway</title>
+        <meta name="description" content="Complete your flight booking payment securely with AirPay">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+            :root {
+                --purple:        #7c3aed;
+                --purple-mid:    #9333ea;
+                --blue:          #2563eb;
+                --blue-light:    #3b82f6;
+                --bg-base:       #06091a;
+                --bg-card:       rgba(255,255,255,0.04);
+                --border:        rgba(255,255,255,0.08);
+                --border-focus:  rgba(124,58,237,0.6);
+                --text-1:        #f1f5f9;
+                --text-2:        #94a3b8;
+                --text-3:        #64748b;
+                --error:         #ef4444;
+                --error-bg:      rgba(239,68,68,0.1);
+                --error-border:  rgba(239,68,68,0.3);
+                --success:       #10b981;
+                --warning:       #f59e0b;
+            }
+
+            html, body {
+                height: 100%;
+                font-family: 'Inter', sans-serif;
+                background: var(--bg-base);
+                color: var(--text-1);
+                overflow-x: hidden;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                position: relative;
+            }
+
+            /* ── Animated background ── */
+            .bg-layer {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .glow {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(90px);
+                opacity: 0.12;
+            }
+
+            .glow-purple {
+                width: 700px; height: 700px;
+                background: radial-gradient(circle, #7c3aed, transparent 70%);
+                top: -200px; left: -200px;
+                animation: drift 12s ease-in-out infinite;
+            }
+
+            .glow-blue {
+                width: 600px; height: 600px;
+                background: radial-gradient(circle, #2563eb, transparent 70%);
+                bottom: -150px; right: -150px;
+                animation: drift 10s ease-in-out infinite reverse;
+            }
+
+            .glow-mid {
+                width: 400px; height: 400px;
+                background: radial-gradient(circle, #9333ea, transparent 70%);
+                top: 40%; left: 45%;
+                transform: translate(-50%, -50%);
+                animation: drift 14s ease-in-out infinite 3s;
+            }
+
+            @keyframes drift {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                33%       { transform: translate(30px, -20px) scale(1.05); }
+                66%       { transform: translate(-20px, 15px) scale(0.97); }
+            }
+
+            .grid-overlay {
+                position: fixed;
+                inset: 0;
+                background-image:
+                    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+                background-size: 44px 44px;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* ── Layout ── */
+            .page-wrap {
+                position: relative;
+                z-index: 10;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 32px 20px;
+                gap: 16px;
+            }
+
+            /* ── Top nav bar ── */
+            .top-bar {
+                width: 100%;
+                max-width: 900px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 4px;
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+            }
+
+            .logo-badge {
+                width: 38px; height: 38px;
+                background: linear-gradient(135deg, var(--purple), var(--blue));
+                border-radius: 11px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+            }
+
+            .logo-badge svg { width: 20px; height: 20px; fill: white; }
+
+            .logo-name {
+                font-size: 20px;
+                font-weight: 800;
+                color: var(--text-1);
+                letter-spacing: -0.5px;
+            }
+
+            .logo-name span {
+                background: linear-gradient(90deg, var(--purple-mid), var(--blue-light));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .nav-right {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: var(--text-3);
+            }
+
+            .nav-right svg { width: 14px; height: 14px; opacity: 0.6; }
+
+            /* ── Incident banner ── */
+            .incident-banner {
+                width: 100%;
+                max-width: 900px;
+                background: rgba(239,68,68,0.08);
+                border: 1px solid rgba(239,68,68,0.25);
+                border-radius: 12px;
+                padding: 10px 16px;
+                display: none;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                animation: fadeIn 0.4s ease;
+            }
+
+            .incident-banner.show { display: flex; }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-6px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .incident-dot {
+                width: 8px; height: 8px;
+                background: var(--error);
+                border-radius: 50%;
+                flex-shrink: 0;
+                animation: pulse-red 1s ease-in-out infinite;
+            }
+
+            .incident-title { font-weight: 700; color: #f87171; }
+            .incident-msg   { color: #fca5a5; flex: 1; }
+            .incident-time  { color: var(--text-3); font-size: 11px; white-space: nowrap; }
+
+            /* ── Main card area ── */
+            .main-area {
+                display: flex;
+                gap: 20px;
+                width: 100%;
+                max-width: 900px;
+                align-items: flex-start;
+            }
+
+            /* ── Glass card ── */
+            .glass-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+
+            /* ── Order panel ── */
+            .order-panel {
+                flex: 1;
+                padding: 28px;
+            }
+
+            .section-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--text-3);
+                margin-bottom: 14px;
+            }
+
+            .order-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 14px;
+                background: rgba(255,255,255,0.03);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                margin-bottom: 10px;
+            }
+
+            .item-icon {
+                width: 42px; height: 42px;
+                background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(37,99,235,0.25));
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                flex-shrink: 0;
+                border: 1px solid rgba(124,58,237,0.2);
+            }
+
+            .item-info       { flex: 1; min-width: 0; }
+            .item-name       { font-size: 14px; font-weight: 600; color: var(--text-1); }
+            .item-desc       { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+            .item-price      { font-size: 15px; font-weight: 700; color: var(--text-1); flex-shrink: 0; }
+
+            .order-divider {
+                border: none;
+                border-top: 1px solid var(--border);
+                margin: 14px 0;
+            }
+
+            .order-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                color: var(--text-2);
+                margin-bottom: 6px;
+            }
+
+            .order-total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-top: 10px;
+            }
+
+            .total-label { font-size: 13px; color: var(--text-2); }
+            .total-amount { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+
+            /* ── Service status widget ── */
+            .status-widget {
+                margin-top: 22px;
+                padding: 12px 14px;
+                background: rgba(255,255,255,0.03);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+            }
+
+            .status-header {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: var(--text-3);
+                margin-bottom: 10px;
+            }
+
+            .status-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .status-dot {
+                width: 9px; height: 9px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                background: var(--text-3);
+            }
+            .status-dot.checking { background: var(--warning); animation: pulse-amber 1.5s ease-in-out infinite; }
+            .status-dot.up       { background: var(--success); animation: pulse-green 2s ease-in-out infinite; }
+            .status-dot.down     { background: var(--error);   animation: pulse-red 1s ease-in-out infinite; }
+
+            @keyframes pulse-green {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+                50%       { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+            }
+            @keyframes pulse-red {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+                50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+            }
+            @keyframes pulse-amber {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
+                50%       { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+            }
+
+            .status-name  { font-size: 13px; font-weight: 500; color: var(--text-2); flex: 1; }
+            .status-badge {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 3px 9px;
+                border-radius: 20px;
+            }
+            .status-badge.checking { background: rgba(245,158,11,0.15); color: var(--warning); }
+            .status-badge.up       { background: rgba(16,185,129,0.15); color: var(--success); }
+            .status-badge.down     { background: rgba(239,68,68,0.15);  color: var(--error); }
+
+            /* ── Payment panel ── */
+            .payment-panel {
+                width: 370px;
+                flex-shrink: 0;
+                padding: 28px;
+            }
+
+            .panel-title    { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+            .panel-subtitle { font-size: 13px; color: var(--text-2); margin-bottom: 24px; }
+
+            /* ── Card preview ── */
+            .card-preview {
+                background: linear-gradient(135deg, #4c1d95, #1e3a8a);
+                border-radius: 16px;
+                padding: 20px 22px 18px;
+                margin-bottom: 22px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            }
+
+            .card-preview::before {
+                content: '';
+                position: absolute;
+                top: -50px; right: -50px;
+                width: 160px; height: 160px;
+                background: rgba(255,255,255,0.07);
+                border-radius: 50%;
+            }
+
+            .card-preview::after {
+                content: '';
+                position: absolute;
+                bottom: -70px; left: -20px;
+                width: 200px; height: 200px;
+                background: rgba(255,255,255,0.04);
+                border-radius: 50%;
+            }
+
+            .card-brand {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card-chip {
+                width: 34px; height: 26px;
+                background: linear-gradient(135deg, #d4af37, #f5d060);
+                border-radius: 5px;
+            }
+
+            .card-logo-dots {
+                display: flex;
+                gap: -6px;
+            }
+
+            .card-logo-dots span {
+                width: 26px; height: 26px;
+                border-radius: 50%;
+                opacity: 0.85;
+            }
+            .card-logo-dots span:first-child { background: #eb001b; }
+            .card-logo-dots span:last-child  { background: #f79e1b; margin-left: -10px; }
+
+            .card-num {
+                font-size: 17px;
+                font-weight: 500;
+                color: rgba(255,255,255,0.9);
+                letter-spacing: 4px;
+                font-family: 'Courier New', monospace;
+                margin-bottom: 18px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .card-footer {
+                display: flex;
+                justify-content: space-between;
+                position: relative;
+                z-index: 1;
+            }
+
+            .cf-label { font-size: 10px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.5px; }
+            .cf-value { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.95); margin-top: 2px; text-transform: uppercase; }
+
+            /* ── Form ── */
+            .form-group { margin-bottom: 14px; }
+
+            .form-label {
+                display: block;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                color: var(--text-3);
+                margin-bottom: 7px;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 11px 14px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                color: var(--text-1);
+                font-size: 14px;
+                font-family: 'Inter', sans-serif;
+                outline: none;
+                transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            }
+
+            .form-input::placeholder { color: var(--text-3); }
+
+            .form-input:focus {
+                border-color: var(--border-focus);
+                background: rgba(255,255,255,0.07);
+                box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+            }
+
+            .form-row {
+                display: flex;
+                gap: 10px;
+            }
+
+            .form-row .form-group { flex: 1; }
+
+            .input-wrap { position: relative; }
+
+            .input-icon {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 15px;
+                pointer-events: none;
+            }
+
+            .input-wrap .form-input { padding-right: 36px; }
+
+            /* ── Pay button ── */
+            .pay-btn {
+                width: 100%;
+                margin-top: 6px;
+                padding: 14px;
+                background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-size: 15px;
+                font-weight: 700;
+                font-family: 'Inter', sans-serif;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .pay-btn::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+                transform: translateX(-100%);
+                transition: transform 0.5s;
+            }
+
+            .pay-btn:hover::after { transform: translateX(100%); }
+
+            .pay-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 36px rgba(124,58,237,0.45);
+            }
+
+            .pay-btn:active:not(:disabled) { transform: translateY(0); }
+
+            .pay-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+            .pay-btn.success {
+                background: linear-gradient(135deg, #059669, #10b981);
+                box-shadow: 0 8px 28px rgba(16,185,129,0.35);
+            }
+
+            /* ── Spinner ── */
+            .spinner {
+                width: 16px; height: 16px;
+                border: 2px solid rgba(255,255,255,0.3);
+                border-top-color: white;
+                border-radius: 50%;
+                animation: spin 0.7s linear infinite;
+                display: none;
+                flex-shrink: 0;
+            }
+
+            @keyframes spin { to { transform: rotate(360deg); } }
+
+            /* ── Error banner ── */
+            .error-banner {
+                display: none;
+                margin-top: 14px;
+                background: var(--error-bg);
+                border: 1px solid var(--error-border);
+                border-radius: 12px;
+                padding: 14px;
+                animation: slideDown 0.3s ease;
+            }
+
+            .error-banner.show { display: block; }
+
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-8px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .error-head {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #f87171;
+                margin-bottom: 6px;
+            }
+
+            .error-body  { font-size: 13px; color: #fca5a5; line-height: 1.55; }
+            .error-trace {
+                margin-top: 8px;
+                padding: 8px 10px;
+                background: rgba(0,0,0,0.3);
+                border-radius: 7px;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                color: #fca5a5;
+                line-height: 1.6;
+                word-break: break-all;
+            }
+
+            /* ── Security bar ── */
+            .security-bar {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 18px;
+                margin-top: 18px;
+                padding-top: 16px;
+                border-top: 1px solid var(--border);
+            }
+
+            .sec-badge {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 11px;
+                color: var(--text-3);
+            }
+
+            /* ── Footer ── */
+            .page-footer {
+                font-size: 11px;
+                color: var(--text-3);
+                text-align: center;
+                margin-top: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Background -->
+        <div class="bg-layer">
+            <div class="glow glow-purple"></div>
+            <div class="glow glow-blue"></div>
+            <div class="glow glow-mid"></div>
+        </div>
+        <div class="grid-overlay"></div>
+
+        <div class="page-wrap">
+            <!-- Top bar -->
+            <div class="top-bar">
+                <a class="logo" href="#">
+                    <div class="logo-badge">
+                        <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+                    </div>
+                    <span class="logo-name">Air<span>Pay</span></span>
+                </a>
+                <div class="nav-right">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    256-bit TLS Encryption
+                </div>
+            </div>
+
+            <!-- Incident alert banner (shown when service is down) -->
+            <div class="incident-banner" id="incidentBanner">
+                <div class="incident-dot"></div>
+                <span class="incident-title">Incident Detected&nbsp;—&nbsp;</span>
+                <span class="incident-msg">Payment processing service is unreachable. Engineers are investigating.</span>
+                <span class="incident-time" id="incidentTime"></span>
+            </div>
+
+            <!-- Main content -->
+            <div class="main-area">
+
+                <!-- Order Summary -->
+                <div class="glass-card order-panel">
+                    <div class="section-label">Order Summary</div>
+
+                    <div class="order-item">
+                        <div class="item-icon">✈️</div>
+                        <div class="item-info">
+                            <div class="item-name">MUM → NYC</div>
+                            <div class="item-desc">Economy · 1 Passenger · Direct</div>
+                        </div>
+                        <div class="item-price">$449.00</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="item-icon">🧳</div>
+                        <div class="item-info">
+                            <div class="item-name">Checked Baggage</div>
+                            <div class="item-desc">23 kg · hold bag</div>
+                        </div>
+                        <div class="item-price">$50.00</div>
+                    </div>
+
+                    <hr class="order-divider">
+
+                    <div class="order-row">
+                        <span>Subtotal</span><span>$499.00</span>
+                    </div>
+                    <div class="order-row">
+                        <span>Processing fee</span><span>$0.00</span>
+                    </div>
+
+                    <div class="order-total-row">
+                        <div class="total-label">Total due today</div>
+                        <div class="total-amount">$499.00</div>
+                    </div>
+
+                    <!-- Service status -->
+                    <div class="status-widget">
+                        <div class="status-header">Service Health</div>
+                        <div class="status-row">
+                            <div class="status-dot checking" id="statusDot"></div>
+                            <div class="status-name">Payment API</div>
+                            <div class="status-badge checking" id="statusBadge">Checking...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <div class="glass-card payment-panel">
+                    <div class="panel-title">Payment Details</div>
+                    <div class="panel-subtitle">Your transaction is encrypted end-to-end</div>
+
+                    <!-- Card preview -->
+                    <div class="card-preview">
+                        <div class="card-brand">
+                            <div class="card-chip"></div>
+                            <div class="card-logo-dots">
+                                <span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="card-num" id="cardDisplay">•••• &nbsp;•••• &nbsp;•••• &nbsp;••••</div>
+                        <div class="card-footer">
+                            <div>
+                                <div class="cf-label">Card Holder</div>
+                                <div class="cf-value" id="holderDisplay">Your Name</div>
+                            </div>
+                            <div>
+                                <div class="cf-label">Expires</div>
+                                <div class="cf-value" id="expiryDisplay">MM/YY</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div id="paymentForm">
+                        <div class="form-group">
+                            <label class="form-label" for="cardName">Cardholder Name</label>
+                            <div class="input-wrap">
+                                <input id="cardName" type="text" class="form-input"
+                                       placeholder="Jane Smith" maxlength="26"
+                                       oninput="updateHolder(this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="cardNumber">Card Number</label>
+                            <div class="input-wrap">
+                                <input id="cardNumber" type="text" class="form-input"
+                                       placeholder="1234 5678 9012 3456" maxlength="19"
+                                       oninput="fmtCard(this)">
+                                <span class="input-icon">💳</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="expiry">Expiry</label>
+                                <input id="expiry" type="text" class="form-input"
+                                       placeholder="MM/YY" maxlength="5"
+                                       oninput="fmtExpiry(this)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="cvv">CVV</label>
+                                <div class="input-wrap">
+                                    <input id="cvv" type="password" class="form-input"
+                                           placeholder="•••" maxlength="3"
+                                           oninput="this.value=this.value.replace(/\D/g,'')">
+                                    <span class="input-icon">🔒</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="pay-btn" id="payBtn" onclick="processPayment()">
+                            <div class="spinner" id="spinner"></div>
+                            <span id="btnText">🔐&nbsp; Pay Securely — $499.00</span>
+                        </button>
+
+                        <div class="error-banner" id="errorBanner">
+                            <div class="error-head">
+                                <span>⚠️</span> Payment Failed — Service Unreachable
+                            </div>
+                            <div class="error-body">
+                                We could not connect to the payment processing service.
+                                The endpoint is down and our team has been notified.
+                            </div>
+                            <div class="error-trace" id="errorTrace">
+                                Error: fetch POST /api/charge&#10;
+                                → 503 Service Unavailable&#10;
+                                → upstream: payment-gateway-api:8080&#10;
+                                → No healthy upstream
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="security-bar">
+                        <div class="sec-badge">🔒 SSL / TLS</div>
+                        <div class="sec-badge">🛡️ PCI DSS</div>
+                        <div class="sec-badge">✅ 3D Secure</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                AirPay Gateway · Powered by Kubernetes &nbsp;|&nbsp; All transactions are encrypted and monitored
+            </div>
+        </div>
+
+        <script>
+            /* ── Card formatting ── */
+            function fmtCard(input) {
+                let raw = input.value.replace(/\D/g, '').substring(0, 16);
+                input.value = raw.replace(/(.{4})/g, '$1 ').trim();
+                let disp = raw.padEnd(16, '•').replace(/(.{4})/g, '$1 ').trim();
+                document.getElementById('cardDisplay').textContent = disp;
+            }
+
+            function fmtExpiry(input) {
+                let v = input.value.replace(/\D/g, '').substring(0, 4);
+                if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
+                input.value = v;
+                document.getElementById('expiryDisplay').textContent = v || 'MM/YY';
+            }
+
+            function updateHolder(val) {
+                document.getElementById('holderDisplay').textContent = val.toUpperCase() || 'Your Name';
+            }
+
+            /* ── Service status check ── */
+            async function checkStatus() {
+                const dot    = document.getElementById('statusDot');
+                const badge  = document.getElementById('statusBadge');
+                const banner = document.getElementById('incidentBanner');
+
+                try {
+                    const res = await fetch('/api/health', {
+                        signal: AbortSignal.timeout(4000)
+                    });
+                    if (res.ok) {
+                        dot.className   = 'status-dot up';
+                        badge.className = 'status-badge up';
+                        badge.textContent = 'Operational';
+                        banner.classList.remove('show');
+                    } else {
+                        throw new Error('unhealthy');
+                    }
+                } catch (_) {
+                    dot.className   = 'status-dot down';
+                    badge.className = 'status-badge down';
+                    badge.textContent = 'Down';
+
+                    banner.classList.add('show');
+                    document.getElementById('incidentTime').textContent =
+                        'Detected at ' + new Date().toLocaleTimeString();
+                }
+            }
+
+            /* ── Payment ── */
+            async function processPayment() {
+                const btn     = document.getElementById('payBtn');
+                const spinner = document.getElementById('spinner');
+                const btnText = document.getElementById('btnText');
+                const errBan  = document.getElementById('errorBanner');
+                const errTrace = document.getElementById('errorTrace');
+
+                btn.disabled = true;
+                spinner.style.display = 'block';
+                btnText.textContent   = 'Processing...';
+                errBan.classList.remove('show');
+
+                try {
+                    const res = await fetch('/api/charge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount: 49900,
+                            currency: 'USD',
+                            card_last4: document.getElementById('cardNumber').value.slice(-4),
+                            cardholder: document.getElementById('cardName').value
+                        }),
+                        signal: AbortSignal.timeout(6000)
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        spinner.style.display = 'none';
+                        btnText.textContent   = '✅  Payment Successful — ' + (data.transaction_id || 'txn_ok');
+                        btn.classList.add('success');
+                        btn.disabled = false;
+                        document.getElementById('statusDot').className   = 'status-dot up';
+                        document.getElementById('statusBadge').className = 'status-badge up';
+                        document.getElementById('statusBadge').textContent = 'Operational';
+                        document.getElementById('incidentBanner').classList.remove('show');
+                        return;
+                    }
+                    throw new Error('HTTP ' + res.status);
+
+                } catch (err) {
+                    let trace =
+                        'Error: fetch POST /api/charge\n' +
+                        '→ 503 Service Unavailable\n' +
+                        '→ upstream: payment-gateway-api:8080\n' +
+                        '→ No healthy upstream / connection refused';
+
+                    if (err.name === 'TimeoutError') {
+                        trace =
+                            'Error: Request timed out after 6000ms\n' +
+                            '→ fetch POST /api/charge\n' +
+                            '→ upstream: payment-gateway-api:8080\n' +
+                            '→ Gateway timeout';
+                    }
+
+                    errTrace.textContent = trace;
+                    errBan.classList.add('show');
+                }
+
+                spinner.style.display = 'none';
+                btnText.textContent   = '🔐\u00a0 Pay Securely — $499.00';
+                btn.disabled = false;
+            }
+
+            /* ── Init ── */
+            checkStatus();
+        </script>
+    </body>
+    </html>

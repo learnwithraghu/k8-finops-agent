@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-gateway-api
+  namespace: payment
+  labels:
+    app: payment-gateway-api
+    # Intentionally missing: owner, team, cost-center, tier, environment
+    # Students must find that no one owns this service
+spec:
+  replicas: 0  # <-- THE PROBLEM: this service is down
+  selector:
+    matchLabels:
+      app: payment-gateway-api
+  template:
+    metadata:
+      labels:
+        app: payment-gateway-api
+    spec:
+      containers:
+        - name: payment-api
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          volumeMounts:
+            - name: api-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: api-config
+          configMap:
+            name: payment-gateway-api-config
