@@ -3,7 +3,6 @@
 import os
 import sys
 import logging
-import argparse
 from pathlib import Path
 from typing import Optional
 
@@ -108,29 +107,13 @@ def load_config() -> dict:
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(description='K8s FinOps Agent')
-    parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
-    parser.add_argument('--namespace', '-n', help='Target namespace')
-    parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
+    config = load_config()
 
-    args = parser.parse_args()
-
-    # Setup logging
-    setup_logging(args.log_level)
+    setup_logging(config.get('log_level', 'INFO'))
     logger = logging.getLogger(__name__)
 
     logger.info("Starting K8s FinOps Agent")
 
-    # Load configuration
-    config = load_config()
-
-    # Override with command line args
-    if args.kubeconfig:
-        config['kubeconfig_path'] = args.kubeconfig
-    if args.namespace is not None:
-        config['target_namespace'] = args.namespace
-
-    # Initialize and run agent
     agent = FinOpsAgent(config)
     if not agent.initialize():
         logger.error("Failed to initialize agent")

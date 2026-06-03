@@ -3,7 +3,6 @@
 import os
 import sys
 import logging
-import argparse
 from pathlib import Path
 
 import yaml
@@ -69,24 +68,12 @@ def load_tagging_rules(tagging_rules_path: str) -> dict:
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(description='K8s FinOps Agent')
-    parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
-    parser.add_argument('--namespace', '-n', help='Target namespace')
-    parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
+    config = load_config()
 
-    args = parser.parse_args()
-
-    setup_logging(args.log_level)
+    setup_logging(config.get('log_level', 'INFO'))
     logger = logging.getLogger(__name__)
 
     logger.info("Starting K8s FinOps Agent")
-
-    config = load_config()
-
-    if args.kubeconfig:
-        config['kubeconfig_path'] = args.kubeconfig
-    if args.namespace is not None:
-        config['target_namespace'] = args.namespace
 
     model_id = config.get('bedrock_model_id')
     if not model_id:
