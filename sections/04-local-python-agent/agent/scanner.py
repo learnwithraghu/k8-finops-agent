@@ -1,7 +1,6 @@
-"""Kubernetes resource scanner for FinOps agent."""
+"""Simple Kubernetes resource scanner for FinOps agent."""
 
 from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, field
 from pathlib import Path
 import logging
 
@@ -9,27 +8,6 @@ from kubernetes import client, config
 from kubernetes.client.exceptions import ApiException
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class K8sResource:
-    """Represents a Kubernetes resource with its metadata."""
-    name: str
-    namespace: str
-    kind: str
-    labels: Dict[str, str] = field(default_factory=dict)
-    annotations: Dict[str, str] = field(default_factory=dict)
-    # Resource specs
-    cpu_request: int = 0  # in millicores
-    cpu_limit: int = 0
-    memory_request: int = 0  # in Mi
-    memory_limit: int = 0
-    replicas: int = 1
-    # Storage
-    pvc_names: List[str] = field(default_factory=list)
-    pvc_size_gb: float = 0.0
-    # Status
-    is_orphaned: bool = False
 
 
 class K8sScanner:
@@ -73,7 +51,7 @@ class K8sScanner:
             logger.error(f"Failed to list namespaces: {e}")
             return []
 
-    def scan_deployments(self, namespace: Optional[str] = None) -> List[K8sResource]:
+    def scan_deployments(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
         """Scan deployments in the cluster."""
         if not self._connected:
             raise RuntimeError("Scanner not connected to cluster")
@@ -92,49 +70,15 @@ class K8sScanner:
             for dep in deps.items:
                 if self._is_excluded_namespace(dep.metadata.namespace):
                     continue
-                # Extract CPU/memory from container specs
-                cpu_request = 0
-                cpu_limit = 0
-                mem_request = 0
-                mem_limit = 0
 
-                for container in dep.spec.template.spec.containers:
-                    if container.resources:
-                        if container.resources.requests:
-                            cpu_request += self._parse_cpu(
-                                container.resources.requests.get('cpu', '0')
-                            )
-                            mem_request += self._parse_memory(
-                                container.resources.requests.get('memory', '0')
-                            )
-                        if container.resources.limits:
-                            cpu_limit += self._parse_cpu(
-                                container.resources.limits.get('cpu', '0')
-                            )
-                            mem_limit += self._parse_memory(
-                                container.resources.limits.get('memory', '0')
-                            )
-
-                # Get PVCs from volumes
-                pvc_names = []
-                if dep.spec.template.spec.volumes:
-                    for vol in dep.spec.template.spec.volumes:
-                        if vol.persistent_volume_claim:
-                            pvc_names.append(vol.persistent_volume_claim.claim_name)
-
-                resource = K8sResource(
-                    name=dep.metadata.name,
-                    namespace=dep.metadata.namespace,
-                    kind="Deployment",
-                    labels=dep.metadata.labels or {},
-                    annotations=dep.metadata.annotations or {},
-                    cpu_request=cpu_request,
-                    cpu_limit=cpu_limit,
-                    memory_request=mem_request,
-                    memory_limit=mem_limit,
-                    replicas=dep.spec.replicas or 1,
-                    pvc_names=pvc_names
-                )
+                resource = {
+                    'name': dep.metadata.name,
+                    'namespace': dep.metadata.namespace,
+                    'kind': 'Deployment',
+                    'labels': dep.metadata.labels or {},
+                    'annotations': dep.metadata.annotations or {},
+                    'replicas': dep.spec.replicas or 1
+                }
                 resources.append(resource)
 
         except ApiException as e:
@@ -142,7 +86,7 @@ class K8sScanner:
 
         return resources
 
-    def scan_services(self, namespace: Optional[str] = None) -> List[K8sResource]:
+    def scan_services(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
         """Scan services in the cluster."""
         if not self._connected:
             raise RuntimeError("Scanner not connected to cluster")
@@ -161,17 +105,16 @@ class K8sScanner:
             for svc in svcs.items:
                 if self._is_excluded_namespace(svc.metadata.namespace):
                     continue
-                # Skip headless services and system services
                 if svc.metadata.name == 'kubernetes':
                     continue
 
-                resource = K8sResource(
-                    name=svc.metadata.name,
-                    namespace=svc.metadata.namespace,
-                    kind="Service",
-                    labels=svc.metadata.labels or {},
-                    annotations=svc.metadata.annotations or {}
-                )
+                resource = {
+                    'name': svc.metadata.name,
+                    'namespace': svc.metadata.namespace,
+                    'kind': 'Service',
+                    'labels': svc.metadata.labels or {},
+                    'annotations': svc.metadata.annotations or {}
+                }
                 resources.append(resource)
 
         except ApiException as e:
@@ -179,7 +122,7 @@ class K8sScanner:
 
         return resources
 
-    def scan_configmaps(self, namespace: Optional[str] = None) -> List[K8sResource]:
+    def scan_configmaps(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
         """Scan configmaps in the cluster."""
         if not self._connected:
             raise RuntimeError("Scanner not connected to cluster")
@@ -200,13 +143,14 @@ class K8sScanner:
                     continue
                 if cm.metadata.name == 'kube-root-ca.crt':
                     continue
-                resource = K8sResource(
-                    name=cm.metadata.name,
-                    namespace=cm.metadata.namespace,
-                    kind="ConfigMap",
-                    labels=cm.metadata.labels or {},
-                    annotations=cm.metadata.annotations or {}
-                )
+
+                resource = {
+                    'name': cm.metadata.name,
+                    'namespace': cm.metadata.namespace,
+                    'kind': 'ConfigMap',
+                    'labels': cm.metadata.labels or {},
+                    'annotations': cm.metadata.annotations or {}
+                }
                 resources.append(resource)
 
         except ApiException as e:
@@ -214,7 +158,7 @@ class K8sScanner:
 
         return resources
 
-    def scan_pvcs(self, namespace: Optional[str] = None) -> List[K8sResource]:
+    def scan_pvcs(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
         """Scan PVCs and identify orphaned ones."""
         if not self._connected:
             raise RuntimeError("Scanner not connected to cluster")
@@ -230,26 +174,24 @@ class K8sScanner:
             else:
                 pvcs = self.v1.list_persistent_volume_claim_for_all_namespaces()
 
-            # Get list of mounted PVCs from pods
             mounted_pvcs = self._get_mounted_pvcs(namespace)
 
             for pvc in pvcs.items:
                 if self._is_excluded_namespace(pvc.metadata.namespace):
                     continue
-                size_gb = self._parse_storage(pvc.spec.resources.requests.get('storage', '0'))
 
-                # Check if PVC is orphaned (not mounted by any pod)
+                size_gb = self._parse_storage(pvc.spec.resources.requests.get('storage', '0'))
                 is_orphaned = (pvc.metadata.namespace, pvc.metadata.name) not in mounted_pvcs
 
-                resource = K8sResource(
-                    name=pvc.metadata.name,
-                    namespace=pvc.metadata.namespace,
-                    kind="PersistentVolumeClaim",
-                    labels=pvc.metadata.labels or {},
-                    annotations=pvc.metadata.annotations or {},
-                    pvc_size_gb=size_gb,
-                    is_orphaned=is_orphaned
-                )
+                resource = {
+                    'name': pvc.metadata.name,
+                    'namespace': pvc.metadata.namespace,
+                    'kind': 'PersistentVolumeClaim',
+                    'labels': pvc.metadata.labels or {},
+                    'annotations': pvc.metadata.annotations or {},
+                    'size_gb': size_gb,
+                    'is_orphaned': is_orphaned
+                }
                 resources.append(resource)
 
         except ApiException as e:
@@ -280,7 +222,7 @@ class K8sScanner:
             pass
         return mounted
 
-    def scan_all(self, namespace: Optional[str] = None) -> List[K8sResource]:
+    def scan_all(self, namespace: Optional[str] = None) -> List[Dict[str, Any]]:
         """Scan all resource types and return combined list."""
         resources = []
         resources.extend(self.scan_deployments(namespace))
@@ -295,30 +237,6 @@ class K8sScanner:
         return bool(namespace and namespace in self.excluded_namespaces)
 
     @staticmethod
-    def _parse_cpu(cpu_str: str) -> int:
-        """Parse CPU string to millicores."""
-        if not cpu_str:
-            return 0
-        if cpu_str.endswith('m'):
-            return int(cpu_str[:-1])
-        # Whole cores to millicores
-        return int(float(cpu_str) * 1000)
-
-    @staticmethod
-    def _parse_memory(mem_str: str) -> int:
-        """Parse memory string to Mi."""
-        if not mem_str:
-            return 0
-        if mem_str.endswith('Gi'):
-            return int(float(mem_str[:-2]) * 1024)
-        if mem_str.endswith('Mi'):
-            return int(mem_str[:-2])
-        if mem_str.endswith('Ki'):
-            return int(float(mem_str[:-2]) / 1024)
-        # Assume bytes
-        return int(float(mem_str) / (1024 * 1024))
-
-    @staticmethod
     def _parse_storage(storage_str: str) -> float:
         """Parse storage string to GB."""
         if not storage_str:
@@ -329,5 +247,4 @@ class K8sScanner:
             return float(storage_str[:-2]) / 1024
         if storage_str.endswith('Ti'):
             return float(storage_str[:-2]) * 1024
-        # Assume Gi if no unit
         return float(storage_str)

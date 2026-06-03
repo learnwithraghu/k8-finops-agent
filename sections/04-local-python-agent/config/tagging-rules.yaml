@@ -8,6 +8,7 @@ required_tags:
   - cost-center
   - application
   - tier
+  - criticality
 
 # Alternative Kubernetes label keys (checked in addition to above)
 label_mappings:
@@ -29,9 +30,10 @@ label_mappings:
   tier:
     - app.kubernetes.io/tier
     - tier
-  compliance:
-    - compliance-level
-    - compliance
+  criticality:
+    - criticality
+    - priority
+    - severity
 
 # Airline booking context cost centers
 cost_centers:
@@ -56,11 +58,12 @@ tiers:
   - cache
   - messaging
 
-# Compliance levels
-compliance_levels:
-  - pci-dss      # Payment Card Industry
-  - sox          # Sarbanes-Oxley
-  - standard     # No special compliance
+# Valid criticality levels
+criticality_levels:
+  - P0    # Critical - production outage impact
+  - P1    # High - important business function
+  - P2    # Medium - standard business function
+  - P3    # Low - nice to have
 
 # Resource types to scan
 resource_types:

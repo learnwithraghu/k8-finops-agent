@@ -11,11 +11,9 @@ import yaml
 from dotenv import load_dotenv
 
 from agent.scanner import K8sScanner
-from agent.cost_calculator import CostCalculator
-from agent.untracked_money import UntrackedMoneyDetector
-from agent.analyzer import BedrockAnalyzer, MockAnalyzer
+from agent.simple_checker import SimpleTagChecker
 
-# Configure logging
+
 def setup_logging(log_level: str = "INFO"):
     """Setup logging configuration."""
     level = getattr(logging, log_level.upper(), logging.INFO)
@@ -35,11 +33,7 @@ class FinOpsAgent:
         """Initialize agent with configuration."""
         self.config = config or {}
         self.scanner = None
-        self.calculator = None
-        self.detector = None
-        self.analyzer = None
-        self.analyzer_mode = "unknown"
-        self.recommendations_generated = 0
+        self.checker = None
 
     def initialize(self) -> bool:
         """Initialize all components."""
@@ -53,38 +47,10 @@ class FinOpsAgent:
             logger.error("Failed to connect to Kubernetes")
             return False
 
-        # Initialize cost calculator
-        pricing_config = self.config.get('pricing_config')
-        self.calculator = CostCalculator(pricing_config)
-
-        # Initialize untracked money detector
+        # Initialize tag checker
         tagging_rules = self.config.get('tagging_rules')
-        self.detector = UntrackedMoneyDetector(self.calculator, tagging_rules)
-
-        # Initialize analyzer
-        force_mock = self.config.get('force_mock', False)
-        if force_mock:
-            self.analyzer = MockAnalyzer()
-            self.analyzer_mode = "mock"
-            logger.info("Using mock analyzer (--mock flag)")
-        else:
-            model_id = self.config.get('bedrock_model_id')
-            region = self.config.get('aws_region', 'us-east-1')
-            max_tokens = self.config.get('bedrock_max_tokens', 1024)
-            temperature = self.config.get('bedrock_temperature', 0.3)
-            self.analyzer = BedrockAnalyzer(
-                model_id=model_id,
-                region=region,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                tagging_rules=getattr(self.detector, 'rules', {})
-            )
-            if self.analyzer.connect():
-                self.analyzer_mode = "bedrock"
-            else:
-                logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
-                self.analyzer = MockAnalyzer()
-                self.analyzer_mode = "mock-fallback"
+        self.checker = SimpleTagChecker(tagging_rules)
+        logger.info("Tag checker initialized")
 
         return True
 
@@ -98,50 +64,18 @@ class FinOpsAgent:
         resources = self.scanner.scan_all(target_ns)
         logger.info(f"Found {len(resources)} resources")
 
-        # Calculate costs and detect untracked money
-        logger.info("Analyzing untracked money...")
-        analysis = self.detector.analyze_all(resources)
+        # Check tags
+        logger.info("Checking tagging compliance...")
+        analysis = self.checker.check_all(resources)
 
-        # Generate summary report
-        report = self.analyzer.generate_summary_report(analysis)
-        print("\n" + "=" * 80)
-        print(report)
-        print("=" * 80 + "\n")
-        logger.info(f"Analyzer mode: {self.analyzer_mode}")
-        if self.analyzer_mode == "bedrock":
-            logger.info("LLM-powered output generated from Bedrock")
-            logger.info(f"Bedrock inference profile ARN: {self.config.get('bedrock_model_id')}")
-
-        # Get high-impact violations
-        threshold = self.config.get('min_cost_threshold', 1.0)
-        violations = self.detector.get_high_impact_violations(resources, threshold)
-        logger.info(f"Found {len(violations)} high-impact violations")
-
-        # Analyze with AI / Bedrock
-        recommendations_generated = 0
-        if violations:
-            if self.analyzer_mode == "bedrock":
-                logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
-            else:
-                logger.info("Generating recommendation drafts with mock analyzer")
-
-            drafts = []
-            for untracked in violations:
-                draft = self.analyzer.analyze_resource(
-                    untracked.resource,
-                    untracked
-                )
-                if draft:
-                    drafts.append(draft)
-
-            recommendations_generated = len(drafts)
-            logger.info(f"Prepared {recommendations_generated} recommendation drafts")
+        # Print report
+        self.checker.print_report(analysis)
 
         return {
             'analysis': analysis,
-            'violations': len(violations),
-            'recommendations_generated': recommendations_generated,
-            'report': report
+            'total_resources': len(resources),
+            'compliant_count': analysis['compliant_count'],
+            'non_compliant_count': analysis['non_compliant_count']
         }
 
 
@@ -166,15 +100,8 @@ def load_config() -> dict:
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'pricing_config': os.getenv('PRICING_CONFIG'),
         'tagging_rules': tagging_rules_path,
-        'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
-        'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
-        'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
-        'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
-        'dry_run': os.getenv('DRY_RUN', 'false').lower() == 'true',
-        'min_cost_threshold': float(os.getenv('MIN_COST_THRESHOLD', '1.0')),
         'excluded_namespaces': excluded_namespaces,
     }
 
@@ -184,9 +111,6 @@ def main():
     parser = argparse.ArgumentParser(description='K8s FinOps Agent')
     parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
     parser.add_argument('--namespace', '-n', help='Target namespace')
-    parser.add_argument('--dry-run', '-d', action='store_true', help='Dry run mode')
-    parser.add_argument('--mock', '-m', action='store_true', help='Use mock analyzer')
-    parser.add_argument('--threshold', '-t', type=float, default=1.0, help='Minimum cost threshold')
     parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
 
     args = parser.parse_args()
@@ -205,12 +129,6 @@ def main():
         config['kubeconfig_path'] = args.kubeconfig
     if args.namespace is not None:
         config['target_namespace'] = args.namespace
-    if args.dry_run:
-        config['dry_run'] = True
-    if args.mock:
-        config['force_mock'] = True
-    if args.threshold:
-        config['min_cost_threshold'] = args.threshold
 
     # Initialize and run agent
     agent = FinOpsAgent(config)
@@ -221,8 +139,9 @@ def main():
     try:
         results = agent.run_scan()
         logger.info("FinOps scan completed successfully")
-        logger.info(f"Total untracked: ${results['analysis']['total_untracked']}/month")
-        logger.info(f"Recommendation drafts prepared: {results['recommendations_generated']}")
+        logger.info(f"Total resources: {results['total_resources']}")
+        logger.info(f"Compliant: {results['compliant_count']}")
+        logger.info(f"Non-compliant: {results['non_compliant_count']}")
     except Exception as e:
         logger.error(f"Scan failed: {e}", exc_info=True)
         sys.exit(1)
