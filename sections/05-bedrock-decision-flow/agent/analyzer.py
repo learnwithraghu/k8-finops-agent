@@ -11,7 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
 from agent.scanner import K8sResource
-from agent.untracked_money import UntrackedMoney
+from agent.tagging_violations import TaggingViolation
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +19,14 @@ logger = logging.getLogger(__name__)
 class IssueDraftResponse(BaseModel):
     """Pydantic model for structured LLM output."""
     should_create_issue: bool = Field(description="Whether to create an issue for this resource")
-    issue_title: str = Field(description="GitHub issue title in format: [FinOps] namespace/name - CATEGORY ($X.XX/month)")
-    issue_body: str = Field(description="Markdown body with summary, cost impact, missing tags, and remediation steps")
+    issue_title: str = Field(description="GitHub issue title in format: [FinOps] namespace/name - CATEGORY")
+    issue_body: str = Field(description="Markdown body with summary, missing tags, and remediation steps")
     issue_labels: List[str] = Field(description="GitHub issue labels")
     priority: str = Field(description="Priority level: critical, high, medium, or low")
     reasoning: str = Field(description="Short explanation for the decision")
     suggested_cost_center: str = Field(description="Suggested cost center for the resource")
     suggested_owner: str = Field(description="Suggested team owner for the resource")
     suggested_tags: Dict[str, str] = Field(description="Suggested tags to apply")
-    estimated_monthly_savings: float = Field(description="Estimated monthly savings if remediated")
 
 
 @dataclass
@@ -42,7 +41,6 @@ class IssueDraft:
     suggested_cost_center: str
     suggested_owner: str
     suggested_tags: Dict[str, str]
-    estimated_savings: float
 
 
 PROMPT_TEMPLATE = """You are a FinOps agent for a Kubernetes-based airline platform.
@@ -62,8 +60,6 @@ Resource Facts:
 - PVCs: {pvc_names}
 - PVC Size (GB): {pvc_size_gb}
 - Orphaned PVC: {is_orphaned}
-- Monthly Cost: ${monthly_cost:.2f}
-- Untracked Amount: ${untracked_amount:.2f}
 - Category: {category}
 - Missing Tags: {missing_tags}
 - Reason: {reason}
@@ -78,13 +74,13 @@ Rules:
 - Prefer concrete team names.
 - Set should_create_issue=false only if this is clearly not actionable.
 - Keep titles concise.
-- Body should include: summary, cost impact, missing tags, and remediation steps.
+- Body should include: summary, missing tags, and remediation steps.
 """
 
 
 def analyze_resource(
     resource: K8sResource,
-    untracked: UntrackedMoney,
+    violation: TaggingViolation,
     model_id: str,
     region: str = "us-east-1",
     max_tokens: int = 1024,
@@ -121,11 +117,9 @@ def analyze_resource(
             "pvc_names": resource.pvc_names,
             "pvc_size_gb": resource.pvc_size_gb,
             "is_orphaned": resource.is_orphaned,
-            "monthly_cost": untracked.monthly_cost,
-            "untracked_amount": untracked.untracked_amount,
-            "category": untracked.category.value,
-            "missing_tags": ', '.join(str(t) for t in untracked.missing_tags if t) if untracked.missing_tags else 'None',
-            "reason": untracked.reason,
+            "category": violation.category.value,
+            "missing_tags": ', '.join(str(t) for t in violation.missing_tags if t) if violation.missing_tags else 'None',
+            "reason": violation.reason,
             "tagging_rules": json.dumps(tagging_rules, indent=2),
             "format_instructions": parser.get_format_instructions(),
         })
@@ -142,7 +136,6 @@ def analyze_resource(
             suggested_cost_center=response.suggested_cost_center,
             suggested_owner=response.suggested_owner,
             suggested_tags=response.suggested_tags,
-            estimated_savings=response.estimated_monthly_savings,
         )
     except Exception as e:
         logger.exception(f"Error invoking LangChain chain: {e}")
@@ -150,7 +143,7 @@ def analyze_resource(
 
 
 def analyze_batch(
-    violations: List[tuple],
+    violations: List[TaggingViolation],
     model_id: str,
     region: str = "us-east-1",
     max_tokens: int = 1024,
@@ -159,17 +152,14 @@ def analyze_batch(
 ) -> Dict[str, Any]:
     """Analyze multiple violations and return summary."""
     results = []
-    total_savings = 0.0
 
-    for resource, untracked in violations:
+    for violation in violations:
         draft = analyze_resource(
-            resource, untracked, model_id, region, max_tokens, temperature, tagging_rules
+            violation.resource, violation, model_id, region, max_tokens, temperature, tagging_rules
         )
         results.append({
-            'resource': f"{resource.namespace}/{resource.name}",
-            'kind': resource.kind,
-            'current_cost': untracked.monthly_cost,
-            'untracked_amount': untracked.untracked_amount,
+            'resource': f"{violation.resource.namespace}/{violation.resource.name}",
+            'kind': violation.resource.kind,
             'issue': {
                 'title': draft.title,
                 'priority': draft.priority,
@@ -178,37 +168,33 @@ def analyze_batch(
                 'labels': draft.labels,
             }
         })
-        total_savings += draft.estimated_savings
 
     return {
         'analyzed_count': len(violations),
         'recommendations': results,
-        'total_estimated_savings': round(total_savings, 2)
     }
 
 
-def generate_summary_report(untracked_analysis: Dict[str, Any]) -> str:
+def generate_summary_report(violations_analysis: Dict[str, Any]) -> str:
     """Generate a human-readable summary report."""
     report = f"""# FinOps Analysis Report (LLM Powered - Bedrock)
 
-## Cost Summary
-- **Total Monthly Cost**: ${untracked_analysis['total_monthly_cost']}
-- **Tracked**: ${untracked_analysis['total_tracked']} ({untracked_analysis['tracked_percentage']}%)
-- **Untracked**: ${untracked_analysis['total_untracked']} ({untracked_analysis['untracked_percentage']}%)
+## Tagging Summary
+- **Total Resources**: {violations_analysis['total_resources']}
+- **Properly Tagged**: {violations_analysis['properly_tagged']} ({violations_analysis['tagged_percentage']}%)
+- **Violations**: {violations_analysis['violations']} ({violations_analysis['violation_percentage']}%)
 
 ## Breakdown by Category
 """
 
-    for category, amount in untracked_analysis.get('breakdown_by_category', {}).items():
-        report += f"- **{category.capitalize()}**: ${amount}/month\n"
+    for category, count in violations_analysis.get('breakdown_by_category', {}).items():
+        report += f"- **{category.capitalize()}**: {count} resources\n"
 
-    report += f"\n## Violations Found: {len(untracked_analysis.get('violations', []))}\n\n"
+    report += f"\n## Violations Found: {len(violations_analysis.get('violations_list', []))}\n\n"
 
-    for i, v in enumerate(untracked_analysis.get('violations', []), 1):
+    for i, v in enumerate(violations_analysis.get('violations_list', []), 1):
         report += f"""### {i}. {v['resource']} ({v['kind']})
 - **Category**: {v['category']}
-- **Monthly Cost**: ${v['monthly_cost']}
-- **Untracked Amount**: ${v['untracked_amount']}
 - **Missing Tags**: {', '.join(str(t) for t in v['missing_tags'] if t) if v['missing_tags'] else 'None'}
 - **Reason**: {v['reason']}
 

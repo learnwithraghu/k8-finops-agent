@@ -10,9 +10,8 @@ import yaml
 from dotenv import load_dotenv
 
 from agent.scanner import K8sScanner
-from agent.cost_calculator import CostCalculator
-from agent.untracked_money import UntrackedMoneyDetector
-from agent.analyzer import analyze_resource, analyze_batch, generate_summary_report
+from agent.tagging_violations import TaggingViolationDetector
+from agent.analyzer import analyze_resource, generate_summary_report
 
 
 def setup_logging(log_level: str = "INFO"):
@@ -47,14 +46,12 @@ def load_config() -> dict:
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'pricing_config': os.getenv('PRICING_CONFIG'),
         'tagging_rules': tagging_rules_path,
         'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
         'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
         'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
         'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
-        'min_cost_threshold': float(os.getenv('MIN_COST_THRESHOLD', '1.0')),
         'excluded_namespaces': excluded_namespaces,
     }
 
@@ -75,7 +72,6 @@ def main():
     parser = argparse.ArgumentParser(description='K8s FinOps Agent')
     parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
     parser.add_argument('--namespace', '-n', help='Target namespace')
-    parser.add_argument('--threshold', '-t', type=float, default=1.0, help='Minimum cost threshold')
     parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
 
     args = parser.parse_args()
@@ -91,8 +87,6 @@ def main():
         config['kubeconfig_path'] = args.kubeconfig
     if args.namespace is not None:
         config['target_namespace'] = args.namespace
-    if args.threshold:
-        config['min_cost_threshold'] = args.threshold
 
     model_id = config.get('bedrock_model_id')
     if not model_id:
@@ -109,16 +103,15 @@ def main():
         logger.error("Failed to connect to Kubernetes")
         sys.exit(1)
 
-    calculator = CostCalculator(config.get('pricing_config'))
     tagging_rules = load_tagging_rules(config.get('tagging_rules')) if config.get('tagging_rules') else {}
-    detector = UntrackedMoneyDetector(calculator, config.get('tagging_rules'))
+    detector = TaggingViolationDetector(config.get('tagging_rules'))
 
     target_ns = config.get('target_namespace')
     logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
     resources = scanner.scan_all(target_ns)
     logger.info(f"Found {len(resources)} resources")
 
-    logger.info("Analyzing untracked money...")
+    logger.info("Analyzing tagging violations...")
     analysis = detector.analyze_all(resources)
 
     report = generate_summary_report(analysis)
@@ -126,20 +119,19 @@ def main():
     print(report)
     print("=" * 80 + "\n")
 
-    threshold = config.get('min_cost_threshold', 1.0)
-    violations = detector.get_high_impact_violations(resources, threshold)
-    logger.info(f"Found {len(violations)} high-impact violations")
+    violations = detector.get_violations(resources)
+    logger.info(f"Found {len(violations)} tagging violations")
 
     recommendations_generated = 0
     if violations:
         logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
 
         drafts = []
-        for untracked in violations:
+        for violation in violations:
             try:
                 draft = analyze_resource(
-                    untracked.resource,
-                    untracked,
+                    violation.resource,
+                    violation,
                     model_id,
                     config.get('aws_region', 'us-east-1'),
                     config.get('bedrock_max_tokens', 1024),
@@ -148,13 +140,13 @@ def main():
                 )
                 drafts.append(draft)
             except Exception as e:
-                logger.error(f"Failed to analyze {untracked.resource.namespace}/{untracked.resource.name}: {e}")
+                logger.error(f"Failed to analyze {violation.resource.namespace}/{violation.resource.name}: {e}")
 
         recommendations_generated = len(drafts)
         logger.info(f"Prepared {recommendations_generated} recommendation drafts")
 
     logger.info("FinOps scan completed successfully")
-    logger.info(f"Total untracked: ${analysis['total_untracked']}/month")
+    logger.info(f"Total violations: {analysis['violations']}")
     logger.info(f"Recommendation drafts prepared: {recommendations_generated}")
 
 
