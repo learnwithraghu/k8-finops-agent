@@ -9,7 +9,7 @@ metadata:
     cost-center: inventory
     environment: prod
     owner: inventory-team
-    compliance-level: standard
+    criticality: P2
     # All required tags present - properly tagged baseline
 spec:
   replicas: 1

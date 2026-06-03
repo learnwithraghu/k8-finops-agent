@@ -5,8 +5,10 @@ metadata:
   namespace: booking-api
   labels:
     app.kubernetes.io/name: booking-api
+    app.kubernetes.io/tier: backend
     cost-center: booking-engine
-    # Intentionally missing: environment, compliance, owner
+    environment: prod
+    # Missing: owner, criticality
 spec:
   replicas: 1
   selector:

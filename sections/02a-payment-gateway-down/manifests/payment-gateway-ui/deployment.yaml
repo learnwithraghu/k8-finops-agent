@@ -5,8 +5,7 @@ metadata:
   namespace: payment
   labels:
     app: payment-gateway
-    # Intentionally missing: owner, team, cost-center, tier, environment
-    # This is the point — no one knows who to call when this breaks
+    # Minimal tags - missing most required tags
 spec:
   replicas: 1
   selector:

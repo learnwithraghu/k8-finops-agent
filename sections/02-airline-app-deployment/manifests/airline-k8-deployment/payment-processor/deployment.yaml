@@ -6,7 +6,9 @@ metadata:
   labels:
     environment: prod
     owner: payments-team
-    # Intentionally missing: cost-center, tier, application
+    app.kubernetes.io/tier: backend
+    cost-center: payment
+    # Missing: application, criticality
 spec:
   replicas: 1
   selector:

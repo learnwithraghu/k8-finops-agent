@@ -5,8 +5,7 @@ metadata:
   namespace: payment
   labels:
     app: payment-gateway-api
-    # Intentionally missing: owner, team, cost-center, tier, environment
-    # Students must find that no one owns this service
+    # Minimal tags - missing most required tags
 spec:
   replicas: 0  # <-- THE PROBLEM: this service is down
   selector:

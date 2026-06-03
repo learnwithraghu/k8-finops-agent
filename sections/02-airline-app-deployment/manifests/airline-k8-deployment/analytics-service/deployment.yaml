@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: analytics-collector
   namespace: default
+  labels:
+    app: analytics
+    # Minimal tags - in default namespace with missing required tags
 spec:
   replicas: 1
   selector:

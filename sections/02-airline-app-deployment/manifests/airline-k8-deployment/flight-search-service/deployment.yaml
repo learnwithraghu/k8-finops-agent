@@ -5,7 +5,9 @@ metadata:
   namespace: flight-search
   labels:
     app: flight-search
-    # Intentionally missing: cost-center, owner
+    app.kubernetes.io/tier: backend
+    environment: prod
+    # Missing: owner, cost-center, application, criticality
 spec:
   replicas: 1
   selector:
