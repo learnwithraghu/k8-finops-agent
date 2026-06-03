@@ -16,17 +16,6 @@ from agent.analyzer import analyze_resource, generate_summary_report
 TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
 
 
-def setup_logging(log_level: str = "INFO"):
-    """Setup logging configuration."""
-    level = getattr(logging, log_level.upper(), logging.INFO)
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
-
 
 def load_config() -> dict:
     """Load configuration from environment."""
@@ -43,7 +32,6 @@ def load_config() -> dict:
         'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
         'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
         'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
-        'log_level': os.getenv('LOG_LEVEL', 'INFO'),
         'excluded_namespaces': excluded_namespaces,
     }
 
@@ -51,11 +39,10 @@ def load_config() -> dict:
 
 def main():
     """Main entry point."""
-    config = load_config()
-
-    setup_logging(config.get('log_level', 'INFO'))
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
+    config = load_config()
     logger.info("Starting K8s FinOps Agent")
 
     model_id = config.get('bedrock_model_id')
