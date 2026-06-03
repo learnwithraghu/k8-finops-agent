@@ -3,16 +3,16 @@
 This is the only file you need for Section 05.
 
 ## Goal
-Use Bedrock to turn the local FinOps scan into a clearer, more decision-oriented report.
+Use Bedrock with LangChain to turn the FinOps scan into a clearer, more decision-oriented report.
 
 ## Tutor note
 Show the plain local report first, then switch to Bedrock and show how the output becomes more decision-oriented.
 
-## What students will learn
-- what looks weak in the plain local report
-- how Bedrock improves the report structure and reasoning
+## What you will learn
+- how to use LangChain with AWS Bedrock
 - how to use an **Inference Profile ARN** with Bedrock
 - why AWS IAM credentials are enough
+- how Pydantic models structure LLM output
 - how this becomes the handoff point before the tracker service
 
 ## What you need before starting
@@ -21,7 +21,7 @@ Complete Sections 01, 02, 03, and 04 first.
 You should already have:
 - a working Kind cluster
 - the airline app deployed
-- the local agent working in mock mode
+- the local agent working
 - an AWS account with Bedrock access
 
 Bedrock uses your AWS credentials. Configure them with:
@@ -34,7 +34,7 @@ This writes to `~/.aws/credentials` and `~/.aws/config`. The agent picks them up
 ## Where the agent code lives
 - `sections/05-bedrock-decision-flow/agent/`
 
-This is the same scanner, calculator, and detector from Section 04, now with the Bedrock analyzer wired in.
+This is the same scanner, calculator, and detector from Section 04, now with Bedrock analysis functions wired in using LangChain.
 
 ## Step 1: Read the Bedrock analyzer
 ```bash
@@ -42,10 +42,11 @@ cat sections/05-bedrock-decision-flow/agent/analyzer.py
 ```
 
 What to look for:
-- the `BedrockAnalyzer` class
+- the `analyze_resource()` function that uses LangChain
+- the `ChatBedrock` from `langchain_aws`
 - the prompt that asks for JSON output
-- the fallback path when Bedrock is unavailable
-- the `modelId` value being passed into Bedrock
+- the `PydanticOutputParser` for structured output
+- the `model_id` value being passed to Bedrock
 
 ## Step 2: Set the Bedrock profile in `.env`
 Open the environment file:
@@ -75,10 +76,10 @@ What to look for:
 - AWS credentials come from your configured profile (`aws configure`)
 
 ## Step 4: Look at the plain local report
-Use the Section 04 run as your baseline.
+The scanner produces cost data and identifies untracked resources. The raw output is useful but mechanical — it lists findings without prioritization or context.
 
 What to look for:
-- the report is useful, but still very mechanical
+- the report shows cost breakdowns and violations
 - it lists findings, but does not decide what matters most
 - this is the gap Bedrock will help close
 
@@ -88,11 +89,9 @@ PYTHONPATH=sections/05-bedrock-decision-flow python -m agent.main --log-level IN
 ```
 
 What to look for:
-- the logs should clearly say Bedrock connected
 - the logs should show the inference profile ARN
 - the logs should say that findings are being sent to Bedrock
 - the report title should say it is LLM powered
-- no issue tracker is involved yet
 - if Bedrock fails, check the AWS credentials and profile ARN first
 
 ## Step 6: Read the Bedrock output
@@ -111,9 +110,10 @@ What to look for:
 
 ## Expected outcome
 You should be able to explain:
-- what changed between mock and Bedrock mode
+- how LangChain simplifies Bedrock integration
 - why the inference profile ARN matters
 - how Bedrock helps turn a report into a decision input
+- the difference between raw scan output and LLM-enhanced recommendations
 
 ## Handoff to Section 06
 Once the decision flow is clear, move to:

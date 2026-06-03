@@ -5,7 +5,6 @@ import sys
 import logging
 import argparse
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -13,9 +12,9 @@ from dotenv import load_dotenv
 from agent.scanner import K8sScanner
 from agent.cost_calculator import CostCalculator
 from agent.untracked_money import UntrackedMoneyDetector
-from agent.analyzer import BedrockAnalyzer, MockAnalyzer
+from agent.analyzer import analyze_resource, analyze_batch, generate_summary_report
 
-# Configure logging
+
 def setup_logging(log_level: str = "INFO"):
     """Setup logging configuration."""
     level = getattr(logging, log_level.upper(), logging.INFO)
@@ -28,126 +27,8 @@ def setup_logging(log_level: str = "INFO"):
     )
 
 
-class FinOpsAgent:
-    """Main FinOps Agent orchestrator."""
-
-    def __init__(self, config: Optional[dict] = None):
-        """Initialize agent with configuration."""
-        self.config = config or {}
-        self.scanner = None
-        self.calculator = None
-        self.detector = None
-        self.analyzer = None
-        self.analyzer_mode = "unknown"
-        self.recommendations_generated = 0
-
-    def initialize(self) -> bool:
-        """Initialize all components."""
-        logger = logging.getLogger(__name__)
-
-        # Initialize scanner
-        kubeconfig = self.config.get('kubeconfig_path')
-        excluded_namespaces = self.config.get('excluded_namespaces', [])
-        self.scanner = K8sScanner(kubeconfig_path=kubeconfig, excluded_namespaces=excluded_namespaces)
-        if not self.scanner.connect():
-            logger.error("Failed to connect to Kubernetes")
-            return False
-
-        # Initialize cost calculator
-        pricing_config = self.config.get('pricing_config')
-        self.calculator = CostCalculator(pricing_config)
-
-        # Initialize untracked money detector
-        tagging_rules = self.config.get('tagging_rules')
-        self.detector = UntrackedMoneyDetector(self.calculator, tagging_rules)
-
-        # Initialize analyzer
-        force_mock = self.config.get('force_mock', False)
-        if force_mock:
-            self.analyzer = MockAnalyzer()
-            self.analyzer_mode = "mock"
-            logger.info("Using mock analyzer (--mock flag)")
-        else:
-            model_id = self.config.get('bedrock_model_id')
-            region = self.config.get('aws_region', 'us-east-1')
-            max_tokens = self.config.get('bedrock_max_tokens', 1024)
-            temperature = self.config.get('bedrock_temperature', 0.3)
-            self.analyzer = BedrockAnalyzer(
-                model_id=model_id,
-                region=region,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                tagging_rules=getattr(self.detector, 'rules', {})
-            )
-            if self.analyzer.connect():
-                self.analyzer_mode = "bedrock"
-            else:
-                logger.warning("Failed to connect to Bedrock, falling back to mock analyzer")
-                self.analyzer = MockAnalyzer()
-                self.analyzer_mode = "mock-fallback"
-
-        return True
-
-    def run_scan(self) -> dict:
-        """Run the full scan and analysis."""
-        logger = logging.getLogger(__name__)
-
-        # Scan resources
-        target_ns = self.config.get('target_namespace')
-        logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
-        resources = self.scanner.scan_all(target_ns)
-        logger.info(f"Found {len(resources)} resources")
-
-        # Calculate costs and detect untracked money
-        logger.info("Analyzing untracked money...")
-        analysis = self.detector.analyze_all(resources)
-
-        # Generate summary report
-        report = self.analyzer.generate_summary_report(analysis)
-        print("\n" + "=" * 80)
-        print(report)
-        print("=" * 80 + "\n")
-        logger.info(f"Analyzer mode: {self.analyzer_mode}")
-        if self.analyzer_mode == "bedrock":
-            logger.info("LLM-powered output generated from Bedrock")
-            logger.info(f"Bedrock inference profile ARN: {self.config.get('bedrock_model_id')}")
-
-        # Get high-impact violations
-        threshold = self.config.get('min_cost_threshold', 1.0)
-        violations = self.detector.get_high_impact_violations(resources, threshold)
-        logger.info(f"Found {len(violations)} high-impact violations")
-
-        # Analyze with AI / Bedrock
-        recommendations_generated = 0
-        if violations:
-            if self.analyzer_mode == "bedrock":
-                logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
-            else:
-                logger.info("Generating recommendation drafts with mock analyzer")
-
-            drafts = []
-            for untracked in violations:
-                draft = self.analyzer.analyze_resource(
-                    untracked.resource,
-                    untracked
-                )
-                if draft:
-                    drafts.append(draft)
-
-            recommendations_generated = len(drafts)
-            logger.info(f"Prepared {recommendations_generated} recommendation drafts")
-
-        return {
-            'analysis': analysis,
-            'violations': len(violations),
-            'recommendations_generated': recommendations_generated,
-            'report': report
-        }
-
-
 def load_config() -> dict:
     """Load configuration from environment."""
-    # Load .env file if it exists
     env_path = Path('.env')
     if env_path.exists():
         load_dotenv()
@@ -179,53 +60,106 @@ def load_config() -> dict:
     }
 
 
+def load_tagging_rules(tagging_rules_path: str) -> dict:
+    """Load tagging rules from YAML file."""
+    try:
+        with open(tagging_rules_path, 'r') as f:
+            return yaml.safe_load(f) or {}
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Could not load tagging rules from {tagging_rules_path}: {e}")
+        return {}
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description='K8s FinOps Agent')
     parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
     parser.add_argument('--namespace', '-n', help='Target namespace')
     parser.add_argument('--dry-run', '-d', action='store_true', help='Dry run mode')
-    parser.add_argument('--mock', '-m', action='store_true', help='Use mock analyzer')
     parser.add_argument('--threshold', '-t', type=float, default=1.0, help='Minimum cost threshold')
     parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
 
     args = parser.parse_args()
 
-    # Setup logging
     setup_logging(args.log_level)
     logger = logging.getLogger(__name__)
 
     logger.info("Starting K8s FinOps Agent")
 
-    # Load configuration
     config = load_config()
 
-    # Override with command line args
     if args.kubeconfig:
         config['kubeconfig_path'] = args.kubeconfig
     if args.namespace is not None:
         config['target_namespace'] = args.namespace
     if args.dry_run:
         config['dry_run'] = True
-    if args.mock:
-        config['force_mock'] = True
     if args.threshold:
         config['min_cost_threshold'] = args.threshold
 
-    # Initialize and run agent
-    agent = FinOpsAgent(config)
-    if not agent.initialize():
-        logger.error("Failed to initialize agent")
+    model_id = config.get('bedrock_model_id')
+    if not model_id:
+        logger.error("BEDROCK_MODEL_ID not set in environment or .env file")
         sys.exit(1)
 
-    try:
-        results = agent.run_scan()
-        logger.info("FinOps scan completed successfully")
-        logger.info(f"Total untracked: ${results['analysis']['total_untracked']}/month")
-        logger.info(f"Recommendation drafts prepared: {results['recommendations_generated']}")
-    except Exception as e:
-        logger.error(f"Scan failed: {e}", exc_info=True)
+    logger.info(f"Using Bedrock inference profile ARN: {model_id}")
+
+    scanner = K8sScanner(
+        kubeconfig_path=config.get('kubeconfig_path'),
+        excluded_namespaces=config.get('excluded_namespaces', [])
+    )
+    if not scanner.connect():
+        logger.error("Failed to connect to Kubernetes")
         sys.exit(1)
+
+    calculator = CostCalculator(config.get('pricing_config'))
+    tagging_rules = load_tagging_rules(config.get('tagging_rules')) if config.get('tagging_rules') else {}
+    detector = UntrackedMoneyDetector(calculator, config.get('tagging_rules'))
+
+    target_ns = config.get('target_namespace')
+    logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
+    resources = scanner.scan_all(target_ns)
+    logger.info(f"Found {len(resources)} resources")
+
+    logger.info("Analyzing untracked money...")
+    analysis = detector.analyze_all(resources)
+
+    report = generate_summary_report(analysis)
+    print("\n" + "=" * 80)
+    print(report)
+    print("=" * 80 + "\n")
+
+    threshold = config.get('min_cost_threshold', 1.0)
+    violations = detector.get_high_impact_violations(resources, threshold)
+    logger.info(f"Found {len(violations)} high-impact violations")
+
+    recommendations_generated = 0
+    if violations:
+        logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
+
+        drafts = []
+        for untracked in violations:
+            try:
+                draft = analyze_resource(
+                    untracked.resource,
+                    untracked,
+                    model_id,
+                    config.get('aws_region', 'us-east-1'),
+                    config.get('bedrock_max_tokens', 1024),
+                    config.get('bedrock_temperature', 0.3),
+                    tagging_rules,
+                )
+                drafts.append(draft)
+            except Exception as e:
+                logger.error(f"Failed to analyze {untracked.resource.namespace}/{untracked.resource.name}: {e}")
+
+        recommendations_generated = len(drafts)
+        logger.info(f"Prepared {recommendations_generated} recommendation drafts")
+
+    logger.info("FinOps scan completed successfully")
+    logger.info(f"Total untracked: ${analysis['total_untracked']}/month")
+    logger.info(f"Recommendation drafts prepared: {recommendations_generated}")
 
 
 if __name__ == '__main__':
