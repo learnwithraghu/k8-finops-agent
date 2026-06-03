@@ -12,6 +12,9 @@ from agent.scanner import K8sScanner
 from agent.tagging_violations import TaggingViolationDetector
 from agent.analyzer import analyze_resource, generate_summary_report
 
+# Path to tagging rules is fixed — always lives in config/ next to the agent
+TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
+
 
 def setup_logging(log_level: str = "INFO"):
     """Setup logging configuration."""
@@ -31,21 +34,11 @@ def load_config() -> dict:
     if env_path.exists():
         load_dotenv()
 
-    tagging_rules_path = os.getenv('TAGGING_RULES')
-    excluded_namespaces = []
-    if tagging_rules_path:
-        try:
-            rules_file = Path(tagging_rules_path).expanduser()
-            if rules_file.exists():
-                with open(rules_file, 'r') as f:
-                    tagging_rules_data = yaml.safe_load(f) or {}
-                excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
-        except Exception:
-            excluded_namespaces = []
+    tagging_rules_data = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
+    excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'tagging_rules': tagging_rules_path,
         'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
         'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
         'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
@@ -54,16 +47,6 @@ def load_config() -> dict:
         'excluded_namespaces': excluded_namespaces,
     }
 
-
-def load_tagging_rules(tagging_rules_path: str) -> dict:
-    """Load tagging rules from YAML file."""
-    try:
-        with open(tagging_rules_path, 'r') as f:
-            return yaml.safe_load(f) or {}
-    except Exception as e:
-        logger = logging.getLogger(__name__)
-        logger.warning(f"Could not load tagging rules from {tagging_rules_path}: {e}")
-        return {}
 
 
 def main():
@@ -90,8 +73,8 @@ def main():
         logger.error("Failed to connect to Kubernetes")
         sys.exit(1)
 
-    tagging_rules = load_tagging_rules(config.get('tagging_rules')) if config.get('tagging_rules') else {}
-    detector = TaggingViolationDetector(config.get('tagging_rules'))
+    tagging_rules = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
+    detector = TaggingViolationDetector(str(TAGGING_RULES_PATH))
 
     target_ns = config.get('target_namespace')
     logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
