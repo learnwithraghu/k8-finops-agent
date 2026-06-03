@@ -5,7 +5,11 @@ metadata:
   namespace: payment
   labels:
     app: payment-gateway
-    # Minimal tags - missing most required tags
+    app.kubernetes.io/name: payment-gateway
+    app.kubernetes.io/tier: frontend
+    environment: prod
+    # Missing: owner, cost-center, criticality
+    # SRE can see this is a production frontend service but has no idea who owns it
 spec:
   replicas: 1
   selector:

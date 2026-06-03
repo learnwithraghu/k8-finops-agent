@@ -5,7 +5,11 @@ metadata:
   namespace: payment
   labels:
     app: payment-gateway-api
-    # Minimal tags - missing most required tags
+    app.kubernetes.io/name: payment-gateway-api
+    app.kubernetes.io/tier: backend
+    environment: prod
+    # Missing: owner, cost-center, criticality
+    # SRE can see this is a production backend service but has no idea who owns it
 spec:
   replicas: 0  # <-- THE PROBLEM: this service is down
   selector:
