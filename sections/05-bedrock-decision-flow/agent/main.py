@@ -54,7 +54,6 @@ def load_config() -> dict:
         'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
         'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
-        'dry_run': os.getenv('DRY_RUN', 'false').lower() == 'true',
         'min_cost_threshold': float(os.getenv('MIN_COST_THRESHOLD', '1.0')),
         'excluded_namespaces': excluded_namespaces,
     }
@@ -76,7 +75,6 @@ def main():
     parser = argparse.ArgumentParser(description='K8s FinOps Agent')
     parser.add_argument('--kubeconfig', help='Path to kubeconfig file')
     parser.add_argument('--namespace', '-n', help='Target namespace')
-    parser.add_argument('--dry-run', '-d', action='store_true', help='Dry run mode')
     parser.add_argument('--threshold', '-t', type=float, default=1.0, help='Minimum cost threshold')
     parser.add_argument('--log-level', '-l', default='INFO', help='Log level')
 
@@ -93,8 +91,6 @@ def main():
         config['kubeconfig_path'] = args.kubeconfig
     if args.namespace is not None:
         config['target_namespace'] = args.namespace
-    if args.dry_run:
-        config['dry_run'] = True
     if args.threshold:
         config['min_cost_threshold'] = args.threshold
 
