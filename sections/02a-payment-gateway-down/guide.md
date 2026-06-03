@@ -67,13 +67,13 @@ The `payment-gateway-api` deployment shows `0/1` or simply no pods. That is the 
 Port-forward the UI service to your local machine:
 
 ```bash
-kubectl port-forward svc/payment-gateway -n payment 8080:80
+kubectl port-forward svc/payment-gateway -n payment 8089:80
 ```
 
 Keep this terminal open. Open Chrome and go to:
 
 ```
-http://localhost:8080
+http://localhost:8089
 ```
 
 You will see the **AirPay** payment gateway — a Stripe-like interface with a card form.
@@ -255,7 +255,7 @@ kubectl get deployment payment-gateway-api -n payment --show-labels
 
 ### Step 15: Refresh Chrome and test the payment
 
-Go back to `http://localhost:8080` and refresh the page.
+Go back to `http://localhost:8089` and refresh the page.
 
 What you should see:
 - The incident banner is gone

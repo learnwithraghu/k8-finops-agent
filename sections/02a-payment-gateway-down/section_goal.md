@@ -30,7 +30,7 @@ You should already have:
 
 ## Success criteria
 A student can:
-1. Open http://localhost:8080 in Chrome and see the AirPay payment UI
+1. Open http://localhost:8089 in Chrome and see the AirPay payment UI
 2. Attempt a payment and watch it fail with a specific error
 3. Run the kubectl debug sequence and confirm there are no pods for the backend
 4. Notice the missing ownership labels on the failing deployment
