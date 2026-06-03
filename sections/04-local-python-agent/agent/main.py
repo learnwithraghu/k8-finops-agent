@@ -12,6 +12,9 @@ from dotenv import load_dotenv
 from agent.scanner import K8sScanner
 from agent.simple_checker import SimpleTagChecker
 
+# Path to tagging rules is fixed — always lives in config/ next to the agent
+TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
+
 
 def setup_logging(log_level: str = "INFO"):
     """Setup logging configuration."""
@@ -47,8 +50,7 @@ class FinOpsAgent:
             return False
 
         # Initialize tag checker
-        tagging_rules = self.config.get('tagging_rules')
-        self.checker = SimpleTagChecker(tagging_rules)
+        self.checker = SimpleTagChecker(str(TAGGING_RULES_PATH))
         logger.info("Tag checker initialized")
 
         return True
@@ -85,21 +87,11 @@ def load_config() -> dict:
     if env_path.exists():
         load_dotenv()
 
-    tagging_rules_path = os.getenv('TAGGING_RULES')
-    excluded_namespaces = []
-    if tagging_rules_path:
-        try:
-            rules_file = Path(tagging_rules_path).expanduser()
-            if rules_file.exists():
-                with open(rules_file, 'r') as f:
-                    tagging_rules_data = yaml.safe_load(f) or {}
-                excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
-        except Exception:
-            excluded_namespaces = []
+    tagging_rules_data = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
+    excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'tagging_rules': tagging_rules_path,
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
         'excluded_namespaces': excluded_namespaces,
     }
