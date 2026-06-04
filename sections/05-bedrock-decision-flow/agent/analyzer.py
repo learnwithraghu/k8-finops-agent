@@ -101,6 +101,7 @@ def analyze_resource(
         region_name=region,
         temperature=temperature,
         max_tokens=max_tokens,
+        provider="amazon",
     )
     chain = prompt | llm | parser
 

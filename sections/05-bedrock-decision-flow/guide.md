@@ -100,7 +100,7 @@ What to look for:
 
 ## Step 6: Run the agent with Bedrock enabled
 ```bash
-PYTHONPATH=sections/05-bedrock-decision-flow python -m agent.main --log-level INFO
+PYTHONPATH=sections/05-bedrock-decision-flow python3 -m agent.main --log-level INFO
 ```
 
 What to look for:
