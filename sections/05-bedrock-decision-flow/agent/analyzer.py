@@ -1,12 +1,14 @@
-"""AWS Bedrock AI analyzer for FinOps agent using LangChain."""
+"""OpenAI-compatible AI analyzer for FinOps agent using LangChain."""
 
 import json
 import logging
+import os
 from dataclasses import dataclass
 from typing import Dict, Any, List
 
+from openai import OpenAI
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
@@ -31,7 +33,7 @@ class IssueDraftResponse(BaseModel):
 
 @dataclass
 class IssueDraft:
-    """Bedrock-generated GitHub issue payload."""
+    """LLM-generated GitHub issue payload."""
     title: str
     body: str
     labels: List[str]
@@ -82,7 +84,8 @@ def analyze_resource(
     resource: K8sResource,
     violation: TaggingViolation,
     model_id: str,
-    region: str = "us-east-1",
+    base_url: str = None,
+    api_key: str = None,
     max_tokens: int = 1024,
     temperature: float = 0.3,
     tagging_rules: Dict[str, Any] = None,
@@ -91,17 +94,17 @@ def analyze_resource(
     tagging_rules = tagging_rules or {}
 
     logger.info(
-        f"Sending resource to Bedrock: {resource.namespace}/{resource.name} ({resource.kind})"
+        f"Sending resource to OpenAI-compatible endpoint: {resource.namespace}/{resource.name} ({resource.kind})"
     )
 
     parser = PydanticOutputParser(pydantic_object=IssueDraftResponse)
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-    llm = ChatBedrock(
-        model_id=model_id,
-        region_name=region,
+    llm = ChatOpenAI(
+        model=model_id,
+        base_url=base_url or os.getenv("OPENAI_BASE_URL", "https://api.ai.kodekloud.com/v1"),
+        api_key=api_key or os.getenv("OPENAI_API_KEY"),
         temperature=temperature,
         max_tokens=max_tokens,
-        provider="amazon",
     )
     chain = prompt | llm | parser
 
@@ -125,7 +128,7 @@ def analyze_resource(
             "format_instructions": parser.get_format_instructions(),
         })
 
-        logger.info(f"Bedrock analysis complete for {resource.namespace}/{resource.name}")
+        logger.info(f"LLM analysis complete for {resource.namespace}/{resource.name}")
 
         return IssueDraft(
             title=response.issue_title,
@@ -146,7 +149,8 @@ def analyze_resource(
 def analyze_batch(
     violations: List[TaggingViolation],
     model_id: str,
-    region: str = "us-east-1",
+    base_url: str = None,
+    api_key: str = None,
     max_tokens: int = 1024,
     temperature: float = 0.3,
     tagging_rules: Dict[str, Any] = None,
@@ -156,7 +160,7 @@ def analyze_batch(
 
     for violation in violations:
         draft = analyze_resource(
-            violation.resource, violation, model_id, region, max_tokens, temperature, tagging_rules
+            violation.resource, violation, model_id, base_url, api_key, max_tokens, temperature, tagging_rules
         )
         results.append({
             'resource': f"{violation.resource.namespace}/{violation.resource.name}",
@@ -178,7 +182,7 @@ def analyze_batch(
 
 def generate_summary_report(violations_analysis: Dict[str, Any]) -> str:
     """Generate a human-readable summary report."""
-    report = f"""# FinOps Analysis Report (LLM Powered - Bedrock)
+    report = f"""# FinOps Analysis Report (LLM Powered - OpenAI-Compatible)"
 
 ## Tagging Summary
 - **Total Resources**: {violations_analysis['total_resources']}

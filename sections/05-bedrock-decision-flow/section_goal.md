@@ -1,14 +1,14 @@
-# Section 05 Goal: Bedrock Decision Flow
+# Section 05 Goal: LLM Decision Flow
 
 ## Goal
-Enhance the local agent with Bedrock so the report becomes cleaner, more contextual, and more decision-oriented.
+Enhance the local agent with an OpenAI-compatible LLM endpoint so the report becomes cleaner, more contextual, and more decision-oriented.
 
 ## Scope
-- Add Bedrock integration
-- Use an Inference Profile ARN as the Bedrock `modelId`
+- Add LangChain + OpenAI-compatible LLM integration
+- Configure the endpoint via `OPENAI_BASE_URL` and `OPENAI_API_KEY` in `.env`
 - Feed scan results into a prompt
 - Improve the report with AI-guided structure and recommendations
-- Compare raw output vs Bedrock output
+- Compare raw output vs LLM output
 
 ## Out of scope
 - Issue tracker writes
@@ -16,4 +16,4 @@ Enhance the local agent with Bedrock so the report becomes cleaner, more context
 - Full automation of remediation
 
 ## Success criteria
-The learner sees a cleaner, more actionable report produced by the local agent.
+The learner sees a cleaner, more actionable report produced by the local agent using the LLM endpoint.

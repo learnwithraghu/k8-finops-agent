@@ -28,10 +28,11 @@ def load_config() -> dict:
 
     return {
         'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'bedrock_model_id': os.getenv('BEDROCK_MODEL_ID'),
-        'bedrock_max_tokens': int(os.getenv('BEDROCK_MAX_TOKENS', '1024')),
-        'bedrock_temperature': float(os.getenv('BEDROCK_TEMPERATURE', '0.3')),
-        'aws_region': os.getenv('AWS_REGION', 'us-east-1'),
+        'openai_base_url': os.getenv('OPENAI_BASE_URL', 'https://api.ai.kodekloud.com/v1'),
+        'openai_api_key': os.getenv('OPENAI_API_KEY'),
+        'openai_model_id': os.getenv('OPENAI_MODEL_ID', 'gpt-4o'),
+        'openai_max_tokens': int(os.getenv('OPENAI_MAX_TOKENS', '1024')),
+        'openai_temperature': float(os.getenv('OPENAI_TEMPERATURE', '0.3')),
         'excluded_namespaces': excluded_namespaces,
     }
 
@@ -45,12 +46,12 @@ def main():
     config = load_config()
     logger.info("Starting K8s FinOps Agent")
 
-    model_id = config.get('bedrock_model_id')
+    model_id = config.get('openai_model_id')
     if not model_id:
-        logger.error("BEDROCK_MODEL_ID not set in environment or .env file")
+        logger.error("OPENAI_MODEL_ID not set in environment or .env file")
         sys.exit(1)
 
-    logger.info(f"Using Bedrock inference profile ARN: {model_id}")
+    logger.info(f"Using OpenAI-compatible model: {model_id}")
 
     scanner = K8sScanner(
         kubeconfig_path=config.get('kubeconfig_path'),
@@ -81,7 +82,7 @@ def main():
 
     recommendations_generated = 0
     if violations:
-        logger.info(f"Sending {len(violations)} findings to Bedrock for LLM-powered decisions")
+        logger.info(f"Sending {len(violations)} findings to LLM for decisions")
 
         drafts = []
         for violation in violations:
@@ -90,9 +91,10 @@ def main():
                     violation.resource,
                     violation,
                     model_id,
-                    config.get('aws_region', 'us-east-1'),
-                    config.get('bedrock_max_tokens', 1024),
-                    config.get('bedrock_temperature', 0.3),
+                    config.get('openai_base_url'),
+                    config.get('openai_api_key'),
+                    config.get('openai_max_tokens', 1024),
+                    config.get('openai_temperature', 0.3),
                     tagging_rules,
                 )
                 drafts.append(draft)
