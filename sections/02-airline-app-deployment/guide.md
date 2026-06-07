@@ -2,6 +2,12 @@
 
 This is the only file you need for Section 02.
 
+## Workload Architecture
+
+Before deploying the workload, review the architecture diagram below. It maps out the six namespaces, the resources deployed in each, and highlights the operational/cost attribution gaps that will be audited in subsequent sections:
+
+![Airline Application Architecture](architecture.svg)
+
 ## Goal
 Deploy the airline app into four separate namespaces and learn how to inspect it with `kubectl`.
 

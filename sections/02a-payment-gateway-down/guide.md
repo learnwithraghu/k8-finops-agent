@@ -2,6 +2,12 @@
 
 This is the only file you need for Section 02a.
 
+## Incident Architecture
+
+During this live incident simulation, the flow of traffic from the client browser through to the backend API, and the point of failure, is mapped out below. This illustrates the visual system architecture and highlights where the upstream 503 error occurs due to the missing API pods:
+
+![Payment Gateway Down Architecture](architecture.svg)
+
 ## Goal
 Experience the real-world pain of debugging a down payment service with no ownership metadata.
 
