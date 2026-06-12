@@ -312,7 +312,7 @@ sections/
 │   ├── agent/
 │   ├── config/
 │   └── guide.md
-├── 05-bedrock-decision-flow/
+├── 05-llm-agent-langchain/
 ├── 06-issue-tracker-service/
 ├── 07-agent-to-tracker-integration/
 └── 08-k8-native-agent/

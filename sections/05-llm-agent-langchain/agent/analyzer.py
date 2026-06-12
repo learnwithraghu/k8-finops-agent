@@ -1,54 +1,45 @@
-"""OpenAI-compatible AI analyzer for FinOps agent using LangChain."""
+"""LLM-powered FinOps analysis using LangChain + an OpenAI-compatible endpoint.
+
+For each resource, a single prompt sends the scanned K8s metadata plus the
+FinOps tagging policy to the LLM. The LLM returns one structured decision that
+covers both the compliance verdict and (if needed) a GitHub issue draft.
+"""
 
 import json
 import logging
 import os
-from dataclasses import dataclass
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
-from openai import OpenAI
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
 from agent.scanner import K8sResource
-from agent.tagging_violations import TaggingViolation
 
 logger = logging.getLogger(__name__)
 
 
-class IssueDraftResponse(BaseModel):
-    """Pydantic model for structured LLM output."""
-    should_create_issue: bool = Field(description="Whether to create an issue for this resource")
+class ResourceDecision(BaseModel):
+    """Structured LLM output: compliance verdict + issue draft for one resource."""
+    is_compliant: bool = Field(description="True if all required tags are present and the resource is not an orphaned PVC")
+    category: str = Field(description="One of: tagged, unallocated, unowned, orphaned, unknown, other")
+    missing_tags: List[str] = Field(description="Required tags that are missing or empty")
+    reason: str = Field(description="Short human-readable reason for the compliance decision")
+    should_create_issue: bool = Field(description="Whether to create a GitHub issue for this resource")
     issue_title: str = Field(description="GitHub issue title in format: [FinOps] namespace/name - CATEGORY")
     issue_body: str = Field(description="Markdown body with summary, missing tags, and remediation steps")
     issue_labels: List[str] = Field(description="GitHub issue labels")
     priority: str = Field(description="Priority level: critical, high, medium, or low")
-    reasoning: str = Field(description="Short explanation for the decision")
     suggested_cost_center: str = Field(description="Suggested cost center for the resource")
     suggested_owner: str = Field(description="Suggested team owner for the resource")
     suggested_tags: Dict[str, str] = Field(description="Suggested tags to apply")
 
 
-@dataclass
-class IssueDraft:
-    """LLM-generated GitHub issue payload."""
-    title: str
-    body: str
-    labels: List[str]
-    priority: str
-    should_create_issue: bool
-    reasoning: str
-    suggested_cost_center: str
-    suggested_owner: str
-    suggested_tags: Dict[str, str]
-
-
 PROMPT_TEMPLATE = """You are a FinOps agent for a Kubernetes-based airline platform.
 
-Review the following resource and produce a GitHub issue draft.
-Return ONLY valid JSON that matches the required schema.
+Decide whether the following resource complies with the FinOps tagging policy below,
+and draft a GitHub issue for the owning team if it does not.
 
 Resource Facts:
 - Name: {resource_name}
@@ -62,42 +53,45 @@ Resource Facts:
 - PVCs: {pvc_names}
 - PVC Size (GB): {pvc_size_gb}
 - Orphaned PVC: {is_orphaned}
-- Category: {category}
-- Missing Tags: {missing_tags}
-- Reason: {reason}
 
-Tagging Policy:
+FinOps Tagging Policy:
 {tagging_rules}
 
 {format_instructions}
 
 Rules:
-- Use the tagging policy and airline context.
-- Prefer concrete team names.
-- Set should_create_issue=false only if this is clearly not actionable.
-- Keep titles concise.
+- Compare the resource's labels against `required_tags`, using `label_mappings` to
+  recognize aliases (e.g. `app.kubernetes.io/owner` counts as `owner`).
+- A resource where "Orphaned PVC: true" is never compliant - set category="orphaned"
+  and should_create_issue=true regardless of its labels.
+- If a resource has no `cost-center` tag (or alias), category="unallocated".
+- If a resource has a cost-center but no `owner`, category="unowned".
+- If the resource is in the "default" namespace with no labels at all, category="unknown".
+- If all required tags are present and the PVC (if any) is mounted, set
+  is_compliant=true, category="tagged", missing_tags=[], should_create_issue=false.
+- Keep issue titles concise: "[FinOps] namespace/name - CATEGORY".
 - Body should include: summary, missing tags, and remediation steps.
+- Prefer concrete team names for suggested_owner.
 """
 
 
 def analyze_resource(
     resource: K8sResource,
-    violation: TaggingViolation,
     model_id: str,
     base_url: str = None,
     api_key: str = None,
     max_tokens: int = 1024,
     temperature: float = 0.3,
     tagging_rules: Dict[str, Any] = None,
-) -> IssueDraft:
-    """Analyze a resource and return a GitHub issue draft using LangChain."""
+) -> ResourceDecision:
+    """Send one resource + the tagging policy to the LLM and return its decision."""
     tagging_rules = tagging_rules or {}
 
     logger.info(
         f"Sending resource to OpenAI-compatible endpoint: {resource.namespace}/{resource.name} ({resource.kind})"
     )
 
-    parser = PydanticOutputParser(pydantic_object=IssueDraftResponse)
+    parser = PydanticOutputParser(pydantic_object=ResourceDecision)
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     llm = ChatOpenAI(
         model=model_id,
@@ -108,100 +102,62 @@ def analyze_resource(
     )
     chain = prompt | llm | parser
 
-    try:
-        response = chain.invoke({
-            "resource_name": resource.name,
-            "namespace": resource.namespace,
-            "kind": resource.kind,
-            "labels": json.dumps(resource.labels, indent=2),
-            "annotations": json.dumps(resource.annotations, indent=2),
-            "cpu_request": resource.cpu_request,
-            "memory_request": resource.memory_request,
-            "replicas": resource.replicas,
-            "pvc_names": resource.pvc_names,
-            "pvc_size_gb": resource.pvc_size_gb,
-            "is_orphaned": resource.is_orphaned,
-            "category": violation.category.value,
-            "missing_tags": ', '.join(str(t) for t in violation.missing_tags if t) if violation.missing_tags else 'None',
-            "reason": violation.reason,
-            "tagging_rules": json.dumps(tagging_rules, indent=2),
-            "format_instructions": parser.get_format_instructions(),
-        })
+    response = chain.invoke({
+        "resource_name": resource.name,
+        "namespace": resource.namespace,
+        "kind": resource.kind,
+        "labels": json.dumps(resource.labels, indent=2),
+        "annotations": json.dumps(resource.annotations, indent=2),
+        "cpu_request": resource.cpu_request,
+        "memory_request": resource.memory_request,
+        "replicas": resource.replicas,
+        "pvc_names": resource.pvc_names,
+        "pvc_size_gb": resource.pvc_size_gb,
+        "is_orphaned": resource.is_orphaned,
+        "tagging_rules": json.dumps(tagging_rules, indent=2),
+        "format_instructions": parser.get_format_instructions(),
+    })
 
-        logger.info(f"LLM analysis complete for {resource.namespace}/{resource.name}")
-
-        return IssueDraft(
-            title=response.issue_title,
-            body=response.issue_body,
-            labels=list(dict.fromkeys(response.issue_labels)),
-            priority=response.priority,
-            should_create_issue=response.should_create_issue,
-            reasoning=response.reasoning,
-            suggested_cost_center=response.suggested_cost_center,
-            suggested_owner=response.suggested_owner,
-            suggested_tags=response.suggested_tags,
-        )
-    except Exception as e:
-        logger.exception(f"Error invoking LangChain chain: {e}")
-        raise
+    logger.info(f"LLM decision for {resource.namespace}/{resource.name}: {response.category}")
+    return response
 
 
-def analyze_batch(
-    violations: List[TaggingViolation],
-    model_id: str,
-    base_url: str = None,
-    api_key: str = None,
-    max_tokens: int = 1024,
-    temperature: float = 0.3,
-    tagging_rules: Dict[str, Any] = None,
-) -> Dict[str, Any]:
-    """Analyze multiple violations and return summary."""
-    results = []
+def generate_summary_report(results: List[Tuple[K8sResource, ResourceDecision]]) -> str:
+    """Generate a human-readable summary report from (resource, decision) pairs."""
+    total = len(results)
+    compliant = [r for r, d in results if d.is_compliant]
+    violations = [(r, d) for r, d in results if not d.is_compliant]
 
-    for violation in violations:
-        draft = analyze_resource(
-            violation.resource, violation, model_id, base_url, api_key, max_tokens, temperature, tagging_rules
-        )
-        results.append({
-            'resource': f"{violation.resource.namespace}/{violation.resource.name}",
-            'kind': violation.resource.kind,
-            'issue': {
-                'title': draft.title,
-                'priority': draft.priority,
-                'should_create_issue': draft.should_create_issue,
-                'reasoning': draft.reasoning,
-                'labels': draft.labels,
-            }
-        })
+    compliant_count = len(compliant)
+    violation_count = len(violations)
+    compliant_pct = round((compliant_count / total * 100) if total else 0, 1)
+    violation_pct = round((violation_count / total * 100) if total else 0, 1)
 
-    return {
-        'analyzed_count': len(violations),
-        'recommendations': results,
-    }
+    breakdown: Dict[str, int] = {}
+    for _, d in results:
+        breakdown[d.category] = breakdown.get(d.category, 0) + 1
 
-
-def generate_summary_report(violations_analysis: Dict[str, Any]) -> str:
-    """Generate a human-readable summary report."""
-    report = f"""# FinOps Analysis Report (LLM Powered - OpenAI-Compatible)"
+    report = f"""# FinOps Analysis Report (LLM Powered - OpenAI-Compatible)
 
 ## Tagging Summary
-- **Total Resources**: {violations_analysis['total_resources']}
-- **Properly Tagged**: {violations_analysis['properly_tagged']} ({violations_analysis['tagged_percentage']}%)
-- **Violations**: {violations_analysis['violations']} ({violations_analysis['violation_percentage']}%)
+- **Total Resources**: {total}
+- **Properly Tagged**: {compliant_count} ({compliant_pct}%)
+- **Violations**: {violation_count} ({violation_pct}%)
 
 ## Breakdown by Category
 """
 
-    for category, count in violations_analysis.get('breakdown_by_category', {}).items():
+    for category, count in breakdown.items():
         report += f"- **{category.capitalize()}**: {count} resources\n"
 
-    report += f"\n## Violations Found: {len(violations_analysis.get('violations_list', []))}\n\n"
+    report += f"\n## Violations Found: {violation_count}\n\n"
 
-    for i, v in enumerate(violations_analysis.get('violations_list', []), 1):
-        report += f"""### {i}. {v['resource']} ({v['kind']})
-- **Category**: {v['category']}
-- **Missing Tags**: {', '.join(str(t) for t in v['missing_tags'] if t) if v['missing_tags'] else 'None'}
-- **Reason**: {v['reason']}
+    for i, (resource, decision) in enumerate(violations, 1):
+        report += f"""### {i}. {resource.namespace}/{resource.name} ({resource.kind})
+- **Category**: {decision.category}
+- **Missing Tags**: {', '.join(decision.missing_tags) if decision.missing_tags else 'None'}
+- **Reason**: {decision.reason}
+- **Suggested Issue**: {decision.issue_title} (priority: {decision.priority})
 
 """
 

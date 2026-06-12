@@ -8,8 +8,10 @@ whenever code in this section is changed.
 ## What this section teaches
 
 Section 05 teaches learners how to connect a LangChain-powered agent to an
-**OpenAI-compatible LLM endpoint** and use it to turn raw Kubernetes tagging
-violations into structured, decision-oriented recommendations.
+**OpenAI-compatible LLM endpoint** and use it to turn raw Kubernetes resource
+metadata + the FinOps tagging policy into a single structured decision
+(compliance verdict + issue draft) per resource — one prompt per resource,
+validated with Pydantic.
 
 The **teaching outcome** must be preserved across all code changes.
 
@@ -75,16 +77,16 @@ in `.env.example` with a safe placeholder value.
 | Model | configurable via `OPENAI_MODEL_ID` (default: `gpt-4o`) |
 | Auth | API key via `OPENAI_API_KEY` in `.env` |
 | LangChain version | `langchain>=0.1.0`, `langchain-openai>=0.1.0`, `langchain-core>=0.1.0` |
-| Run command | `PYTHONPATH=sections/05-bedrock-decision-flow python3 -m agent.main` |
+| Run command | `PYTHONPATH=sections/05-llm-agent-langchain python3 -m agent.main` |
 | Key env vars | `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL_ID`, `OPENAI_MAX_TOKENS`, `OPENAI_TEMPERATURE` |
 
 ---
 
 ## Checklist for any PR / change to this section
 
-- [ ] `agent/analyzer.py` — if changed, Steps 2 and 7 of `guide.md` reviewed
+- [ ] `agent/analyzer.py` — if changed, Steps 2 and 7 of `guide.md` reviewed (in particular `ResourceDecision` and `PROMPT_TEMPLATE`)
 - [ ] `agent/main.py` — if changed, Steps 3, 4, and 6 of `guide.md` reviewed
-- [ ] `agent/tagging_violations.py` — if changed, Step 1 of `guide.md` reviewed
+- [ ] `config/tagging-rules.yaml` — if changed, Step 1 of `guide.md` reviewed (this is the policy handed to the LLM)
 - [ ] `.env` / `.env.example` — if changed, Steps 3 and 4 of `guide.md` reviewed
 - [ ] `requirements.txt` — if changed, `agent.md` "Current technical state" table updated
 - [ ] `section_goal.md` — still accurate after this change?

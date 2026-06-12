@@ -12,7 +12,9 @@ Show the plain violation report first, then switch the LLM on and show how the o
 - how to use LangChain with an OpenAI-compatible endpoint
 - how a custom `base_url` lets you point LangChain at any OpenAI-compatible API
 - how to keep API keys out of code using `.env`
-- how Pydantic models structure LLM output
+- how a single prompt can hand the LLM both the K8s metadata and the FinOps
+  tagging config, and let it decide compliance AND draft the fix
+- how Pydantic models structure that LLM output
 - how this becomes the handoff point before the tracker service
 
 ## What you need before starting
@@ -25,34 +27,38 @@ You should already have:
 - an API key for the LLM endpoint
 
 ## Where the agent code lives
-- `sections/05-bedrock-decision-flow/agent/`
+- `sections/05-llm-agent-langchain/agent/`
 
 This is the same scanner from Section 04, now with:
-- `tagging_violations.py` - detects missing tags (no cost calculations)
-- `analyzer.py` - LLM analysis functions using LangChain + OpenAI-compatible client
+- `analyzer.py` - sends each resource + the FinOps tagging policy to the LLM
+  and gets back one structured decision (compliance verdict + issue draft)
 - `main.py` - simplified orchestrator
 
-## Step 1: Read the tagging violation detector
+## Step 1: Read the tagging policy
 ```bash
-cat sections/05-bedrock-decision-flow/agent/tagging_violations.py
+cat sections/05-llm-agent-langchain/config/tagging-rules.yaml
 ```
 
 What to look for:
-- the `TaggingViolationDetector` class
-- how it checks for missing required tags (owner, cost-center, etc.)
-- the different violation categories (unallocated, unowned, orphaned, unknown)
-- no cost calculations - purely focused on tagging compliance
+- `required_tags` and `label_mappings` — this is the same FinOps config from
+  Section 04, but this time it's the LLM that applies it
+- there is no Python code left that checks tags directly — the policy is
+  handed to the LLM as part of the prompt
 
 ## Step 2: Read the LLM analyzer
 ```bash
-cat sections/05-bedrock-decision-flow/agent/analyzer.py
+cat sections/05-llm-agent-langchain/agent/analyzer.py
 ```
 
 What to look for:
+- the `ResourceDecision` Pydantic model — one model that covers both the
+  compliance verdict (`is_compliant`, `category`, `missing_tags`, `reason`)
+  and the issue draft (`issue_title`, `issue_body`, `priority`, ...)
+- the `PROMPT_TEMPLATE` — it includes the resource's K8s metadata AND the
+  full tagging policy, and asks the LLM to apply the policy itself
 - the `analyze_resource()` function that uses LangChain
 - the `ChatOpenAI` from `langchain_openai` — configured with a custom `base_url`
 - why `base_url` is what makes it work with any OpenAI-compatible endpoint
-- the prompt that asks for JSON output
 - the `PydanticOutputParser` for structured output
 - the `model` value being passed to the client
 
@@ -88,39 +94,44 @@ What to look for:
 - `OPENAI_MODEL_ID` should be a valid model name for this endpoint
 - no AWS region, no inference profile ARN, no bearer token header
 
-## Step 5: Look at the plain violation report
-The scanner identifies resources with missing tags. The raw output shows what's missing but doesn't provide context or recommendations.
+## Step 5: Recall the Section 04 report
+In Section 04, `SimpleTagChecker` computed compliance in Python — missing
+tags, orphaned PVCs, percentages — with no LLM call at all.
 
 What to look for:
-- the report shows tagging compliance percentages
-- it lists violations by category
-- it shows missing tags but doesn't suggest what to add
+- that report was fast, free, and deterministic
+- it told you *what* was wrong but not what to do about it
 - this is the gap the LLM will help close
 
 ## Step 6: Run the agent with the LLM enabled
 ```bash
-PYTHONPATH=sections/05-bedrock-decision-flow python3 -m agent.main
+PYTHONPATH=sections/05-llm-agent-langchain python3 -m agent.main --namespace booking-api
 ```
 
 What to look for:
 - the logs should show the model ID being used
-- the logs should say that findings are being sent to the LLM
+- the logs should show one LLM call per resource ("Sending resource to
+  OpenAI-compatible endpoint...")
+- `--namespace booking-api` keeps this to a handful of resources/LLM calls —
+  drop the flag to scan the whole cluster (one call per resource scanned)
 - the report title should say it is LLM powered
 - if it fails, check that `OPENAI_API_KEY` and `OPENAI_BASE_URL` are set correctly in `.env`
 
 ## Step 7: Read the LLM output
 What to look for:
+- `category`, `missing_tags`, and `reason` are now decided by the LLM itself —
+  compare them against what you saw in Section 04 for the same resources
 - the report should feel cleaner and more decision-oriented
-- the reasoning should be easier to present to a team
 - the suggestions should read like action items, not raw scan output
-- the structure should be more useful for a tech-debt review
 - this is the handoff point: the next step is tracking, not more scanning
 
 ## What to notice
 - the API key is the only credential needed — no AWS setup, no `aws configure`
 - `base_url` is what makes `ChatOpenAI` talk to a non-OpenAI endpoint
 - the same LangChain chain works with any OpenAI-compatible API — only the URL changes
-- the same violation data produces a cleaner decision layer
+- Section 04's tagging-rules.yaml is reused as-is — only *who* applies it changed
+- the LLM is now doing the policy matching that Python used to do — discuss
+  whether you'd trust it to get every label alias right every time
 - no cost calculations - purely focused on tagging compliance
 
 ## Expected outcome

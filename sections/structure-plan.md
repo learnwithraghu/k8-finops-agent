@@ -28,7 +28,7 @@ sections/
 │   ├── guide.md
 │   ├── agent/
 │   └── config/
-├── 05-bedrock-decision-flow/
+├── 05-llm-agent-langchain/
 │   ├── section_goal.md
 │   ├── guide.md
 │   └── agent-changes/
@@ -89,7 +89,7 @@ sections/
   - local scan flow
   - raw report generation
 
-### Section 05: Bedrock decision flow
+### Section 05: LLM decision flow (LangChain)
 - Keep:
   - `agent/analyzer.py`
   - any prompt/config changes
@@ -113,7 +113,7 @@ sections/
   - metadata mapping logic
 - Output should teach:
   - K8 metadata collection
-  - Bedrock-to-issue translation
+  - LLM-to-issue translation
   - create issue end-to-end
 
 ### Section 08: Kubernetes-native agent
