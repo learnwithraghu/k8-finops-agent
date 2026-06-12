@@ -49,10 +49,6 @@ class SimpleTagChecker:
                 return labels[key]
         return None
 
-    def _has_tag(self, resource: Dict[str, Any], tag: str) -> bool:
-        """Check if resource has a specific tag."""
-        return self._get_tag_value(resource, tag) is not None
-
     def check_resource(self, resource: Dict[str, Any]) -> Dict[str, Any]:
         """Check a single resource for proper tagging."""
         missing_tags = []

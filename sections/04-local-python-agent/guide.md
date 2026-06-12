@@ -84,7 +84,7 @@ What to look for:
 
 ## Step 7: Run the agent across the cluster
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main
 ```
 
 What to look for:
@@ -95,7 +95,7 @@ What to look for:
 
 ## Step 8: Run the agent against one namespace
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace booking-api --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace booking-api
 ```
 
 What to look for:
@@ -105,7 +105,7 @@ What to look for:
 
 ## Step 9: Try a different namespace
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace inventory --log-level DEBUG
+PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace inventory
 ```
 
 What to look for:
@@ -137,6 +137,6 @@ You should be able to run the agent and explain:
 
 ## Handoff to Section 05
 Once the local scan works, move to:
-- `sections/05-bedrock-decision-flow/guide.md`
+- `sections/05-llm-agent-langchain/guide.md`
 
 Section 05 adds the AI decision layer on top of this local scanner.

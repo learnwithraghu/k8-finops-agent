@@ -1,23 +1,3 @@
-"""K8s FinOps Agent - AI-powered cost optimization for Kubernetes."""
+"""K8s FinOps Agent - local tagging compliance scanner."""
 
 __version__ = "1.0.0"
-__author__ = "FinOps Team"
-
-from agent.scanner import K8sScanner, K8sResource
-from agent.cost_calculator import CostCalculator, CostBreakdown
-from agent.untracked_money import UntrackedMoneyDetector, UntrackedMoney, UntrackedCategory
-from agent.analyzer import BedrockAnalyzer, MockAnalyzer, AIRecommendation, IssueDraft
-
-__all__ = [
-    'K8sScanner',
-    'K8sResource',
-    'CostCalculator',
-    'CostBreakdown',
-    'UntrackedMoneyDetector',
-    'UntrackedMoney',
-    'UntrackedCategory',
-    'BedrockAnalyzer',
-    'MockAnalyzer',
-    'AIRecommendation',
-    'IssueDraft',
-]

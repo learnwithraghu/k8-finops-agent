@@ -1,10 +1,14 @@
-"""Main orchestrator for K8s FinOps Agent."""
+"""Entry point for the K8s FinOps Agent.
 
+Pipeline: scan Kubernetes metadata -> check it against the FinOps tagging
+config -> print a compliance report.
+"""
+
+import argparse
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -16,97 +20,43 @@ from agent.simple_checker import SimpleTagChecker
 TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
 
 
-
-class FinOpsAgent:
-    """Main FinOps Agent orchestrator."""
-
-    def __init__(self, config: Optional[dict] = None):
-        """Initialize agent with configuration."""
-        self.config = config or {}
-        self.scanner = None
-        self.checker = None
-
-    def initialize(self) -> bool:
-        """Initialize all components."""
-        logger = logging.getLogger(__name__)
-
-        # Initialize scanner
-        kubeconfig = self.config.get('kubeconfig_path')
-        excluded_namespaces = self.config.get('excluded_namespaces', [])
-        self.scanner = K8sScanner(kubeconfig_path=kubeconfig, excluded_namespaces=excluded_namespaces)
-        if not self.scanner.connect():
-            logger.error("Failed to connect to Kubernetes")
-            return False
-
-        # Initialize tag checker
-        self.checker = SimpleTagChecker(str(TAGGING_RULES_PATH))
-        logger.info("Tag checker initialized")
-
-        return True
-
-    def run_scan(self) -> dict:
-        """Run the full scan and analysis."""
-        logger = logging.getLogger(__name__)
-
-        # Scan resources
-        target_ns = self.config.get('target_namespace')
-        logger.info(f"Scanning resources in namespace: {target_ns or 'all namespaces'}")
-        resources = self.scanner.scan_all(target_ns)
-        logger.info(f"Found {len(resources)} resources")
-
-        # Check tags
-        logger.info("Checking tagging compliance...")
-        analysis = self.checker.check_all(resources)
-
-        # Print report
-        self.checker.print_report(analysis)
-
-        return {
-            'analysis': analysis,
-            'total_resources': len(resources),
-            'compliant_count': analysis['compliant_count'],
-            'non_compliant_count': analysis['non_compliant_count']
-        }
-
-
-def load_config() -> dict:
-    """Load configuration from environment."""
-    # Load .env file if it exists
-    env_path = Path('.env')
-    if env_path.exists():
-        load_dotenv()
-
-    tagging_rules_data = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
-    excluded_namespaces = tagging_rules_data.get('excluded_namespaces', []) or []
-
-    return {
-        'kubeconfig_path': os.getenv('KUBECONFIG_PATH'),
-        'excluded_namespaces': excluded_namespaces,
-    }
-
-
 def main():
-    """Main entry point."""
+    parser = argparse.ArgumentParser(description="K8s FinOps tagging compliance scanner")
+    parser.add_argument("--namespace", help="Limit the scan to a single namespace")
+    args = parser.parse_args()
+
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    config = load_config()
-    logger.info("Starting K8s FinOps Agent")
+    if Path('.env').exists():
+        load_dotenv()
 
-    agent = FinOpsAgent(config)
-    if not agent.initialize():
-        logger.error("Failed to initialize agent")
+    tagging_rules = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
+    excluded_namespaces = tagging_rules.get('excluded_namespaces', []) or []
+
+    # 1. Scan Kubernetes metadata
+    scanner = K8sScanner(
+        kubeconfig_path=os.getenv('KUBECONFIG_PATH'),
+        excluded_namespaces=excluded_namespaces,
+    )
+    if not scanner.connect():
+        logger.error("Failed to connect to Kubernetes")
         sys.exit(1)
 
-    try:
-        results = agent.run_scan()
-        logger.info("FinOps scan completed successfully")
-        logger.info(f"Total resources: {results['total_resources']}")
-        logger.info(f"Compliant: {results['compliant_count']}")
-        logger.info(f"Non-compliant: {results['non_compliant_count']}")
-    except Exception as e:
-        logger.error(f"Scan failed: {e}", exc_info=True)
-        sys.exit(1)
+    logger.info(f"Scanning resources in namespace: {args.namespace or 'all namespaces'}")
+    resources = scanner.scan_all(args.namespace)
+    logger.info(f"Found {len(resources)} resources")
+
+    # 2. Check resources against the FinOps tagging config
+    checker = SimpleTagChecker(str(TAGGING_RULES_PATH))
+    analysis = checker.check_all(resources)
+
+    # 3. Report
+    checker.print_report(analysis)
+    logger.info("FinOps scan completed successfully")
+    logger.info(f"Total resources: {analysis['total_resources']}")
+    logger.info(f"Compliant: {analysis['compliant_count']}")
+    logger.info(f"Non-compliant: {analysis['non_compliant_count']}")
 
 
 if __name__ == '__main__':
