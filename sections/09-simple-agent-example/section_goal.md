@@ -1,5 +1,9 @@
 # Section 09: Simple Agent Example
 
+> **Not part of the taught course.** This is a standalone reference example kept for
+> comparison — it is not covered in the guided sections and is not a prerequisite for
+> any other section.
+
 This section shows the simplest possible FinOps agent.
 No classes, no dataclasses, just plain functions and a single YAML config.
 

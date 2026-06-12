@@ -1,5 +1,9 @@
 # Section 09 Guide: Simple Agent Example
 
+> **Not part of the taught course.** This is a standalone reference example kept for
+> comparison — it is not covered in the guided sections and is not a prerequisite for
+> any other section.
+
 This is the only file you need for Section 09.
 
 ## Goal
@@ -196,8 +200,5 @@ You should have:
 - the agent executed without errors
 - one or more issues created in the issue tracker
 
-## Handoff to Section 10
-Once all commands above work, go to:
-- `sections/10-advanced-agent-patterns/guide.md`
-
-Section 10 builds on this simple agent by adding classes, structured output, and more robust error handling.
+## End of this example
+This section is a standalone reference and does not hand off to another section.
