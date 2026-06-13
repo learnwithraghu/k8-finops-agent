@@ -66,7 +66,7 @@ What to notice:
 kubectl get pods -n payment
 ```
 
-The `payment-gateway-api` deployment shows `0/1` or simply no pods. That is the problem.
+There is no pod for `payment-gateway-api` at all. That is the problem. (`kubectl get deployments -n payment` would show `payment-gateway-api` as `0/0`.)
 
 ## Step 3: Open the payment UI in Chrome
 

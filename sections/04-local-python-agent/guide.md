@@ -3,16 +3,16 @@
 This is the only file you need for Section 04.
 
 ## Goal
-Build and run a simple Python agent that scans Kubernetes resources and checks their FinOps tagging compliance.
+Build and run a tiny local Python agent that collects raw Kubernetes metadata and dumps it as JSON. This is the bridge between the cluster and the LLM in Section 05.
 
 ## Tutor note
-Run the commands one by one. After each step, point out what the learner should notice in the output.
+Run the commands one by one. After each step, point out what the learner should notice in the output. This section deliberately does **not** decide compliance or draft issues. Those decisions are delegated to the LLM in Section 05.
 
 ## What students will learn
-- how the agent reads cluster resources
-- how tagging rules are defined and checked
-- how the scanner identifies missing tags and orphaned storage
-- how to run the agent locally and interpret the results
+- how to read Kubernetes metadata from Python
+- why we keep the collector stupid and the decision layer smart
+- how to spot missing labels with plain `kubectl` commands
+- that having raw metadata is not enough — something has to interpret it
 
 ## What you need before starting
 Complete Sections 01, 02, and 03 first.
@@ -24,8 +24,8 @@ You should already have:
 - Python 3 installed
 
 ## Where the agent code lives
-- `sections/04-local-python-agent/agent/`
-- `sections/04-local-python-agent/config/`
+- `sections/04-local-python-agent/agent/collect.py`
+- `sections/04-local-python-agent/config/tagging-rules.yaml`
 
 ## Step 1: Read the tagging rules
 ```bash
@@ -34,10 +34,25 @@ cat sections/04-local-python-agent/config/tagging-rules.yaml
 
 What to look for:
 - required labels like `owner`, `environment`, `cost-center`, `application`, `tier`, and `criticality`
-- the label aliases the agent accepts (e.g., `app.kubernetes.io/owner` vs `owner`)
-- the namespaces and resource types the scan should care about
+- the label aliases we will hand to the LLM later (e.g., `app.kubernetes.io/owner` vs `owner`)
+- the namespaces the scan should skip (`excluded_namespaces`)
 
-## Step 2: Create the virtual environment
+We are not going to enforce these rules in Python. We are just reading the policy file so the collector knows which namespaces to skip.
+
+## Step 2: Look at the collector code
+```bash
+cat sections/04-local-python-agent/agent/collect.py
+```
+
+What to look for:
+- it only collects metadata: name, namespace, kind, labels, annotations, plus request/replicas/PVC facts
+- it does **not** check tags
+- it does **not** calculate cost
+- it dumps everything to JSON
+
+This is intentional. The script is a dumb pipe from Kubernetes to the next section.
+
+## Step 3: Create the virtual environment
 ```bash
 python3 -m venv venv
 ```
@@ -46,7 +61,7 @@ What to look for:
 - a local Python environment for the agent
 - no changes to the system Python
 
-## Step 3: Activate the virtual environment
+## Step 4: Activate the virtual environment
 ```bash
 source venv/bin/activate
 ```
@@ -55,23 +70,14 @@ What to look for:
 - your shell prompt should switch to the project venv
 - all Python installs will now stay local to this repo
 
-## Step 4: Install the Python dependencies
+## Step 5: Install the Python dependencies
 ```bash
-pip install -r requirements.txt
+pip install -r sections/04-local-python-agent/requirements.txt
 ```
 
 What to look for:
 - the Kubernetes and YAML libraries should install cleanly
 - this is the one-time setup for local runs
-
-## Step 5: Copy the local environment file
-```bash
-cp .env.example .env
-```
-
-What to look for:
-- the agent reads its defaults from `.env`
-- the file already points to the local Kind setup
 
 ## Step 6: Check Kubernetes access
 ```bash
@@ -80,63 +86,98 @@ kubectl cluster-info
 
 What to look for:
 - the agent needs a reachable kubeconfig
-- if this fails, the scan will fail too
+- if this fails, the collection will fail too
 
-## Step 7: Run the agent across the cluster
+## Step 7: Run the collector across the cluster
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main
+PYTHONPATH=sections/04-local-python-agent python -m agent.collect -o k8s_metadata.json
 ```
 
 What to look for:
-- the agent scans all non-system namespaces by default
-- system namespaces are skipped using `excluded_namespaces` from the tagging rules
-- the report should show the problems from Section 03
-- simple print output shows compliant vs non-compliant resources
+- it skips the system namespaces from the tagging rules
+- it writes a JSON file named `k8s_metadata.json`
+- the output says how many resources it collected
 
-## Step 8: Run the agent against one namespace
+## Step 8: Inspect the raw JSON
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace booking-api
+python3 -m json.tool k8s_metadata.json | head -80
 ```
 
 What to look for:
-- the report should shrink to just one namespace
-- this is useful for focused demos
-- compare the output with the full-cluster run
+- every Deployment, Service, ConfigMap, and PVC shows up as a flat object
+- the `labels` and `annotations` fields are raw key/value dictionaries
+- there is no verdict like `is_compliant` anywhere
 
-## Step 9: Try a different namespace
+## Step 9: Look at one namespace only
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.main --namespace inventory
+PYTHONPATH=sections/04-local-python-agent python -m agent.collect --namespace booking-api -o booking_api_metadata.json
 ```
 
 What to look for:
-- inventory should look cleaner than the other namespaces
-- this gives you a good "better baseline" example for the demo
+- the JSON file is much smaller
+- this is useful for focused demos in Section 05
 
-## What the report should show
-Look for these sections in the output:
-- `FINOPS TAGGING COMPLIANCE REPORT`
-- Total resources scanned
-- Compliant vs non-compliant counts
-- List of compliant resources with their tags
-- List of non-compliant resources with missing tags
+## Step 10: Use `kubectl` to spot the missing labels
+The point of this section is to show that the raw data is messy. Run a few quick checks:
 
-## What to notice
-- the agent can scan local Kubernetes resources without any cloud services
-- the simple Python code checks for required tags
-- the bad metadata from Section 03 should now be easy to spot in the output
-- orphaned PVCs are identified as waste
-- the report becomes the basis for understanding FinOps compliance
+```bash
+# All deployments with their labels
+kubectl get deployments -A --show-labels
+```
+
+```bash
+# Which deployments are missing an owner label?
+kubectl get deployments -A -o json | jq -r '.items[] | select(.metadata.labels.owner == null) | "\(.metadata.namespace)/\(.metadata.name)"'
+```
+
+If `jq` is not installed, use this instead:
+
+```bash
+kubectl get deployments -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER:.metadata.labels.owner' | grep '<none>'
+```
+
+```bash
+# Which services have no cost-center?
+kubectl get services -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,COST_CENTER:.metadata.labels.cost-center' | grep '<none>'
+```
+
+```bash
+# Which PVCs are not mounted by any pod?
+kubectl get pvc -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATUS:.status.phase'
+```
+
+What to look for:
+- you can see the gaps with `kubectl`, but it is tedious
+- every command answers one question at a time
+- there is no single view that says "here is all the waste and who owns it"
+
+## Step 11: The mapping problem
+You now have:
+- a JSON file full of Kubernetes metadata
+- a YAML file with the FinOps tagging policy
+- a cluster full of resources that clearly need owners, cost centers, and cleanup
+
+But the JSON does not say which resource violates which rule. The YAML does not know about the cluster. They are disconnected.
+
+**Pause here and ask the class:**
+> "We have all the facts. We have the policy. How do we turn this raw metadata into a decision like 'deployment X is missing owner and cost-center, so create a P1 ticket for the platform team'?"
+>
+> You could write a giant `if` tree in Python. That is what Section 04 used to do. But every new rule, every new label alias, every edge case becomes another branch. It becomes brittle fast.
+>
+> A better approach: hand the metadata and the policy to something that can reason about both — a Large Language Model.
+
+This is the handoff to Section 05.
 
 ## Expected outcome
-You should be able to run the agent and explain:
+You should be able to run the collector and explain:
 - what was scanned
-- which resources are properly tagged
-- which resources are missing tags
-- which PVCs are orphaned
-- why proper tagging helps with cost allocation and accountability
+- what the JSON file contains
+- which labels are missing in the cluster
+- why raw metadata alone is not enough
+- why the next section adds an LLM to interpret this data
 
 ## Handoff to Section 05
-Once the local scan works, move to:
+Once the collection works, move to:
 - `sections/05-llm-agent-langchain/guide.md`
 
-Section 05 adds the AI decision layer on top of this local scanner.
+Section 05 takes the JSON you just produced, sends each resource plus the tagging policy to an LLM, and lets the LLM decide compliance and draft the fix.
