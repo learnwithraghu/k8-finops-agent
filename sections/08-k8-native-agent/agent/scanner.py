@@ -6,6 +6,7 @@ from pathlib import Path
 import logging
 
 from kubernetes import client, config
+from kubernetes.config.config_exception import ConfigException
 from kubernetes.client.exceptions import ApiException
 
 logger = logging.getLogger(__name__)
@@ -21,9 +22,7 @@ class K8sResource:
     annotations: Dict[str, str] = field(default_factory=dict)
     # Resource specs
     cpu_request: int = 0  # in millicores
-    cpu_limit: int = 0
     memory_request: int = 0  # in Mi
-    memory_limit: int = 0
     replicas: int = 1
     # Storage
     pvc_names: List[str] = field(default_factory=list)
@@ -44,13 +43,23 @@ class K8sScanner:
         self._connected = False
 
     def connect(self) -> bool:
-        """Connect to Kubernetes cluster."""
+        """Connect to Kubernetes cluster.
+
+        Tries kubeconfig first (local runs), then falls back to in-cluster
+        service account config (pod runs).
+        """
         try:
             if self.kubeconfig_path:
                 kubeconfig_file = str(Path(self.kubeconfig_path).expanduser())
                 config.load_kube_config(config_file=kubeconfig_file)
+                logger.info("Connected using kubeconfig")
             else:
-                config.load_kube_config()
+                try:
+                    config.load_kube_config()
+                    logger.info("Connected using default kubeconfig")
+                except ConfigException:
+                    config.load_incluster_config()
+                    logger.info("Connected using in-cluster service account")
 
             self.v1 = client.CoreV1Api()
             self.apps_v1 = client.AppsV1Api()
@@ -92,28 +101,18 @@ class K8sScanner:
             for dep in deps.items:
                 if self._is_excluded_namespace(dep.metadata.namespace):
                     continue
-                # Extract CPU/memory from container specs
+                # Extract CPU/memory requests from container specs
                 cpu_request = 0
-                cpu_limit = 0
                 mem_request = 0
-                mem_limit = 0
 
                 for container in dep.spec.template.spec.containers:
-                    if container.resources:
-                        if container.resources.requests:
-                            cpu_request += self._parse_cpu(
-                                container.resources.requests.get('cpu', '0')
-                            )
-                            mem_request += self._parse_memory(
-                                container.resources.requests.get('memory', '0')
-                            )
-                        if container.resources.limits:
-                            cpu_limit += self._parse_cpu(
-                                container.resources.limits.get('cpu', '0')
-                            )
-                            mem_limit += self._parse_memory(
-                                container.resources.limits.get('memory', '0')
-                            )
+                    if container.resources and container.resources.requests:
+                        cpu_request += self._parse_cpu(
+                            container.resources.requests.get('cpu', '0')
+                        )
+                        mem_request += self._parse_memory(
+                            container.resources.requests.get('memory', '0')
+                        )
 
                 # Get PVCs from volumes
                 pvc_names = []
@@ -129,9 +128,7 @@ class K8sScanner:
                     labels=dep.metadata.labels or {},
                     annotations=dep.metadata.annotations or {},
                     cpu_request=cpu_request,
-                    cpu_limit=cpu_limit,
                     memory_request=mem_request,
-                    memory_limit=mem_limit,
                     replicas=dep.spec.replicas or 1,
                     pvc_names=pvc_names
                 )

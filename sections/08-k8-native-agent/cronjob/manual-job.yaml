@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: finops-agent-manual
+  namespace: finops-agent
+spec:
+  template:
+    spec:
+      serviceAccountName: finops-agent
+      restartPolicy: OnFailure
+      containers:
+        - name: finops-agent
+          # Replace with the image you build from docker/Dockerfile.
+          image: finops-agent:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "agent.main"]
+          envFrom:
+            - configMapRef:
+                name: finops-agent-config
+            - secretRef:
+                name: finops-agent-llm
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

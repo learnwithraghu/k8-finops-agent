@@ -1,0 +1,27 @@
+# Build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+.env
+.env.*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Kubernetes manifests and docs are mounted/created separately
+manifests/
+cronjob/
+*.md

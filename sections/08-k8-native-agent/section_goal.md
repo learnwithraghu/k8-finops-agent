@@ -1,17 +1,19 @@
 # Section 08 Goal: Kubernetes-Native Agent
 
 ## Goal
-Containerize the finished agent, deploy it back into Kubernetes, and run it on a schedule so the workflow becomes fully in-cluster.
+Package the Section 05 LLM decision-flow agent as a container and deploy it inside Kubernetes as a scheduled CronJob, so the FinOps scan runs in-cluster instead of from a laptop.
 
 ## Scope
-- Dockerize the agent
-- Deploy it into a separate namespace
-- Add a CronJob or equivalent scheduler
-- Run once and verify the generated issue/output in the tracker
+- Reuse the Section 05 agent code unchanged
+- Containerize the agent with a Dockerfile
+- Add a Kubernetes namespace, ServiceAccount, RBAC, Secret, and ConfigMap
+- Run the agent as a CronJob (plus a manual Job for verification)
+- Show how the `OPENAI_API_KEY` from `.env` becomes a Kubernetes Secret
 
 ## Out of scope
-- Re-teaching the earlier sections
-- Rebuilding the agent logic from scratch
+- Re-teaching LangChain or the LLM prompt design (covered in Section 05)
+- Writing to the issue tracker service (covered in Section 07)
+- Production-grade secret management such as Sealed Secrets or vaults
 
 ## Success criteria
-The learner can see the agent execute inside Kubernetes on a schedule and create tracker output automatically.
+The learner can build the image, create the LLM API key Secret, apply the manifests, and see the agent execute inside the cluster on a schedule with the same decision-oriented report produced by Section 05.

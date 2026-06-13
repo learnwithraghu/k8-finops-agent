@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: finops-agent
+  namespace: finops-agent
+spec:
+  # Run every hour. Change to */5 * * * * for demos (every 5 minutes).
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: finops-agent
+          restartPolicy: OnFailure
+          containers:
+            - name: finops-agent
+              # Replace with the image you build from docker/Dockerfile.
+              image: finops-agent:latest
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "agent.main"]
+              envFrom:
+                - configMapRef:
+                    name: finops-agent-config
+                - secretRef:
+                    name: finops-agent-llm
+              # Optional: scan only one namespace. Remove to scan all.
+              # env:
+              #   - name: TARGET_NAMESPACE
+              #     value: "booking-api"
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
