@@ -105,15 +105,14 @@ What to look for:
 
 ## Step 6: Run the agent with the LLM enabled
 ```bash
-PYTHONPATH=sections/05-llm-agent-langchain python3 -m agent.main --namespace booking-api
+PYTHONPATH=sections/05-llm-agent-langchain python3 -m agent.main
 ```
 
 What to look for:
 - the logs should show the model ID being used
 - the logs should show one LLM call per resource ("Sending resource to
   OpenAI-compatible endpoint...")
-- `--namespace booking-api` keeps this to a handful of resources/LLM calls —
-  drop the flag to scan the whole cluster (one call per resource scanned)
+- the agent always scans all namespaces, except those listed in `excluded_namespaces`
 - the report title should say it is LLM powered
 - if it fails, check that `OPENAI_API_KEY` and `OPENAI_BASE_URL` are set correctly in `.env`
 

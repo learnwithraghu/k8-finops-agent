@@ -4,7 +4,6 @@ Pipeline: scan Kubernetes metadata -> send each resource + the FinOps tagging
 config to the LLM -> print a decision-oriented report.
 """
 
-import argparse
 import logging
 import os
 import sys
@@ -21,10 +20,6 @@ TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.ya
 
 
 def main():
-    parser = argparse.ArgumentParser(description="LLM-powered K8s FinOps agent")
-    parser.add_argument("--namespace", help="Limit the scan to a single namespace")
-    args = parser.parse_args()
-
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
@@ -55,8 +50,8 @@ def main():
         logger.error("Failed to connect to Kubernetes")
         sys.exit(1)
 
-    logger.info(f"Scanning resources in namespace: {args.namespace or 'all namespaces'}")
-    resources = scanner.scan_all(args.namespace)
+    logger.info("Scanning resources in all namespaces")
+    resources = scanner.scan_all()
     logger.info(f"Found {len(resources)} resources")
 
     # 2. Send each resource + the FinOps tagging policy to the LLM

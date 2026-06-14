@@ -1,23 +1,14 @@
-"""K8s FinOps Agent - AI-powered cost optimization for Kubernetes."""
+"""K8s FinOps Agent - tracker integration package."""
 
-__version__ = "1.0.0"
-__author__ = "FinOps Team"
-
-from agent.scanner import K8sScanner, K8sResource
-from agent.cost_calculator import CostCalculator, CostBreakdown
-from agent.untracked_money import UntrackedMoneyDetector, UntrackedMoney, UntrackedCategory
-from agent.analyzer import BedrockAnalyzer, MockAnalyzer, AIRecommendation, IssueDraft
+from agent.analyzer import ResourceDecision, analyze_resource, generate_summary_report
+from agent.scanner import K8sResource, K8sScanner
+from agent.tracker import IssueTrackerClient
 
 __all__ = [
-    'K8sScanner',
-    'K8sResource',
-    'CostCalculator',
-    'CostBreakdown',
-    'UntrackedMoneyDetector',
-    'UntrackedMoney',
-    'UntrackedCategory',
-    'BedrockAnalyzer',
-    'MockAnalyzer',
-    'AIRecommendation',
-    'IssueDraft',
+    "K8sScanner",
+    "K8sResource",
+    "analyze_resource",
+    "generate_summary_report",
+    "ResourceDecision",
+    "IssueTrackerClient",
 ]
