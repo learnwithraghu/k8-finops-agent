@@ -89,6 +89,36 @@ You will see the **AirPay** payment gateway — a Stripe-like interface with a c
 - An incident alert banner appears at the top automatically
 - These are detected by the UI itself via a health check call to the backend
 
+> **🧪 KodeKloud / Remote Lab Note — Getting a 502 Bad Gateway?**
+>
+> This happens because `kubectl port-forward` binds to `127.0.0.1` (localhost) by default.
+> In a KodeKloud playground or any remote environment, the browser tab runs inside the same
+> container/node, so it can reach the node's actual IP — but not `localhost` of a different
+> process.
+>
+> **Fix 1 — Bind to all interfaces (recommended):**
+> ```bash
+> kubectl port-forward svc/payment-gateway -n payment 8089:80 --address=0.0.0.0
+> ```
+> Then open the URL using the node/host IP shown in the KodeKloud lab panel, e.g.:
+> ```
+> http://<NODE-IP>:8089
+> ```
+>
+> **Fix 2 — Use the KodeKloud built-in port viewer:**
+> Some KodeKloud environments expose a "View Port" button in the top bar.
+> Enter `8089` there — it will proxy the connection correctly through the lab UI.
+>
+> **Fix 3 — Check connectivity first:**
+> ```bash
+> # Find the node IP
+> kubectl get nodes -o wide
+>
+> # Confirm the port-forward is actually running
+> curl -s http://localhost:8089 | head -5
+> ```
+> If `curl localhost` returns HTML but the browser shows 502, use Fix 1 or Fix 2 above.
+
 ## Step 4: Try to make a payment
 
 Fill in any dummy card details and click **"Pay Securely — $499.00"**.
