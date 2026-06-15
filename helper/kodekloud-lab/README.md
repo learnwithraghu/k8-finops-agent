@@ -8,6 +8,28 @@ Run the following command to update packages, install Python 3 and pip, create a
 
 ```bash
 apk update && apk add python3 py3-pip && python3 -m venv venv && source venv/bin/activate && pip install -r sections/04-local-python-agent/requirements.txt
+
+---
+
+## Docker Installation (`install-docker.sh`)
+
+If Docker is not available in your KodeKloud lab environment, use this script to install it automatically. It detects your OS and runs the appropriate installation steps.
+
+**Supported platforms:**
+- Alpine Linux (KodeKloud playgrounds)
+- Ubuntu / Debian
+- CentOS / RHEL
+- macOS
+
+```bash
+bash helper/kodekloud-lab/install-docker.sh
+```
+
+The script will:
+1. Detect your OS automatically
+2. Install Docker (and Docker Compose on Alpine)
+3. Start the Docker service
+4. Verify the installation by running `hello-world`
 ```
 
 ### What this does:
