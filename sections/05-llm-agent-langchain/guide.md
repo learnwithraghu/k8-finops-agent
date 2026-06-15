@@ -103,7 +103,15 @@ What to look for:
 - it told you *what* was wrong but not what to do about it
 - this is the gap the LLM will help close
 
-## Step 6: Run the agent with the LLM enabled
+## Step 6: Install the Section 05 dependencies
+```bash
+pip install -r sections/05-llm-agent-langchain/requirements.txt
+```
+
+What to look for:
+- LangChain, Pydantic, and other required packages should install cleanly
+
+## Step 7: Run the agent with the LLM enabled
 ```bash
 PYTHONPATH=sections/05-llm-agent-langchain python3 -m agent.main
 ```
@@ -116,7 +124,7 @@ What to look for:
 - the report title should say it is LLM powered
 - if it fails, check that `OPENAI_API_KEY` and `OPENAI_BASE_URL` are set correctly in `.env`
 
-## Step 7: Read the LLM output
+## Step 8: Read the LLM output
 What to look for:
 - `category`, `missing_tags`, and `reason` are now decided by the LLM itself —
   compare them against what you saw in Section 04 for the same resources
@@ -130,7 +138,7 @@ What to look for:
 - the same LangChain chain works with any OpenAI-compatible API — only the URL changes
 - Section 04's tagging-rules.yaml is reused as-is — only *who* applies it changed
 - the LLM is now doing the policy matching that Python used to do — discuss
-  whether you'd trust it to get every label alias right every time
+- whether you'd trust it to get every label alias right every time
 - no cost calculations - purely focused on tagging compliance
 
 ## Expected outcome
