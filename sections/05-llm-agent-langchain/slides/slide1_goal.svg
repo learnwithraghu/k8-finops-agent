@@ -1,90 +1,213 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    <linearGradient id="accent-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9900"/>
+      <stop offset="100%" stop-color="#F57C00"/>
+    </linearGradient>
+    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34A853"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="neural-glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8F0FE"/>
+      <stop offset="100%" stop-color="#BBDEFB"/>
+    </linearGradient>
+    <linearGradient id="chip-heat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFCCBC"/>
+      <stop offset="100%" stop-color="#FF7043"/>
+    </linearGradient>
+
+    <!-- Circuit chip icon -->
+    <g id="icon-chip">
+      <rect x="-22" y="-22" width="44" height="44" rx="4" fill="#F5F5F5" stroke="#78909C" stroke-width="2"/>
+      <rect x="-14" y="-14" width="28" height="28" rx="2" fill="none" stroke="#90A4AE" stroke-width="1"/>
+      <line x1="-22" y1="-14" x2="-30" y2="-14" stroke="#78909C" stroke-width="2"/>
+      <line x1="-22" y1="-5" x2="-30" y2="-5" stroke="#78909C" stroke-width="2"/>
+      <line x1="-22" y1="5" x2="-30" y2="5" stroke="#78909C" stroke-width="2"/>
+      <line x1="-22" y1="14" x2="-30" y2="14" stroke="#78909C" stroke-width="2"/>
+      <line x1="22" y1="-14" x2="30" y2="-14" stroke="#78909C" stroke-width="2"/>
+      <line x1="22" y1="-5" x2="30" y2="-5" stroke="#78909C" stroke-width="2"/>
+      <line x1="22" y1="5" x2="30" y2="5" stroke="#78909C" stroke-width="2"/>
+      <line x1="22" y1="14" x2="30" y2="14" stroke="#78909C" stroke-width="2"/>
+      <line x1="-14" y1="-22" x2="-14" y2="-30" stroke="#78909C" stroke-width="2"/>
+      <line x1="-5" y1="-22" x2="-5" y2="-30" stroke="#78909C" stroke-width="2"/>
+      <line x1="5" y1="-22" x2="5" y2="-30" stroke="#78909C" stroke-width="2"/>
+      <line x1="14" y1="-22" x2="14" y2="-30" stroke="#78909C" stroke-width="2"/>
+      <line x1="-14" y1="22" x2="-14" y2="30" stroke="#78909C" stroke-width="2"/>
+      <line x1="-5" y1="22" x2="-5" y2="30" stroke="#78909C" stroke-width="2"/>
+      <line x1="5" y1="22" x2="5" y2="30" stroke="#78909C" stroke-width="2"/>
+      <line x1="14" y1="22" x2="14" y2="30" stroke="#78909C" stroke-width="2"/>
+      <circle cx="0" cy="0" r="5" fill="#EF5350"/>
+    </g>
+
+    <!-- Brain / neural icon -->
+    <g id="icon-brain">
+      <circle cx="0" cy="0" r="30" fill="url(#neural-glow)" stroke="#4285F4" stroke-width="2" stroke-dasharray="5 4" opacity="0.9"/>
+      <path d="M -16 -8 C -22 -8, -26 4, -16 12 C -20 20, -4 24, 0 12 C 4 24, 20 20, 16 12 C 26 4, 22 -8, 16 -8 C 19 -18, 4 -22, 0 -12 C -4 -22, -19 -18, -16 -8 Z"
+            fill="#E8F0FE" stroke="#4285F4" stroke-width="2"/>
+      <circle cx="-8" cy="-4" r="3" fill="#4285F4"/>
+      <circle cx="8" cy="-4" r="3" fill="#4285F4"/>
+      <circle cx="0" cy="8" r="3" fill="#4285F4"/>
+      <line x1="-8" y1="-4" x2="8" y2="-4" stroke="#4285F4" stroke-width="1.4"/>
+      <line x1="8" y1="-4" x2="0" y2="8" stroke="#4285F4" stroke-width="1.4"/>
+      <line x1="-8" y1="-4" x2="0" y2="8" stroke="#4285F4" stroke-width="1.4"/>
+    </g>
+
+    <!-- Cross icon -->
+    <g id="icon-cross">
+      <circle cx="0" cy="0" r="9" fill="#EF5350"/>
+      <line x1="-4.5" y1="-4.5" x2="4.5" y2="4.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+      <line x1="4.5" y1="-4.5" x2="-4.5" y2="4.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Check icon -->
+    <g id="icon-check">
+      <circle cx="0" cy="0" r="9" fill="#34A853"/>
+      <path d="M -4.5 0 L -1.5 3 L 4.5 -3" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Gear / automation icon -->
+    <g id="icon-gear">
+      <path d="M 0 -14 L 3 -14 L 4 -20 L 8 -20 L 9 -14 C 12 -13 15 -11 17 -8 L 22 -10 L 24 -6 L 20 -3 C 20 0 20 3 20 6 L 24 9 L 22 13 L 17 11 C 15 14 12 16 9 17 L 8 23 L 4 23 L 3 17 L 0 17 L -3 17 L -4 23 L -8 23 L -9 17 C -12 16 -15 14 -17 11 L -22 13 L -24 9 L -20 6 C -20 3 -20 0 -20 -3 L -24 -6 L -22 -10 L -17 -8 C -15 -11 -12 -13 -9 -14 L -8 -20 L -4 -20 L -3 -14 Z"
+            fill="#ECEFF1" stroke="#607D8B" stroke-width="1.5"/>
+      <circle cx="0" cy="0" r="6" fill="#FFFFFF" stroke="#607D8B" stroke-width="1.5"/>
+    </g>
+
+    <!-- Glow filter for brain -->
+    <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
   <!-- Background -->
-  <rect width="1280" height="720" fill="#FFFFFF" />
+  <rect width="1280" height="720" fill="#FFFFFF"/>
 
-  <!-- Slide Header -->
-  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">01. Section Goal &amp; Overview</text>
-  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Upgrading from static rules to intelligent FinOps reasoning</text>
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
 
-  <!-- Left Card: Section 04 (Simple Rules) -->
-  <g transform="translate(150, 200)">
-    <rect width="360" height="340" rx="16" fill="#F8F9FA" stroke="#78909C" stroke-width="2" />
-    <path d="M 0 16 A 16 16 0 0 1 16 0 L 344 0 A 16 16 0 0 1 360 16 L 360 60 L 0 60 Z" fill="#78909C" />
-    <text x="180" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Static Python Rule-Checker</text>
+  <!-- Section badge -->
+  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
+  <text x="130" y="55" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
 
-    <!-- Visual representation: Hardcoded Switch/Circuit -->
-    <g transform="translate(180, 140)">
-      <!-- A basic circuit switch -->
-      <circle cx="-50" cy="0" r="10" fill="#78909C" />
-      <circle cx="50" cy="0" r="10" fill="#78909C" />
-      <!-- Open Switch Line -->
-      <line x1="-45" y1="-8" x2="35" y2="-40" stroke="#EF5350" stroke-width="6" stroke-linecap="round" />
-      <text x="0" y="45" font-family="Arial, sans-serif" font-size="14" fill="#607D8B" text-anchor="middle">Deterministic If/Else</text>
+  <!-- Slide header -->
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">Section Goal &amp; Overview</text>
+  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Upgrading the collector's brain from static rules to an LLM-powered decision engine</text>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- LEFT: Static Rule Engine (Circuit Chip Metaphor)       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <g transform="translate(80, 180)">
+    <rect width="420" height="370" rx="16" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5"/>
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 404 0 A 16 16 0 0 1 420 16 L 420 55 L 0 55 Z" fill="#78909C"/>
+    <text x="210" y="35" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Static Python Rule-Checker</text>
+
+    <!-- Chip icon centered -->
+    <g transform="translate(210, 138)">
+      <use href="#icon-chip" transform="scale(1.8)"/>
+      <!-- Sparks showing brittleness -->
+      <path d="M 28 -20 L 34 -12 L 30 -8 L 36 0" fill="none" stroke="#FFD54F" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+      <path d="M -28 18 L -34 26 L -30 30" fill="none" stroke="#FFD54F" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
     </g>
 
-    <!-- Details List -->
-    <g transform="translate(40, 220)">
-      <circle cx="0" cy="5" r="4" fill="#EF5350" />
-      <text x="20" y="10" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Hardcoded tag comparisons</text>
+    <text x="210" y="200" font-family="Arial, sans-serif" font-size="13" fill="#78909C" text-anchor="middle">Deterministic If / Else</text>
 
-      <circle cx="0" cy="35" r="4" fill="#EF5350" />
-      <text x="20" y="40" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Rigid checks (misses spelling variants)</text>
+    <!-- Limitation list -->
+    <g transform="translate(35, 230)">
+      <use href="#icon-cross" x="0" y="12"/>
+      <text x="24" y="17" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Hardcoded tag comparisons</text>
 
-      <circle cx="0" cy="65" r="4" fill="#EF5350" />
-      <text x="20" y="70" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Finds problems, but cannot propose fixes</text>
-    </g>
-  </g>
+      <use href="#icon-cross" x="0" y="47"/>
+      <text x="24" y="52" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Misses spelling variants &amp; aliases</text>
 
-  <!-- Middle: Upgrade Arrow -->
-  <g transform="translate(560, 330)">
-    <path d="M 0 20 L 110 20" stroke="#FF9900" stroke-width="6" stroke-dasharray="8 6" />
-    <path d="M 110 10 L 130 20 L 110 30 Z" fill="#FF9900" />
-    <rect x="15" y="-20" width="90" height="30" rx="6" fill="#FFE9D6" stroke="#FF9900" stroke-width="1.5" />
-    <text x="60" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FF9900" text-anchor="middle">UPGRADE</text>
-  </g>
+      <use href="#icon-cross" x="0" y="82"/>
+      <text x="24" y="87" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Finds problems, can't propose fixes</text>
 
-  <!-- Right Card: Section 05 (LLM Agent) -->
-  <g transform="translate(740, 200)">
-    <rect width="360" height="340" rx="16" fill="#F8F9FA" stroke="#4285F4" stroke-width="2.5" />
-    <path d="M 0 16 A 16 16 0 0 1 16 0 L 344 0 A 16 16 0 0 1 360 16 L 360 60 L 0 60 Z" fill="#4285F4" />
-    <text x="180" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Intelligent LLM Analyzer</text>
-
-    <!-- Visual representation: The Brain / Agent Core -->
-    <g transform="translate(180, 140)">
-      <!-- Outer glowing circle -->
-      <circle cx="0" cy="0" r="45" fill="#E8F0FE" stroke="#4285F4" stroke-width="2" stroke-dasharray="4 4" />
-      
-      <!-- Brain Icon Schematic -->
-      <path d="M -20 -10 C -30 -10, -35 5, -20 15 C -25 25, -5 30, 0 15 C 5 30, 25 25, 20 15 C 35 5, 30 -10, 20 -10 C 25 -25, 5 -30, 0 -15 C -5 -30, -25 -25, -20 -10 Z" 
-            fill="#D2E3FC" stroke="#4285F4" stroke-width="2.5" />
-      
-      <!-- Connections/Nodes inside brain -->
-      <circle cx="-10" cy="-5" r="3" fill="#4285F4" />
-      <circle cx="10" cy="-5" r="3" fill="#4285F4" />
-      <circle cx="0" cy="10" r="3" fill="#4285F4" />
-      <line x1="-10" y1="-5" x2="10" y2="-5" stroke="#4285F4" stroke-width="1" />
-      <line x1="10" y1="-5" x2="0" y2="10" stroke="#4285F4" stroke-width="1" />
-      <line x1="-10" y1="-5" x2="0" y2="10" stroke="#4285F4" stroke-width="1" />
-      
-      <text x="0" y="55" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4" text-anchor="middle">LangChain Powered</text>
-    </g>
-
-    <!-- Details List -->
-    <g transform="translate(40, 220)">
-      <circle cx="0" cy="5" r="4" fill="#34A853" />
-      <text x="20" y="10" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Policy-driven prompts (no code changes)</text>
-
-      <circle cx="0" cy="35" r="4" fill="#34A853" />
-      <text x="20" y="40" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Cognitive matching of tag aliases</text>
-
-      <circle cx="0" cy="65" r="4" fill="#34A853" />
-      <text x="20" y="70" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Drafts detailed tickets &amp; resolves owners</text>
+      <use href="#icon-cross" x="0" y="117"/>
+      <text x="24" y="122" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Requires code changes per policy update</text>
     </g>
   </g>
 
-  <!-- Bottom Summary Info Block -->
-  <rect x="80" y="600" width="1120" height="70" rx="8" fill="#F1F3F4" />
-  <text x="110" y="641" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">
-    <tspan font-weight="bold" fill="#4285F4">Key Objective:</tspan> Replace brittle rule checking with LLM-powered context awareness. We feed the LLM cluster metadata and corporate policies, letting it perform cognitive classification and remediation planning.
-  </text>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CENTER: Upgrade / Transformation Arrow                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <g transform="translate(520, 300)">
+    <!-- Arrow shaft with gradient -->
+    <defs>
+      <linearGradient id="arrow-shaft" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#FF9900"/>
+        <stop offset="100%" stop-color="#4285F4"/>
+      </linearGradient>
+    </defs>
+    <line x1="0" y1="0" x2="180" y2="0" stroke="url(#arrow-shaft)" stroke-width="6" stroke-linecap="round" stroke-dasharray="12 8"/>
+    <polygon points="180,-12 210,0 180,12" fill="#4285F4"/>
+
+    <!-- Upgrade badge -->
+    <rect x="45" y="-50" width="110" height="32" rx="16" fill="#FFF3E0" stroke="#FF9900" stroke-width="1.5"/>
+    <text x="100" y="-28" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#E65100" text-anchor="middle">UPGRADE</text>
+
+    <!-- Small gear icon on arrow -->
+    <use href="#icon-gear" x="100" y="35" transform="scale(0.7)"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- RIGHT: LLM Agent (Neural Core Metaphor)                -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <g transform="translate(740, 180)">
+    <rect width="460" height="370" rx="16" fill="#E8F0FE" stroke="#4285F4" stroke-width="2"/>
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 444 0 A 16 16 0 0 1 460 16 L 460 55 L 0 55 Z" fill="url(#accent-blue)"/>
+    <text x="230" y="35" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Intelligent LLM Analyzer</text>
+
+    <!-- Neural core visualization -->
+    <g transform="translate(230, 132)">
+      <!-- Outer rings -->
+      <circle cx="0" cy="0" r="58" fill="none" stroke="rgba(66,133,244,0.15)" stroke-width="2" stroke-dasharray="8 6"/>
+      <circle cx="0" cy="0" r="46" fill="none" stroke="rgba(66,133,244,0.25)" stroke-width="1.5"/>
+
+      <!-- Glowing brain -->
+      <g filter="url(#glow-blue)">
+        <use href="#icon-brain" transform="scale(1.5)"/>
+      </g>
+
+      <!-- Orbiting data particles -->
+      <circle cx="52" cy="-18" r="4" fill="#FF9900" opacity="0.85"/>
+      <circle cx="-50" cy="22" r="4" fill="#34A853" opacity="0.85"/>
+      <circle cx="12" cy="-54" r="3" fill="#4285F4" opacity="0.8"/>
+      <circle cx="-18" cy="50" r="3" fill="#9C27B0" opacity="0.75"/>
+
+      <text x="0" y="75" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">LangChain Powered</text>
+    </g>
+
+    <!-- Capability list -->
+    <g transform="translate(35, 215)">
+      <use href="#icon-check" x="0" y="12"/>
+      <text x="24" y="17" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">Policy-driven prompts (no code changes)</text>
+
+      <use href="#icon-check" x="0" y="47"/>
+      <text x="24" y="52" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">Cognitive matching of tag aliases</text>
+
+      <use href="#icon-check" x="0" y="82"/>
+      <text x="24" y="87" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">Drafts detailed tickets &amp; resolves owners</text>
+
+      <use href="#icon-check" x="0" y="117"/>
+      <text x="24" y="122" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">Structured JSON output via Pydantic</text>
+    </g>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- BOTTOM: Key objective bar                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
+  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">KEY OBJECTIVE</text>
+  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Replace brittle rule checking with LLM-powered context awareness. Feed the LLM cluster metadata and corporate</text>
+  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">policies, letting it perform cognitive classification, owner resolution, and remediation planning automatically.</text>
 </svg>

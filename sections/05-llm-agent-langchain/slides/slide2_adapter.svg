@@ -1,96 +1,183 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34A853"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="ide-header" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2D3748"/>
+      <stop offset="100%" stop-color="#1A202C"/>
+    </linearGradient>
+
+    <!-- ConfigMap / YAML Document Icon -->
+    <g id="icon-cm">
+      <path d="M -9,-12 L 3,-12 L 9,-6 L 9,12 L -9,12 Z" fill="none" stroke="#FFB300" stroke-width="1.5"/>
+      <path d="M 3,-12 L 3,-6 L 9,-6" fill="none" stroke="#FFB300" stroke-width="1.5"/>
+      <line x1="-5" y1="-2" x2="5" y2="-2" stroke="#FFB300" stroke-width="1.2" opacity="0.8"/>
+    </g>
+
+    <!-- Adapter plug icon -->
+    <g id="icon-adapter">
+      <rect x="-18" y="-14" width="36" height="28" rx="4" fill="none" stroke="#4285F4" stroke-width="2"/>
+      <line x1="-8" y1="-14" x2="-8" y2="-20" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="0" y1="-14" x2="0" y2="-20" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="8" y1="-14" x2="8" y2="-20" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="-12" y="-4" width="24" height="10" rx="2" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
+    </g>
+  </defs>
+
   <!-- Background -->
-  <rect width="1280" height="720" fill="#FFFFFF" />
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
+
+  <!-- Section Badge -->
+  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
+  <text x="130" y="54" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
 
   <!-- Slide Header -->
-  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">02. The Universal LLM Adapter</text>
-  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Using custom Base URLs to target any OpenAI-compliant API</text>
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">The Universal LLM Adapter</text>
+  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Using custom Base URLs to target any OpenAI-compliant API — zero code changes</text>
 
-  <!-- Left: The .env Config File -->
-  <g transform="translate(80, 200)">
-    <!-- Browser/IDE Container -->
-    <rect width="440" height="340" rx="10" fill="#263238" />
-    <!-- Header Bar -->
-    <path d="M 0 10 A 10 10 0 0 1 10 0 L 430 0 A 10 10 0 0 1 440 10 L 440 35 L 0 35 Z" fill="#37474F" />
-    <circle cx="20" cy="17" r="6" fill="#EF5350" />
-    <circle cx="40" cy="17" r="6" fill="#FFB74D" />
-    <circle cx="60" cy="17" r="6" fill="#81C784" />
-    <text x="220" y="22" font-family="Arial, sans-serif" font-size="14" fill="#B0BEC5" text-anchor="middle">.env (Environment File)</text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LEFT: IDE-Styled .env Config Window         -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(80, 175)">
+    <!-- IDE container (stays dark — it's a code editor) -->
+    <rect width="440" height="340" rx="12" fill="#1A1E2E" stroke="#37474F" stroke-width="1.5"/>
+    <!-- Title bar -->
+    <path d="M 0 12 A 12 12 0 0 1 12 0 L 428 0 A 12 12 0 0 1 440 12 L 440 38 L 0 38 Z" fill="url(#ide-header)"/>
+    <!-- Traffic lights -->
+    <circle cx="22" cy="19" r="6" fill="#EF5350"/>
+    <circle cx="42" cy="19" r="6" fill="#FFB74D"/>
+    <circle cx="62" cy="19" r="6" fill="#81C784"/>
+    <!-- File name tab -->
+    <rect x="150" y="6" width="140" height="26" rx="4" fill="rgba(255,255,255,0.06)"/>
+    <use href="#icon-cm" x="170" y="19" transform="scale(0.7)"/>
+    <text x="187" y="24" font-family="Arial, sans-serif" font-size="12" fill="#B0BEC5">.env</text>
 
-    <!-- Code Content -->
-    <g transform="translate(25, 75)">
-      <!-- Highlighted base URL -->
-      <rect x="-5" y="-5" width="400" height="34" rx="4" fill="#37474F" stroke="#FF9900" stroke-width="1.5" />
-      <text x="0" y="18" font-family="Courier New, monospace" font-size="14" font-weight="bold" fill="#FF9900">OPENAI_BASE_URL=https://api.ai.kodekloud.com/v1</text>
-      
-      <text x="0" y="55" font-family="Courier New, monospace" font-size="14" fill="#ECEFF1">OPENAI_API_KEY=kk_sk_...</text>
-      
-      <rect x="-5" y="80" width="400" height="34" rx="4" fill="#37474F" stroke="#4285F4" stroke-width="1.5" />
-      <text x="0" y="103" font-family="Courier New, monospace" font-size="14" font-weight="bold" fill="#4285F4">OPENAI_MODEL_ID=gpt-4o</text>
-      
-      <text x="0" y="145" font-family="Courier New, monospace" font-size="14" fill="#B0BEC5">OPENAI_MAX_TOKENS=1024</text>
-      <text x="0" y="185" font-family="Courier New, monospace" font-size="14" fill="#B0BEC5">OPENAI_TEMPERATURE=0.3</text>
+    <!-- Code content area -->
+    <g transform="translate(20, 60)">
+      <!-- Line numbers gutter -->
+      <text x="10" y="20" font-family="Courier New, monospace" font-size="12" fill="#4A5568">1</text>
+      <text x="10" y="48" font-family="Courier New, monospace" font-size="12" fill="#4A5568">2</text>
+      <text x="10" y="76" font-family="Courier New, monospace" font-size="12" fill="#4A5568">3</text>
+      <text x="10" y="104" font-family="Courier New, monospace" font-size="12" fill="#4A5568">4</text>
+      <text x="10" y="132" font-family="Courier New, monospace" font-size="12" fill="#4A5568">5</text>
+      <text x="10" y="160" font-family="Courier New, monospace" font-size="12" fill="#4A5568">6</text>
+      <text x="10" y="188" font-family="Courier New, monospace" font-size="12" fill="#4A5568">7</text>
+
+      <line x1="28" y1="0" x2="28" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+      <!-- Comment -->
+      <text x="38" y="20" font-family="Courier New, monospace" font-size="13" fill="#616E88"># LLM Provider Configuration</text>
+
+      <!-- OPENAI_BASE_URL — highlighted -->
+      <rect x="34" y="32" width="370" height="24" rx="3" fill="rgba(255,153,0,0.08)" stroke="#FF9900" stroke-width="1" stroke-dasharray="4 2"/>
+      <text x="38" y="48" font-family="Courier New, monospace" font-size="13" fill="#FF9900" font-weight="bold">OPENAI_BASE_URL</text>
+      <text x="186" y="48" font-family="Courier New, monospace" font-size="13" fill="#78909C">=</text>
+      <text x="197" y="48" font-family="Courier New, monospace" font-size="13" fill="#81C784">https://api.ai.kodekloud.com/v1</text>
+
+      <!-- OPENAI_API_KEY -->
+      <text x="38" y="76" font-family="Courier New, monospace" font-size="13" fill="#ECEFF1">OPENAI_API_KEY</text>
+      <text x="154" y="76" font-family="Courier New, monospace" font-size="13" fill="#78909C">=</text>
+      <text x="165" y="76" font-family="Courier New, monospace" font-size="13" fill="#81C784">kk_sk_•••••••••</text>
+
+      <!-- Blank -->
+      <text x="38" y="104" font-family="Courier New, monospace" font-size="13" fill="#616E88"># Model settings</text>
+
+      <!-- MODEL_ID — highlighted -->
+      <rect x="34" y="116" width="370" height="24" rx="3" fill="rgba(66,133,244,0.08)" stroke="#4285F4" stroke-width="1" stroke-dasharray="4 2"/>
+      <text x="38" y="132" font-family="Courier New, monospace" font-size="13" fill="#4285F4" font-weight="bold">OPENAI_MODEL_ID</text>
+      <text x="170" y="132" font-family="Courier New, monospace" font-size="13" fill="#78909C">=</text>
+      <text x="181" y="132" font-family="Courier New, monospace" font-size="13" fill="#81C784">gpt-4o</text>
+
+      <!-- MAX_TOKENS -->
+      <text x="38" y="160" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">OPENAI_MAX_TOKENS</text>
+      <text x="190" y="160" font-family="Courier New, monospace" font-size="13" fill="#78909C">=</text>
+      <text x="201" y="160" font-family="Courier New, monospace" font-size="13" fill="#81C784">1024</text>
+
+      <!-- TEMPERATURE -->
+      <text x="38" y="188" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">OPENAI_TEMPERATURE</text>
+      <text x="202" y="188" font-family="Courier New, monospace" font-size="13" fill="#78909C">=</text>
+      <text x="213" y="188" font-family="Courier New, monospace" font-size="13" fill="#81C784">0.3</text>
     </g>
 
-    <text x="220" y="315" font-family="Arial, sans-serif" font-size="14" fill="#FF9900" text-anchor="middle" font-weight="bold">Zero Code Changes Needed to Switch Endpoints!</text>
+    <!-- Bottom label -->
+    <rect x="110" y="278" width="220" height="28" rx="14" fill="rgba(255,153,0,0.1)" stroke="#FF9900" stroke-width="1"/>
+    <text x="220" y="297" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FF9900" text-anchor="middle">Zero Code Changes to Switch!</text>
   </g>
 
-  <!-- Middle: Universal Adapter Plug Metaphor -->
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CENTER: Universal Adapter Hub               -->
+  <!-- ═══════════════════════════════════════════ -->
   <g transform="translate(560, 270)">
-    <!-- Base client box -->
-    <rect x="0" y="40" width="160" height="120" rx="8" fill="#F1F3F4" stroke="#4285F4" stroke-width="2.5" />
-    <text x="80" y="75" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">LangChain Client</text>
-    <text x="80" y="95" font-family="Courier New, monospace" font-size="12" fill="#607D8B" text-anchor="middle">ChatOpenAI()</text>
-    <text x="80" y="125" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#34A853" text-anchor="middle">base_url config</text>
-    <text x="80" y="142" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#34A853" text-anchor="middle">api_key config</text>
+    <rect x="0" y="20" width="180" height="140" rx="12" fill="#E8F0FE" stroke="#4285F4" stroke-width="2"/>
 
-    <!-- Adapter Plug lines branching out -->
-    <path d="M 160 80 Q 230 40 280 10" fill="none" stroke="#90A4AE" stroke-width="3" stroke-dasharray="4 4" />
-    <path d="M 160 100 L 280 100" fill="none" stroke="#4285F4" stroke-width="4" />
-    <path d="M 160 120 Q 230 160 280 190" fill="none" stroke="#90A4AE" stroke-width="3" stroke-dasharray="4 4" />
+    <use href="#icon-adapter" x="90" y="55" transform="scale(1.3)"/>
+
+    <text x="90" y="100" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">LangChain Client</text>
+    <text x="90" y="118" font-family="Courier New, monospace" font-size="11" fill="#607D8B" text-anchor="middle">ChatOpenAI()</text>
+    <text x="90" y="140" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#34A853" text-anchor="middle">base_url • api_key</text>
+
+    <!-- Branching connection lines -->
+    <path d="M 180 60 Q 250 30 290 25" fill="none" stroke="#90A4AE" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <polygon points="288,20 298,25 288,30" fill="#90A4AE"/>
+
+    <path d="M 180 90 L 290 90" fill="none" stroke="#4285F4" stroke-width="3.5"/>
+    <polygon points="288,84 300,90 288,96" fill="#4285F4"/>
+
+    <path d="M 180 120 Q 250 150 290 155" fill="none" stroke="#90A4AE" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <polygon points="288,150 298,155 288,160" fill="#90A4AE"/>
   </g>
 
-  <!-- Right: Target Sockets/Destinations -->
-  <g transform="translate(880, 200)">
-    <!-- Target 1: OpenAI Official -->
-    <g transform="translate(0, 0)">
-      <rect width="320" height="70" rx="8" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5" />
-      <circle cx="35" cy="35" r="15" fill="#ECEFF1" stroke="#90A4AE" stroke-width="1.5" />
-      <text x="35" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#90A4AE" text-anchor="middle">O</text>
-      <text x="70" y="32" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">OpenAI Cloud</text>
-      <text x="70" y="50" font-family="Courier New, monospace" font-size="11" fill="#607D8B">api.openai.com/v1</text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- RIGHT: Target Provider Endpoints            -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(860, 210)">
+    <!-- Target 1: OpenAI Official (inactive) -->
+    <rect width="340" height="68" rx="10" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5"/>
+    <circle cx="34" cy="34" r="16" fill="#ECEFF1" stroke="#90A4AE" stroke-width="1.5"/>
+    <text x="34" y="39" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#90A4AE" text-anchor="middle">O</text>
+    <text x="68" y="30" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#607D8B">OpenAI Cloud</text>
+    <text x="68" y="48" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">api.openai.com/v1</text>
+
+    <!-- Target 2: KodeKloud AI Gateway (ACTIVE) -->
+    <g transform="translate(0, 85)">
+      <rect width="340" height="78" rx="10" fill="#E8F0FE" stroke="#4285F4" stroke-width="2.5"/>
+      <rect x="0" y="0" width="4" height="78" rx="2" fill="url(#accent-blue)"/>
+
+      <circle cx="34" cy="39" r="18" fill="#4285F4"/>
+      <path d="M 26 39 L 32 45 L 43 34" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+
+      <text x="68" y="32" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#1A73E8">KodeKloud AI Gateway</text>
+      <text x="68" y="52" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#1A73E8">api.ai.kodekloud.com/v1</text>
+
+      <rect x="240" y="8" width="85" height="22" rx="11" fill="url(#accent-green)"/>
+      <text x="282" y="23" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ACTIVE</text>
     </g>
 
-    <!-- Target 2: KodeKloud AI Gateway (Active) -->
-    <g transform="translate(0, 90)">
-      <rect width="320" height="80" rx="8" fill="#E8F0FE" stroke="#4285F4" stroke-width="2.5" />
-      
-      <!-- Check badge -->
-      <circle cx="35" cy="40" r="18" fill="#4285F4" />
-      <!-- Small checkmark -->
-      <path d="M 28 40 L 33 45 L 43 35" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
-
-      <text x="70" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1A73E8">KodeKloud AI Gateway</text>
-      <text x="70" y="55" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#1A73E8">api.ai.kodekloud.com/v1</text>
-      
-      <!-- Tag / Active -->
-      <rect x="220" y="10" width="90" height="20" rx="4" fill="#34A853" />
-      <text x="265" y="24" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ACTIVE STAGE</text>
-    </g>
-
-    <!-- Target 3: Local/Private Sandbox -->
-    <g transform="translate(0, 190)">
-      <rect width="320" height="70" rx="8" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5" />
-      <circle cx="35" cy="35" r="15" fill="#ECEFF1" stroke="#90A4AE" stroke-width="1.5" />
-      <text x="35" y="40" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#90A4AE" text-anchor="middle">Loc</text>
-      <text x="70" y="32" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">Local Sandbox (Ollama/vLLM)</text>
-      <text x="70" y="50" font-family="Courier New, monospace" font-size="11" fill="#607D8B">localhost:11434/v1</text>
+    <!-- Target 3: Local Sandbox (inactive) -->
+    <g transform="translate(0, 180)">
+      <rect width="340" height="68" rx="10" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5"/>
+      <circle cx="34" cy="34" r="16" fill="#ECEFF1" stroke="#90A4AE" stroke-width="1.5"/>
+      <text x="34" y="39" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#90A4AE" text-anchor="middle">Loc</text>
+      <text x="68" y="30" font-family="Arial, sans-serif" font-size="15" fill="#607D8B">Local Sandbox (Ollama / vLLM)</text>
+      <text x="68" y="48" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">localhost:11434/v1</text>
     </g>
   </g>
 
-  <!-- Bottom Goals Summary -->
-  <rect x="80" y="600" width="1120" height="70" rx="8" fill="#F1F3F4" />
-  <text x="110" y="641" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">
-    <tspan font-weight="bold" fill="#4285F4">Why this matters:</tspan> By leveraging the OpenAI-compatible standard via LangChain, our code remains provider-agnostic. We can change our LLM backend instantly by editing environment variables inside the <tspan font-family="Courier New, monospace" font-weight="bold">.env</tspan> file, with no code refactoring needed.
-  </text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BOTTOM: Key Takeaway Bar                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
+  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">WHY THIS MATTERS</text>
+  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">By leveraging the OpenAI-compatible standard via LangChain, our code remains provider-agnostic. Change your LLM</text>
+  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">backend instantly by editing environment variables in the .env file — no code refactoring needed.</text>
 </svg>

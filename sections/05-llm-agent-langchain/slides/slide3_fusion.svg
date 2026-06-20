@@ -1,90 +1,174 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    <linearGradient id="accent-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9900"/>
+      <stop offset="100%" stop-color="#F57C00"/>
+    </linearGradient>
+    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34A853"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="fusion-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8F0FE"/>
+      <stop offset="50%" stop-color="#F3E5F5"/>
+      <stop offset="100%" stop-color="#FFF3E0"/>
+    </linearGradient>
+    <linearGradient id="fusion-stroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="50%" stop-color="#9C27B0"/>
+      <stop offset="100%" stop-color="#FF9900"/>
+    </linearGradient>
+
+    <!-- ConfigMap / YAML Document Icon -->
+    <g id="icon-cm">
+      <path d="M -9,-12 L 3,-12 L 9,-6 L 9,12 L -9,12 Z" fill="none" stroke="#FFB300" stroke-width="1.5"/>
+      <path d="M 3,-12 L 3,-6 L 9,-6" fill="none" stroke="#FFB300" stroke-width="1.5"/>
+      <line x1="-5" y1="-2" x2="5" y2="-2" stroke="#FFB300" stroke-width="1.2" opacity="0.8"/>
+    </g>
+  </defs>
+
   <!-- Background -->
-  <rect width="1280" height="720" fill="#FFFFFF" />
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
+
+  <!-- Section Badge -->
+  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
+  <text x="130" y="54" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
 
   <!-- Slide Header -->
-  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">03. Prompt Template &amp; Policy Fusion</text>
-  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Combining live cluster facts and corporate guidelines into a single LLM request</text>
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">Prompt Template &amp; Policy Fusion</text>
+  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Combining live cluster facts and corporate guidelines into a single LLM request</text>
 
-  <!-- Left: Inputs (Metadata & Policy) -->
-  
-  <!-- Live K8s Resource metadata -->
-  <g transform="translate(80, 200)">
-    <rect width="340" height="150" rx="8" fill="#F8F9FA" stroke="#4285F4" stroke-width="2" />
-    <path d="M 0 8 A 8 8 0 0 1 8 0 L 332 0 A 8 8 0 0 1 340 8 L 340 35 L 0 35 Z" fill="#4285F4" />
-    <text x="170" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Live K8s Resource Metadata (JSON)</text>
-    
-    <g transform="translate(15, 55)">
-      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Name: "payment-api-pod"</text>
-      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Namespace: "airline-prod"</text>
-      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Labels: {"env": "prod", "tier": "backend"}</text>
-      <text x="0" y="75" font-family="Courier New, monospace" font-size="12" fill="#607D8B">... (CPU requests, replica counts, PV links)</text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LEFT TOP: Live K8s Resource Metadata        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(60, 170)">
+    <rect width="360" height="155" rx="10" fill="#F8F9FA" stroke="#4285F4" stroke-width="1.5"/>
+    <path d="M 0 10 A 10 10 0 0 1 10 0 L 350 0 A 10 10 0 0 1 360 10 L 360 36 L 0 36 Z" fill="url(#accent-blue)"/>
+    <text x="180" y="23" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Live K8s Resource Metadata (JSON)</text>
+
+    <g transform="translate(18, 50)">
+      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">name:</text>
+      <text x="55" y="15" font-family="Courier New, monospace" font-size="12" fill="#37474F">"payment-api-pod"</text>
+
+      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">namespace:</text>
+      <text x="95" y="35" font-family="Courier New, monospace" font-size="12" fill="#37474F">"airline-prod"</text>
+
+      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">labels:</text>
+      <text x="65" y="55" font-family="Courier New, monospace" font-size="12" fill="#37474F">{"env":"prod", "tier":"backend"}</text>
+
+      <text x="0" y="80" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">... cpu_request, replica_count, pv_links</text>
     </g>
   </g>
 
-  <!-- FinOps Tagging Policy YAML -->
-  <g transform="translate(80, 390)">
-    <rect width="340" height="150" rx="8" fill="#F8F9FA" stroke="#FF9900" stroke-width="2" />
-    <path d="M 0 8 A 8 8 0 0 1 8 0 L 332 0 A 8 8 0 0 1 340 8 L 340 35 L 0 35 Z" fill="#FF9900" />
-    <text x="170" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FinOps Tagging Policy (YAML)</text>
-    
-    <g transform="translate(15, 55)">
-      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#232F3E">required_tags: [owner, cost-center, tier]</text>
-      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#232F3E">label_mappings: {owner: [app.kubernetes.io/owner]}</text>
-      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#232F3E">cost_centers: [booking-engine, payment, platform]</text>
-      <text x="0" y="75" font-family="Courier New, monospace" font-size="12" fill="#607D8B">... (excluded namespaces, compliance expectations)</text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LEFT BOTTOM: FinOps Tagging Policy YAML     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(60, 360)">
+    <rect width="360" height="155" rx="10" fill="#FFF8E1" stroke="#FF9900" stroke-width="1.5"/>
+    <path d="M 0 10 A 10 10 0 0 1 10 0 L 350 0 A 10 10 0 0 1 360 10 L 360 36 L 0 36 Z" fill="url(#accent-orange)"/>
+    <use href="#icon-cm" x="18" y="18" transform="scale(0.8)"/>
+    <text x="188" y="23" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FinOps Tagging Policy (YAML)</text>
+
+    <g transform="translate(18, 50)">
+      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#E65100">required_tags:</text>
+      <text x="125" y="15" font-family="Courier New, monospace" font-size="12" fill="#37474F">[owner, cost-center, tier]</text>
+
+      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#E65100">label_mappings:</text>
+      <text x="125" y="35" font-family="Courier New, monospace" font-size="12" fill="#37474F">{owner: [app.k8s.io/owner]}</text>
+
+      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#E65100">cost_centers:</text>
+      <text x="115" y="55" font-family="Courier New, monospace" font-size="12" fill="#37474F">[booking, payment, platform]</text>
+
+      <text x="0" y="80" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">... excluded_namespaces, compliance_rules</text>
     </g>
   </g>
 
-  <!-- Connectors from left inputs to center -->
-  <path d="M 420 275 Q 490 275 510 320" fill="none" stroke="#4285F4" stroke-width="3" stroke-dasharray="4 4" />
-  <path d="M 420 465 Q 490 465 510 420" fill="none" stroke="#FF9900" stroke-width="3" stroke-dasharray="4 4" />
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CONNECTORS: Left inputs → Center reactor    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <path d="M 420 248 Q 475 248 490 305" fill="none" stroke="#4285F4" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <polygon points="485,303 490,313 495,303" fill="#4285F4"/>
 
-  <!-- Center: Prompt Template Reactor -->
-  <g transform="translate(530, 260)">
-    <!-- Main Cylinder container representing fusion chamber / template engine -->
-    <rect width="220" height="220" rx="20" fill="#E8F0FE" stroke="#1A73E8" stroke-width="3" />
-    
-    <text x="110" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1A73E8" text-anchor="middle">PROMPT TEMPLATE</text>
-    
-    <!-- Symbolic prompt instructions inside reactor -->
-    <rect x="20" y="65" width="180" height="120" rx="8" fill="#FFFFFF" stroke="#ADC1F9" stroke-width="1" />
-    
-    <g transform="translate(30, 85)">
-      <text x="0" y="15" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#37474F">SYSTEM INSTRUCTIONS</text>
-      <text x="0" y="32" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">Analyze compliance matching:</text>
-      <text x="0" y="47" font-family="Courier New, monospace" font-size="10" font-weight="bold" fill="#E53935">{tagging_rules}</text>
-      <text x="0" y="62" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">against K8s configuration data:</text>
-      <text x="0" y="77" font-family="Courier New, monospace" font-size="10" font-weight="bold" fill="#1E88E5">{resource_metadata}</text>
-      <text x="0" y="92" font-family="Arial, sans-serif" font-size="10" fill="#43A047">output structured json schema</text>
+  <path d="M 420 438 Q 475 438 490 380" fill="none" stroke="#FF9900" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <polygon points="485,382 490,372 495,382" fill="#FF9900"/>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CENTER: Fusion Reactor — Prompt Template    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(500, 220)">
+    <rect width="250" height="245" rx="20" fill="url(#fusion-gradient)" stroke="url(#fusion-stroke)" stroke-width="2"/>
+
+    <text x="125" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#7B1FA2" text-anchor="middle">PROMPT TEMPLATE</text>
+
+    <!-- Inner template container -->
+    <rect x="18" y="52" width="214" height="160" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+
+    <g transform="translate(30, 72)">
+      <text x="0" y="12" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#37474F">SYSTEM INSTRUCTIONS</text>
+      <line x1="0" y1="20" x2="180" y2="20" stroke="#E0E0E0" stroke-width="1"/>
+
+      <text x="0" y="38" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">Analyze compliance matching:</text>
+
+      <rect x="-4" y="44" width="190" height="20" rx="3" fill="#FFF3E0" stroke="#FF9900" stroke-width="0.8"/>
+      <text x="0" y="58" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#E65100">{tagging_rules}</text>
+
+      <text x="0" y="82" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">against K8s config data:</text>
+
+      <rect x="-4" y="88" width="190" height="20" rx="3" fill="#E8F0FE" stroke="#4285F4" stroke-width="0.8"/>
+      <text x="0" y="102" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#1A73E8">{resource_metadata}</text>
+
+      <text x="0" y="126" font-family="Arial, sans-serif" font-size="11" fill="#2E7D32">→ output structured JSON schema</text>
     </g>
   </g>
 
-  <!-- Connection to LLM endpoint -->
-  <path d="M 750 370 L 850 370" stroke="#34A853" stroke-width="5" />
-  <path d="M 850 362 L 870 370 L 850 378 Z" fill="#34A853" />
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CONNECTOR: Center → Right LLM Node          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <path d="M 750 343 L 860 343" stroke="#34A853" stroke-width="4"/>
+  <polygon points="858,335 878,343 858,351" fill="#34A853"/>
 
-  <!-- Right: ChatOpenAI Client / Execution -->
-  <g transform="translate(880, 275)">
-    <!-- LLM Node -->
-    <rect width="320" height="190" rx="12" fill="#F4FBF7" stroke="#34A853" stroke-width="2.5" />
-    <path d="M 0 12 A 12 12 0 0 1 12 0 L 308 0 A 12 12 0 0 1 320 12 L 320 45 L 0 45 Z" fill="#34A853" />
-    <text x="160" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">LLM Inference Node</text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- RIGHT: LLM Inference Node                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <g transform="translate(885, 210)">
+    <rect width="330" height="270" rx="14" fill="#E8F5E9" stroke="#34A853" stroke-width="1.5"/>
+    <path d="M 0 14 A 14 14 0 0 1 14 0 L 316 0 A 14 14 0 0 1 330 14 L 330 50 L 0 50 Z" fill="url(#accent-green)"/>
+    <text x="165" y="32" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">LLM Inference Node</text>
 
-    <!-- Content details -->
-    <g transform="translate(20, 75)">
-      <!-- Input label -->
-      <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E">Model: ChatOpenAI (GPT-4o)</text>
-      <text x="0" y="38" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Evaluates alias variations intelligently</text>
-      <text x="0" y="58" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Resolves owner context ("payment-api" → payment)</text>
-      <text x="0" y="78" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Assesses priority level dynamically</text>
-      <text x="0" y="98" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Drafts structured correction advice</text>
+    <g transform="translate(25, 70)">
+      <text x="0" y="18" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#232F3E">Model: ChatOpenAI (GPT-4o)</text>
+      <line x1="0" y1="28" x2="280" y2="28" stroke="#C8E6C9" stroke-width="1"/>
+
+      <circle cx="8" cy="50" r="4" fill="#34A853"/>
+      <text x="22" y="55" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Evaluates alias variations intelligently</text>
+
+      <circle cx="8" cy="78" r="4" fill="#34A853"/>
+      <text x="22" y="83" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Resolves owner context heuristically</text>
+
+      <circle cx="8" cy="106" r="4" fill="#34A853"/>
+      <text x="22" y="111" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Assesses priority level dynamically</text>
+
+      <circle cx="8" cy="134" r="4" fill="#34A853"/>
+      <text x="22" y="139" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Drafts structured correction advice</text>
+
+      <circle cx="8" cy="162" r="4" fill="#34A853"/>
+      <text x="22" y="167" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Outputs typed ResourceDecision JSON</text>
     </g>
   </g>
 
-  <!-- Bottom Goals Summary -->
-  <rect x="80" y="600" width="1120" height="70" rx="8" fill="#F1F3F4" />
-  <text x="110" y="641" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">
-    <tspan font-weight="bold" fill="#4285F4">Core shift:</tspan> The policy rules are no longer hardcoded into python algorithms. We feed the entire policy YAML block directly into the LLM context prompt alongside the cluster metadata, transferring the analysis work completely from regular Python loops to LLM context parsing.
-  </text>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BOTTOM: Key Takeaway Bar                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
+  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">CORE SHIFT</text>
+  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Policy rules are no longer hardcoded into Python algorithms. We feed the entire policy YAML block alongside cluster</text>
+  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">metadata directly into the LLM context prompt — transferring analysis work completely to AI reasoning.</text>
 </svg>
