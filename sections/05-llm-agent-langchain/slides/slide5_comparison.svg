@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF" />
+
+  <!-- Slide Header -->
+  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">05. Raw Scan vs. LLM-Enhanced Report</text>
+  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Comparing deterministic detection against context-aware, actionable decisions</text>
+
+  <!-- Left: Section 04 Raw Scan Result -->
+  <g transform="translate(80, 200)">
+    <rect width="520" height="360" rx="16" fill="#F8F9FA" stroke="#78909C" stroke-width="2.5" />
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 504 0 A 16 16 0 0 1 520 16 L 520 60 L 0 60 Z" fill="#78909C" />
+    <text x="260" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Section 04: Raw Violation Output</text>
+    
+    <!-- Code Box representing CLI raw print -->
+    <rect x="25" y="85" width="470" height="215" rx="8" fill="#263238" stroke="#37474F" stroke-width="1.5" />
+    <g transform="translate(45, 115)">
+      <text x="0" y="15" font-family="Courier New, monospace" font-size="13" fill="#EF5350" font-weight="bold">VIOLATION: airline-prod/payment-gateway-svc</text>
+      <text x="0" y="35" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">- Missing required tag: owner</text>
+      <text x="0" y="55" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">- Missing required tag: cost-center</text>
+      
+      <text x="0" y="90" font-family="Courier New, monospace" font-size="13" fill="#EF5350" font-weight="bold">VIOLATION: airline-prod/payment-db-pvc</text>
+      <text x="0" y="110" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">- Orphaned PVC: true (No active pod referencing it)</text>
+      
+      <text x="0" y="145" font-family="Courier New, monospace" font-size="13" fill="#81C784" font-weight="bold">SUMMARY: 2 active violations out of 10 scanned</text>
+    </g>
+
+    <!-- Details/Drawbacks -->
+    <text x="260" y="335" font-family="Arial, sans-serif" font-size="14" fill="#E53935" text-anchor="middle" font-weight="bold">Shows WHAT is broken, but not WHO owns it or HOW to fix it.</text>
+  </g>
+
+  <!-- Right: Section 05 LLM-Enhanced decision report -->
+  <g transform="translate(680, 200)">
+    <rect width="520" height="360" rx="16" fill="#F8F9FA" stroke="#34A853" stroke-width="2.5" />
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 504 0 A 16 16 0 0 1 520 16 L 520 60 L 0 60 Z" fill="#34A853" />
+    <text x="260" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Section 05: LLM-Enhanced Report</text>
+    
+    <!-- Rich layout cards -->
+    <g transform="translate(25, 80)">
+      <!-- Resource Card 1 -->
+      <rect width="470" height="120" rx="8" fill="#E8F4EA" stroke="#A3D9B1" stroke-width="1.5" />
+      <text x="15" y="25" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#137333">payment-gateway-svc (Service)</text>
+      
+      <!-- Badges -->
+      <rect x="15" y="40" width="100" height="20" rx="4" fill="#FFE9D6" stroke="#FF9900" />
+      <text x="65" y="54" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#FF9900" text-anchor="middle">Category: Unowned</text>
+
+      <rect x="125" y="40" width="90" height="20" rx="4" fill="#FCE8E6" stroke="#C5221F" />
+      <text x="170" y="54" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#C5221F" text-anchor="middle">Priority: High</text>
+
+      <text x="15" y="85" font-family="Arial, sans-serif" font-size="13" fill="#232F3E"><tspan font-weight="bold">Reason:</tspan> Matches alias "app.kubernetes.io/name" to app but owner is unresolvable.</text>
+      <text x="15" y="105" font-family="Arial, sans-serif" font-size="13" fill="#232F3E"><tspan font-weight="bold">Suggested Fix:</tspan> Add tag owner="payment-team" based on service name heuristic.</text>
+
+      <!-- Resource Card 2 -->
+      <g transform="translate(0, 135)">
+        <rect width="470" height="100" rx="8" fill="#FCE8E6" stroke="#F1B0B7" stroke-width="1.5" />
+        <text x="15" y="25" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#A50E0E">payment-db-pvc (PersistentVolumeClaim)</text>
+        
+        <!-- Badges -->
+        <rect x="15" y="38" width="120" height="20" rx="4" fill="#FCE8E6" stroke="#A50E0E" />
+        <text x="75" y="52" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#A50E0E" text-anchor="middle">Category: Orphaned</text>
+
+        <rect x="145" y="38" width="100" height="20" rx="4" fill="#FCE8E6" stroke="#A50E0E" />
+        <text x="195" y="52" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#A50E0E" text-anchor="middle">Priority: Critical</text>
+
+        <text x="15" y="80" font-family="Arial, sans-serif" font-size="13" fill="#232F3E"><tspan font-weight="bold">Action:</tspan> Orphaned PVC found. Drafting automated deletion ticket to reclaim space.</text>
+      </g>
+    </g>
+
+    <!-- Details/Benefits -->
+    <text x="260" y="335" font-family="Arial, sans-serif" font-size="14" fill="#137333" text-anchor="middle" font-weight="bold">Produces actionable decisions, drafts tickets, and routes to owners.</text>
+  </g>
+
+  <!-- Bottom Goals Summary -->
+  <rect x="80" y="600" width="1120" height="70" rx="8" fill="#F1F3F4" />
+  <text x="110" y="641" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">
+    <tspan font-weight="bold" fill="#4285F4">The outcome:</tspan> Instead of dumping a list of raw validation issues that must be manually triaged, the LLM provides contextual decisions, assigns priority based on resource usage, drafts the exact Markdown issue body, and suggests specific owners.
+  </text>
+</svg>

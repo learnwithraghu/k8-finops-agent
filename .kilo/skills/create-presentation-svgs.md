@@ -3,7 +3,20 @@
 ## Purpose
 
 This skill provides the design guidelines, code structure, and checklist for creating and refining visually stunning, high-quality SVG slide graphics for presentation decks (PowerPoint, Keynote, Google Slides).
+### Integration with Infographic & Metaphor Skill
 
+The `infographic-metaphor` skill (located at `.kilo/skills/infographic-metaphor.md`) provides a reusable workflow for building metaphor‑driven infographics. When creating a new slide, invoke it like:
+
+```markdown
+{{% call_skill "infographic-metaphor"
+   title="Connecting K8s Metadata to FinOps"
+   metaphor="bridge"
+   components=["cluster","json","python-agent"]
+   palette="aws"
+%}}
+```
+
+This will generate a description and a ready‑to‑use SVG (e.g., `slides/bridge_k8s_finops.svg`) that you can embed directly into your presentation.
 ## When to Use
 
 Use this skill when:

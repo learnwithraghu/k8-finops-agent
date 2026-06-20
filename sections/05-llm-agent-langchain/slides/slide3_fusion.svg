@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF" />
+
+  <!-- Slide Header -->
+  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">03. Prompt Template &amp; Policy Fusion</text>
+  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Combining live cluster facts and corporate guidelines into a single LLM request</text>
+
+  <!-- Left: Inputs (Metadata & Policy) -->
+  
+  <!-- Live K8s Resource metadata -->
+  <g transform="translate(80, 200)">
+    <rect width="340" height="150" rx="8" fill="#F8F9FA" stroke="#4285F4" stroke-width="2" />
+    <path d="M 0 8 A 8 8 0 0 1 8 0 L 332 0 A 8 8 0 0 1 340 8 L 340 35 L 0 35 Z" fill="#4285F4" />
+    <text x="170" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Live K8s Resource Metadata (JSON)</text>
+    
+    <g transform="translate(15, 55)">
+      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Name: "payment-api-pod"</text>
+      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Namespace: "airline-prod"</text>
+      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#232F3E">Labels: {"env": "prod", "tier": "backend"}</text>
+      <text x="0" y="75" font-family="Courier New, monospace" font-size="12" fill="#607D8B">... (CPU requests, replica counts, PV links)</text>
+    </g>
+  </g>
+
+  <!-- FinOps Tagging Policy YAML -->
+  <g transform="translate(80, 390)">
+    <rect width="340" height="150" rx="8" fill="#F8F9FA" stroke="#FF9900" stroke-width="2" />
+    <path d="M 0 8 A 8 8 0 0 1 8 0 L 332 0 A 8 8 0 0 1 340 8 L 340 35 L 0 35 Z" fill="#FF9900" />
+    <text x="170" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FinOps Tagging Policy (YAML)</text>
+    
+    <g transform="translate(15, 55)">
+      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#232F3E">required_tags: [owner, cost-center, tier]</text>
+      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#232F3E">label_mappings: {owner: [app.kubernetes.io/owner]}</text>
+      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#232F3E">cost_centers: [booking-engine, payment, platform]</text>
+      <text x="0" y="75" font-family="Courier New, monospace" font-size="12" fill="#607D8B">... (excluded namespaces, compliance expectations)</text>
+    </g>
+  </g>
+
+  <!-- Connectors from left inputs to center -->
+  <path d="M 420 275 Q 490 275 510 320" fill="none" stroke="#4285F4" stroke-width="3" stroke-dasharray="4 4" />
+  <path d="M 420 465 Q 490 465 510 420" fill="none" stroke="#FF9900" stroke-width="3" stroke-dasharray="4 4" />
+
+  <!-- Center: Prompt Template Reactor -->
+  <g transform="translate(530, 260)">
+    <!-- Main Cylinder container representing fusion chamber / template engine -->
+    <rect width="220" height="220" rx="20" fill="#E8F0FE" stroke="#1A73E8" stroke-width="3" />
+    
+    <text x="110" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1A73E8" text-anchor="middle">PROMPT TEMPLATE</text>
+    
+    <!-- Symbolic prompt instructions inside reactor -->
+    <rect x="20" y="65" width="180" height="120" rx="8" fill="#FFFFFF" stroke="#ADC1F9" stroke-width="1" />
+    
+    <g transform="translate(30, 85)">
+      <text x="0" y="15" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#37474F">SYSTEM INSTRUCTIONS</text>
+      <text x="0" y="32" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">Analyze compliance matching:</text>
+      <text x="0" y="47" font-family="Courier New, monospace" font-size="10" font-weight="bold" fill="#E53935">{tagging_rules}</text>
+      <text x="0" y="62" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">against K8s configuration data:</text>
+      <text x="0" y="77" font-family="Courier New, monospace" font-size="10" font-weight="bold" fill="#1E88E5">{resource_metadata}</text>
+      <text x="0" y="92" font-family="Arial, sans-serif" font-size="10" fill="#43A047">output structured json schema</text>
+    </g>
+  </g>
+
+  <!-- Connection to LLM endpoint -->
+  <path d="M 750 370 L 850 370" stroke="#34A853" stroke-width="5" />
+  <path d="M 850 362 L 870 370 L 850 378 Z" fill="#34A853" />
+
+  <!-- Right: ChatOpenAI Client / Execution -->
+  <g transform="translate(880, 275)">
+    <!-- LLM Node -->
+    <rect width="320" height="190" rx="12" fill="#F4FBF7" stroke="#34A853" stroke-width="2.5" />
+    <path d="M 0 12 A 12 12 0 0 1 12 0 L 308 0 A 12 12 0 0 1 320 12 L 320 45 L 0 45 Z" fill="#34A853" />
+    <text x="160" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">LLM Inference Node</text>
+
+    <!-- Content details -->
+    <g transform="translate(20, 75)">
+      <!-- Input label -->
+      <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E">Model: ChatOpenAI (GPT-4o)</text>
+      <text x="0" y="38" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Evaluates alias variations intelligently</text>
+      <text x="0" y="58" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Resolves owner context ("payment-api" → payment)</text>
+      <text x="0" y="78" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Assesses priority level dynamically</text>
+      <text x="0" y="98" font-family="Arial, sans-serif" font-size="13" fill="#607D8B">- Drafts structured correction advice</text>
+    </g>
+  </g>
+
+  <!-- Bottom Goals Summary -->
+  <rect x="80" y="600" width="1120" height="70" rx="8" fill="#F1F3F4" />
+  <text x="110" y="641" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">
+    <tspan font-weight="bold" fill="#4285F4">Core shift:</tspan> The policy rules are no longer hardcoded into python algorithms. We feed the entire policy YAML block directly into the LLM context prompt alongside the cluster metadata, transferring the analysis work completely from regular Python loops to LLM context parsing.
+  </text>
+</svg>
