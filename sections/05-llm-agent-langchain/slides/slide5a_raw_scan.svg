@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#1E88E5"/>
+    </linearGradient>
+    <linearGradient id="ide-header" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2D3748"/>
+      <stop offset="100%" stop-color="#1A202C"/>
+    </linearGradient>
+
+    <!-- Hexagon Pod/Workload Icon -->
+    <g id="icon-pod">
+      <polygon points="0,-16 13.86,-8 13.86,8 0,16 -13.86,8 -13.86,-8" fill="none" stroke="#E57373" stroke-width="1.8"/>
+      <line x1="0" y1="-16" x2="0" y2="16" stroke="#E57373" stroke-width="1" opacity="0.4"/>
+      <line x1="0" y1="0" x2="13.86" y2="8" stroke="#E57373" stroke-width="1" opacity="0.4"/>
+      <line x1="0" y1="0" x2="-13.86" y2="8" stroke="#E57373" stroke-width="1" opacity="0.4"/>
+    </g>
+
+    <!-- Warning Icon -->
+    <g id="icon-warning">
+      <polygon points="0,-12 12,8 -12,8" fill="#EF5350" stroke="#EF5350" stroke-width="1.5"/>
+      <circle cx="0" cy="5" r="1.2" fill="#ffffff"/>
+      <line x1="0" y1="-5" x2="0" y2="2" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
+
+  <!-- Section Badge -->
+  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
+  <text x="130" y="54" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
+
+  <!-- Slide Header -->
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">Raw Scan Output</text>
+  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Deterministic detection shows errors but lacks actionable context</text>
+
+  <g transform="translate(375, 170)">
+    <!-- Terminal container (stays dark) -->
+    <rect width="530" height="380" rx="12" fill="#1A1E2E" stroke="#37474F" stroke-width="1.5"/>
+    <path d="M 0 12 A 12 12 0 0 1 12 0 L 518 0 A 12 12 0 0 1 530 12 L 530 42 L 0 42 Z" fill="url(#ide-header)"/>
+    <circle cx="22" cy="21" r="6" fill="#EF5350"/>
+    <circle cx="42" cy="21" r="6" fill="#FFB74D"/>
+    <circle cx="62" cy="21" r="6" fill="#81C784"/>
+    <text x="265" y="27" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#B0BEC5" text-anchor="middle">Section 04: Raw Violation Output</text>
+
+    <!-- Terminal content -->
+    <g transform="translate(28, 65)">
+      <use href="#icon-pod" x="10" y="15"/>
+
+      <text x="35" y="12" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#EF5350">VIOLATION:</text>
+      <text x="140" y="12" font-family="Courier New, monospace" font-size="13" fill="#ECEFF1">airline-prod/payment-gateway-svc</text>
+
+      <text x="35" y="35" font-family="Courier New, monospace" font-size="12" fill="#78909C">  - Missing required tag:</text>
+      <text x="258" y="35" font-family="Courier New, monospace" font-size="12" fill="#FFB74D">owner</text>
+
+      <text x="35" y="55" font-family="Courier New, monospace" font-size="12" fill="#78909C">  - Missing required tag:</text>
+      <text x="258" y="55" font-family="Courier New, monospace" font-size="12" fill="#FFB74D">cost-center</text>
+
+      <line x1="0" y1="75" x2="470" y2="75" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+      <use href="#icon-warning" x="12" y="100"/>
+      <text x="35" y="97" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#EF5350">VIOLATION:</text>
+      <text x="140" y="97" font-family="Courier New, monospace" font-size="13" fill="#ECEFF1">airline-prod/payment-db-pvc</text>
+
+      <text x="35" y="120" font-family="Courier New, monospace" font-size="12" fill="#78909C">  - Orphaned PVC:</text>
+      <text x="175" y="120" font-family="Courier New, monospace" font-size="12" fill="#EF5350">true</text>
+      <text x="210" y="120" font-family="Courier New, monospace" font-size="12" fill="#607D8B">(No active pod ref)</text>
+
+      <line x1="0" y1="140" x2="470" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+      <text x="0" y="168" font-family="Courier New, monospace" font-size="13" fill="#81C784" font-weight="bold">SUMMARY:</text>
+      <text x="100" y="168" font-family="Courier New, monospace" font-size="13" fill="#B0BEC5">2 active violations out of 10 scanned</text>
+
+      <!-- Annotations for 'Before' state -->
+      <path d="M 420 20 Q 350 20 310 32" fill="none" stroke="#FF5252" stroke-width="2"/>
+      <path d="M 318 26 L 308 33 L 315 39" fill="none" stroke="#FF5252" stroke-width="2" stroke-linecap="round"/>
+      <text x="430" y="24" font-family="Arial, sans-serif" font-style="italic" font-size="14" font-weight="bold" fill="#FF5252">No owner identified</text>
+
+      <path d="M 350 145 Q 280 145 230 125" fill="none" stroke="#FF5252" stroke-width="2"/>
+      <path d="M 238 131 L 228 124 L 236 118" fill="none" stroke="#FF5252" stroke-width="2" stroke-linecap="round"/>
+      <text x="360" y="150" font-family="Arial, sans-serif" font-style="italic" font-size="14" font-weight="bold" fill="#FF5252">Is it safe to delete?</text>
+    </g>
+
+    <!-- Bottom assessment -->
+    <rect x="100" y="310" width="330" height="40" rx="20" fill="rgba(239,83,80,0.1)" stroke="#EF5350" stroke-width="1"/>
+    <use href="#icon-warning" x="125" y="330" transform="scale(0.8)"/>
+    <text x="265" y="335" font-family="Arial, sans-serif" font-size="13" fill="#EF5350" text-anchor="middle" font-weight="bold">Shows WHAT is broken — not WHO or HOW to fix</text>
+  </g>
+
+  <!-- BOTTOM: Key Takeaway Bar -->
+  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
+  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">THE PROBLEM</text>
+  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Raw validation issues dump deterministic errors but lack actionable context. They show what is broken, but</text>
+  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">don't provide priority, reasoning, or specific ownership for triage.</text>
+</svg>

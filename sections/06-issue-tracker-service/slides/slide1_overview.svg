@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF" />
+
+  <!-- Defs for Icons -->
+  <defs>
+    <!-- Card / Ticket Icon -->
+    <g id="icon-ticket">
+      <rect x="-12" y="-15" width="24" height="30" rx="3" fill="none" stroke="#4285F4" stroke-width="2"/>
+      <line x1="-8" y1="-8" x2="8" y2="-8" stroke="#4285F4" stroke-width="1.8"/>
+      <line x1="-8" y1="-2" x2="8" y2="-2" stroke="#4285F4" stroke-width="1.8"/>
+      <line x1="-8" y1="4" x2="2" y2="4" stroke="#4285F4" stroke-width="1.8"/>
+    </g>
+
+    <!-- User / Assignee Icon -->
+    <g id="icon-user">
+      <circle cx="0" cy="-6" r="6" fill="none" stroke="#37474F" stroke-width="2"/>
+      <path d="M -10,8 A 10,10 0 0,1 10,8" fill="none" stroke="#37474F" stroke-width="2"/>
+    </g>
+
+    <!-- Warning / Issue Icon -->
+    <g id="icon-warning">
+      <polygon points="0,-12 12,8 -12,8" fill="#EF5350" stroke="#EF5350" stroke-width="1.5" />
+      <circle cx="0" cy="5" r="1.2" fill="#ffffff" />
+      <line x1="0" y1="-5" x2="0" y2="2" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+    </g>
+
+    <!-- Success Check Icon -->
+    <g id="icon-check">
+      <circle cx="0" cy="0" r="10" fill="#34A853" />
+      <path d="M -5,0 L -1,4 L 5,-4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <!-- Slide Header -->
+  <text x="80" y="90" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">01. Issue Tracker Overview</text>
+  <text x="80" y="130" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Bridging the gap between automated FinOps findings and human resolution</text>
+
+  <!-- Left: The Problem - "The Handoff Gap" -->
+  <g transform="translate(140, 200)">
+    <!-- Card Container -->
+    <rect width="380" height="340" rx="16" fill="#F8F9FA" stroke="#EF5350" stroke-width="2" />
+    <!-- Header -->
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 364 0 A 16 16 0 0 1 380 16 L 380 60 L 0 60 Z" fill="#EF5350" />
+    <text x="190" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">The Handoff Gap</text>
+
+    <!-- Content Items -->
+    <!-- Item 1: Raw JSON output is ignored -->
+    <g transform="translate(30, 95)">
+      <use href="#icon-warning" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">Unactioned AI Insights</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">Raw JSON scan results sit in terminal/logs</text>
+    </g>
+
+    <!-- Item 2: No Accountability -->
+    <g transform="translate(30, 165)">
+      <use href="#icon-warning" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">No Owner Assigned</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">No clear responsibility for fixing resource leaks</text>
+    </g>
+
+    <!-- Item 3: No Audit Trail -->
+    <g transform="translate(30, 235)">
+      <use href="#icon-warning" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">Untracked Resolutions</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">Hard to prove that remediation saved money</text>
+    </g>
+  </g>
+
+  <!-- Middle Connection: Orange dashed arrow representing Handoff Bridge -->
+  <g transform="translate(540, 360)">
+    <path d="M 0 0 L 180 0" stroke="#FF9900" stroke-width="6" stroke-dasharray="10 8" />
+    <path d="M 180 -10 L 200 0 L 180 10 Z" fill="#FF9900" />
+    <text x="90" y="-18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FF9900" text-anchor="middle">API Handoff</text>
+    <text x="90" y="24" font-family="Arial, sans-serif" font-size="12" fill="#546E7A" text-anchor="middle">JSON Payload</text>
+  </g>
+
+  <!-- Right: The Solution - "Issue Tracker Kanban Board" -->
+  <g transform="translate(760, 200)">
+    <!-- Card Container -->
+    <rect width="380" height="340" rx="16" fill="#F8F9FA" stroke="#34A853" stroke-width="2" />
+    <!-- Header -->
+    <path d="M 0 16 A 16 16 0 0 1 16 0 L 364 0 A 16 16 0 0 1 380 16 L 380 60 L 0 60 Z" fill="#34A853" />
+    <text x="190" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FinOps Issue Tracker</text>
+
+    <!-- Content Items -->
+    <!-- Item 1: API First -->
+    <g transform="translate(30, 95)">
+      <use href="#icon-check" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">Programmatic Creation</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">POST /create-issue formats findings as tickets</text>
+    </g>
+
+    <!-- Item 2: Visual Kanban Board -->
+    <g transform="translate(30, 165)">
+      <use href="#icon-check" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">Kanban Board Interface</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">Interactive backlog/todo board on port 8085</text>
+    </g>
+
+    <!-- Item 3: Ownership and Tracking -->
+    <g transform="translate(30, 235)">
+      <use href="#icon-check" x="15" y="12" />
+      <text x="45" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#232F3E">Clear Accountability</text>
+      <text x="45" y="36" font-family="Arial, sans-serif" font-size="14" fill="#546E7A">Assign tickets &amp; track progress to completion</text>
+    </g>
+  </g>
+
+  <!-- Footer Goals Summary -->
+  <rect x="80" y="610" width="1120" height="60" rx="8" fill="#F1F3F4" />
+  <text x="110" y="646" font-family="Arial, sans-serif" font-size="18" fill="#232F3E"><tspan font-weight="bold" fill="#4285F4">Why this matters:</tspan> To close the loop on cost optimizations, we need a target system that models real-world developer workflows (Jira-style Kanban boards).</text>
+</svg>

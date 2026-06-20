@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <!-- Background - Dark Blue/Slate for Demo to differentiate -->
+  <rect width="1280" height="720" fill="#1A2238" />
+
+  <!-- Grid decoration overlay -->
+  <g stroke="#ffffff" opacity="0.05" stroke-width="1">
+    <path d="M 0 90 L 1280 90" />
+    <path d="M 0 180 L 1280 180" />
+    <path d="M 0 270 L 1280 270" />
+    <path d="M 0 360 L 1280 360" />
+    <path d="M 0 450 L 1280 450" />
+    <path d="M 0 540 L 1280 540" />
+    <path d="M 0 630 L 1280 630" />
+    <path d="M 160 0 L 160 720" />
+    <path d="M 320 0 L 320 720" />
+    <path d="M 480 0 L 480 720" />
+    <path d="M 640 0 L 640 720" />
+    <path d="M 800 0 L 800 720" />
+    <path d="M 960 0 L 960 720" />
+    <path d="M 1120 0 L 1120 720" />
+  </g>
+
+  <!-- Glowing background effect -->
+  <circle cx="640" cy="360" r="300" fill="#FF9900" opacity="0.08" filter="blur(80px)" />
+
+  <!-- Demo Header -->
+  <rect x="540" y="80" width="200" height="46" rx="23" fill="#FFE9D6" stroke="#FF9900" stroke-width="2" />
+  <text x="640" y="110" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#E65100" text-anchor="middle">LIVE DEMO 02</text>
+
+  <text x="640" y="180" font-family="Arial, sans-serif" font-size="44" font-weight="bold" fill="#FFFFFF" text-anchor="middle">API Ticket Creation &amp; Lifecycle</text>
+  <text x="640" y="220" font-family="Arial, sans-serif" font-size="18" fill="#90A4AE" text-anchor="middle">Let's generate a ticket programmatically and modify its status on the board</text>
+
+  <!-- Left: curl Command Box -->
+  <g transform="translate(80, 270)">
+    <rect width="640" height="320" rx="12" fill="#202A44" stroke="#4285F4" stroke-width="2"/>
+    <text x="30" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#90A4AE">TERMINAL: CREATE TICKET VIA CURL</text>
+    <rect x="20" y="55" width="600" height="240" rx="6" fill="#111827" />
+    <text x="35" y="85" font-family="Courier New, monospace" font-size="11.5" fill="#34A853">curl -X POST http://localhost:8085/create-issue \</text>
+    <text x="35" y="105" font-family="Courier New, monospace" font-size="11.5" fill="#34A853">  -H 'Content-Type: application/json' \</text>
+    <text x="35" y="125" font-family="Courier New, monospace" font-size="11.5" fill="#34A853">  -d '{</text>
+    <text x="35" y="145" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "title": "[FinOps] payment/processor - UNALLOCATED ($8.47/mo)",</text>
+    <text x="35" y="165" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "summary": "Missing cost-center and owner metadata",</text>
+    <text x="35" y="185" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "namespace": "payment", "resource_name": "payment-processor",</text>
+    <text x="35" y="205" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "resource_kind": "Deployment", "category": "unallocated",</text>
+    <text x="35" y="225" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "priority": "high", "cost_impact": 8.47,</text>
+    <text x="35" y="245" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">    "suggested_owner": "payment-team", "source": "bedrock"</text>
+    <text x="35" y="265" font-family="Courier New, monospace" font-size="11.5" fill="#9CDCFE">  }'</text>
+  </g>
+
+  <!-- Right: Verification Checklist -->
+  <g transform="translate(760, 270)">
+    <rect width="440" height="320" rx="12" fill="#202A44" stroke="#34A853" stroke-width="2"/>
+    <text x="30" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#90A4AE">VERIFICATION CHECKLIST</text>
+
+    <!-- Checklist Item 1 -->
+    <g transform="translate(30, 70)">
+      <circle cx="15" cy="15" r="10" fill="#34A853" />
+      <path d="M 10 15 L 13 18 L 19 12" fill="none" stroke="#FFFFFF" stroke-width="2" />
+      <text x="40" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">Inspect API JSON response</text>
+      <text x="40" y="38" font-family="Arial, sans-serif" font-size="12" fill="#90A4AE">Ensure id is returned with a key like FINOPS-0001</text>
+    </g>
+
+    <!-- Checklist Item 2 -->
+    <g transform="translate(30, 140)">
+      <circle cx="15" cy="15" r="10" fill="#34A853" />
+      <path d="M 10 15 L 13 18 L 19 12" fill="none" stroke="#FFFFFF" stroke-width="2" />
+      <text x="40" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">Verify Card on Kanban Board</text>
+      <text x="40" y="38" font-family="Arial, sans-serif" font-size="12" fill="#90A4AE">Card appears instantly in the Backlog column</text>
+    </g>
+
+    <!-- Checklist Item 3 -->
+    <g transform="translate(30, 210)">
+      <circle cx="15" cy="15" r="10" fill="#34A853" />
+      <path d="M 10 15 L 13 18 L 19 12" fill="none" stroke="#FFFFFF" stroke-width="2" />
+      <text x="40" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFFFFF">Assign &amp; Drag Card</text>
+      <text x="40" y="38" font-family="Arial, sans-serif" font-size="12" fill="#90A4AE">Drag to To Do / In Progress and edit assignment</text>
+    </g>
+  </g>
+
+  <!-- Footer Info -->
+  <text x="640" y="660" font-family="Arial, sans-serif" font-size="14" fill="#90A4AE" text-anchor="middle">Observe how the board state updates reactively. The frontend Javascript polls or communicates changes dynamically.</text>
+</svg>
