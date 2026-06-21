@@ -18,8 +18,40 @@ This guide provides the slide-by-slide narration scripts, visual metaphor explan
 
 ---
 
-## Slide 2: The Universal LLM Adapter
-* **Slide File:** [slide2_adapter.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide2_adapter.svg)
+## Slide 2: The Agent Framework Landscape
+* **Slide File:** [slide2_frameworks.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide2_frameworks.svg)
+* **Visual Metaphor:** Comparing tools to build our LLM decision engine. LlamaIndex, AutoGen/CrewAI, Cloud Managed Agents, and LangChain are represented.
+* **Narration Script:**
+  > "Before we build, let's talk about why we chose LangChain. The LLM framework landscape is exploding. You have LlamaIndex, which is fantastic for purely RAG and vector-based data querying. You have AutoGen and CrewAI, which are built for conversational swarms where multiple agents talk to each other to solve abstract problems. You also have Cloud Managed Agents like AWS Bedrock or GCP Vertex AI, which are powerful but can lead to vendor lock-in and are harder to test locally.
+  >
+  > But for our Kubernetes FinOps use case, we don't need swarms of chatting agents. We need predictable, typed data pipelines that can take Kubernetes JSON, apply a policy, and spit out structured decisions. That's exactly what LangChain excels at."
+
+---
+
+## Slide 3: Why LangChain for FinOps?
+* **Slide File:** [slide3_langchain_features.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide3_langchain_features.svg)
+* **Visual Metaphor:** Key features that power our decision engine. Universal Adapters, Structured Outputs, Prompt Composition, and Tool Execution.
+* **Narration Script:**
+  > "LangChain gives us four major features right out of the box that make building our agent incredibly easy.
+  >
+  > First, universal model adapters. We aren't locked into OpenAI. Second, structured outputs via Pydantic—forcing the LLM to give us JSON instead of raw text. Third, easy prompt composition to inject our Kubernetes variables. And finally, built-in tool execution for when we eventually need the agent to perform actions."
+
+---
+
+## Slide 4: Code Blocks & Workspace Layout
+* **Slide File:** [slide4_file_structure.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide4_file_structure.svg)
+* **Visual Metaphor:** Visualizing the file tree and structural components we need to build for the LLM Agent.
+* **Narration Script:**
+  > "Let's take a quick look at our workspace layout for this section. We have our `config` directory containing our `tagging-rules.yaml`, which are the FinOps policies we want to enforce. 
+  > 
+  > Inside the `agent` directory, we have `analyzer.py` which holds our LangChain logic, Pydantic parsers, and prompt templates. Finally, `main.py` is the entrypoint that actually runs the LLM loop against live Kubernetes data. At the root, our `.env` file holds our API keys."
+* **Live Demo Handoff:**
+  > "Go ahead and open the `05-llm-agent-langchain/` folder in your code editor so you can follow along with these files."
+
+---
+
+## Slide 5: The Universal LLM Adapter
+* **Slide File:** [slide5_adapter.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide5_adapter.svg)
 * **Visual Metaphor:** A universal travel adapter plug. An IDE-styled `.env` window on the left shows syntax-highlighted config. The central adapter hub branches to three provider endpoints (OpenAI, KodeKloud, Local), with the active one highlighted.
 * **Narration Script:**
   > "One of the major strengths of using LangChain's `ChatOpenAI` client is that it is provider-agnostic. Think of it like a universal travel adapter. You write the code once, and by simply modifying your `.env` configuration file, you can plug it into OpenAI, an open-source model running on your local machine, or a managed gateway like the KodeKloud AI Gateway.
@@ -30,8 +62,8 @@ This guide provides the slide-by-slide narration scripts, visual metaphor explan
 
 ---
 
-## Slide 3: Prompt Template & Policy Fusion
-* **Slide File:** [slide3_fusion.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide3_fusion.svg)
+## Slide 6: Prompt Template & Policy Fusion
+* **Slide File:** [slide6_fusion.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide6_fusion.svg)
 * **Visual Metaphor:** A fusion reactor. Two distinct data feeds (blue K8s metadata + orange FinOps policy) converge into a purple-gradient prompt template reactor, which outputs to a green LLM inference node. Dashed connection lines with arrowheads show data flow.
 * **Narration Script:**
   > "So, how does the LLM actually know our policies? Instead of writing complex parser rules in Python, we use Prompt Engineering to fuse two separate sources of data.
@@ -42,8 +74,8 @@ This guide provides the slide-by-slide narration scripts, visual metaphor explan
 
 ---
 
-## Slide 4: Structured Outputs with Pydantic
-* **Slide File:** [slide4_pydantic.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide4_pydantic.svg)
+## Slide 7: Structured Outputs with Pydantic
+* **Slide File:** [slide7_pydantic.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide7_pydantic.svg)
 * **Visual Metaphor:** A metal stencil/mold. Amorphous unstructured text (cloud shape) enters the Pydantic schema mold (typed field slots with color-coded type indicators), and emerges as a rigid, structured `ResourceDecision` instance ready for API consumption.
 * **Narration Script:**
   > "LLMs naturally communicate in paragraphs of text. But our automation pipelines need structured data—integers, boolean values, and specific keys.
@@ -54,8 +86,8 @@ This guide provides the slide-by-slide narration scripts, visual metaphor explan
 
 ---
 
-## Slide 5: Raw Scan vs. LLM-Enhanced Report
-* **Slide File:** [slide5_comparison.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide5_comparison.svg)
+## Slide 8: Raw Scan vs. LLM-Enhanced Report
+* **Slide File:** [slide8_comparison.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide8_comparison.svg)
 * **Visual Metaphor:** X-Ray vs. Prescription. A terminal-styled raw CLI output (left) shows bare violations. A rich decision report (right) displays categorized resource cards with priority badges, suggested fixes, owner routing, and auto-drafted ticket content. A central "VS" badge anchors the comparison.
 * **Narration Script:**
   > "Finally, let's look at the result. In Section 4, our CLI printed raw fact violations. It just said 'Missing Tag Owner'. It was dry, non-contextual, and required manual interpretation.
@@ -66,8 +98,8 @@ This guide provides the slide-by-slide narration scripts, visual metaphor explan
 
 ---
 
-## Slide 6: The Bridge Metaphor *(Infographic-Metaphor Skill)*
-* **Slide File:** [slide6_bridge_metaphor.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide6_bridge_metaphor.svg)
+## Slide 9: The Bridge Metaphor *(Infographic-Metaphor Skill)*
+* **Slide File:** [slide9_bridge_metaphor.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/05-llm-agent-langchain/slides/slide9_bridge_metaphor.svg)
 * **Skill Invocation:** `infographic-metaphor` with `title="Bridging K8s Data to FinOps Decisions"`, `metaphor="bridge"`, `components=["cluster","json","python-agent","brain"]`, `palette="aws"`
 * **Visual Metaphor:** Two cliff islands separated by a water chasm (complexity gap). The left island holds raw K8s metadata (pod icons, JSON cards). The right island holds structured FinOps decisions (compliance reports, auto-drafted tickets). A bridge structure spans the gap with the LLM brain icon at its center. Data flows across the bridge from raw JSON/YAML inputs to structured `ResourceDecision` outputs.
 * **Narration Script:**
