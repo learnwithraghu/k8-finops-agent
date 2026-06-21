@@ -31,12 +31,28 @@ This guide accompanies the generated SVG slide assets to help you narrate this s
 
 ---
 
-## Slide 4: Parser Methods Needed
-*   **File**: [slide4_parser_methods.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/04-local-python-agent/slides/slide4_parser_methods.svg)
+## Slide 4A: Parser Logic Flow - CPU & Memory
+*   **File**: [slide4a_parser_logic_flow.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/04-local-python-agent/slides/slide4a_parser_logic_flow.svg)
 *   **Narrative Focus**:
-    *   Explain why we need custom parser methods in the agent:
-        *   Kubernetes returns values in varying units (e.g., CPU request of `"1.5"` vs `"500m"`, and Memory of `"256Mi"` vs `"1Gi"`). We normalize these to integers (`millicores` and `MiB`) so they are standard.
-        *   We detect **orphaned PVCs** by scanning all Pod volume mounts and comparing them with the total PVC list. Any PVC not mounted is flagged as an orphan.
+    *   Walk through the **decision tree logic** inside `parse_cpu()` and `parse_memory()` functions
+    *   Explain the **conditional branching**:
+        *   CPU Parser: First checks if value is None (return 0), then checks if it ends with "m" (strip and return integer), else multiply by 1000
+        *   Memory Parser: Checks suffix pattern (Gi/Mi/Ki/bytes) and applies correct conversion factor
+    *   Emphasize this is **pattern matching logic** - the code inspects string format to determine which conversion formula to apply
+    *   This prepares them to see the actual Python code in `collect.py` where these if-else chains live
+
+---
+
+## Slide 4B: Orphan Detection Logic Flow
+*   **File**: [slide4b_orphan_detection_flow.svg](file:///Users/raghunandanask/Desktop/github-repo/k8-finops-agent/sections/04-local-python-agent/slides/slide4b_orphan_detection_flow.svg)
+*   **Narrative Focus**:
+    *   Explain the **3-step algorithm** using set operations:
+        *   Step 1: Build a set of mounted PVCs by looping through all pods and extracting volume claims
+        *   Step 2: Fetch all PVCs from Kubernetes API and parse their storage sizes
+        *   Step 3: Use **set difference** logic - if PVC exists in all_pvcs but NOT in mounted_pvcs, flag as orphaned
+    *   Show the **visual set comparison** (Venn diagram style) to illustrate the logic
+    *   Highlight that this is a **membership test** (`if key NOT IN mounted_pvcs`) - simple but powerful
+    *   This prepares them to see the actual `get_mounted_pvcs()` function and the orphan flagging loop in code
 
 ---
 

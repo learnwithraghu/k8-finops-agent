@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF" />
+
+  <!-- Slide Header -->
+  <text x="80" y="70" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">04B. Orphan Detection Logic Flow</text>
+  <text x="80" y="110" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Set operations to identify unused PVCs</text>
+
+  <!-- Main flow diagram -->
+  
+  <!-- Step 1: Build mounted PVCs set -->
+  <g transform="translate(60, 150)">
+    <rect width="500" height="185" rx="10" fill="#E3F2FD" stroke="#2196F3" stroke-width="3" />
+    
+    <text x="250" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#1565C0" text-anchor="middle">Step 1: Build Mounted Set</text>
+    
+    <!-- Flowchart inside -->
+    <rect x="30" y="50" width="440" height="38" rx="6" fill="#BBDEFB" stroke="#1976D2" stroke-width="2" />
+    <text x="250" y="73" font-family="Arial, sans-serif" font-size="14" fill="#0D47A1" text-anchor="middle">List all Pods in cluster</text>
+    
+    <path d="M 250 88 L 250 105" stroke="#1565C0" stroke-width="2" />
+    <path d="M 245 100 L 250 110 L 255 100" fill="#1565C0" />
+    
+    <rect x="30" y="115" width="440" height="38" rx="6" fill="#90CAF9" stroke="#1976D2" stroke-width="2" />
+    <text x="250" y="138" font-family="Arial, sans-serif" font-size="14" fill="#0D47A1" text-anchor="middle">Loop: Extract PVC names from volumes</text>
+    
+    <path d="M 470 134 L 515 134 L 515 73 L 480 73" stroke="#FF9800" stroke-width="2" stroke-dasharray="4,2" />
+    <text x="525" y="108" font-family="Arial, sans-serif" font-size="11" fill="#E65100" font-weight="bold">Loop</text>
+    
+    <!-- Output -->
+    <rect x="120" y="165" width="260" height="15" rx="4" fill="#FFFFFF" stroke="#4CAF50" stroke-width="2" />
+    <text x="250" y="177" font-family="monospace" font-size="12" fill="#2E7D32" text-anchor="middle" font-weight="bold">{"pvc-db", "pvc-cache"}</text>
+  </g>
+
+  <!-- Arrow to next step -->
+  <path d="M 560 242 L 620 242" stroke="#5F6368" stroke-width="3" />
+  <path d="M 615 237 L 630 242 L 615 247" fill="#5F6368" />
+
+  <!-- Step 2: Get all PVCs -->
+  <g transform="translate(640, 150)">
+    <rect width="580" height="185" rx="10" fill="#FFF3E0" stroke="#FF9800" stroke-width="3" />
+    
+    <text x="290" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#E65100" text-anchor="middle">Step 2: List All PVCs</text>
+    
+    <!-- Flowchart inside -->
+    <rect x="40" y="50" width="500" height="38" rx="6" fill="#FFE0B2" stroke="#FB8C00" stroke-width="2" />
+    <text x="290" y="73" font-family="Arial, sans-serif" font-size="14" fill="#D84315" text-anchor="middle">Fetch all PVCs from K8s API</text>
+    
+    <path d="M 290 88 L 290 105" stroke="#E65100" stroke-width="2" />
+    <path d="M 285 100 L 290 110 L 295 100" fill="#E65100" />
+    
+    <rect x="40" y="115" width="500" height="38" rx="6" fill="#FFCC80" stroke="#FB8C00" stroke-width="2" />
+    <text x="290" y="138" font-family="Arial, sans-serif" font-size="14" fill="#D84315" text-anchor="middle">Parse storage sizes</text>
+    
+    <!-- Output -->
+    <rect x="115" y="165" width="350" height="15" rx="4" fill="#FFFFFF" stroke="#FF9800" stroke-width="2" />
+    <text x="290" y="177" font-family="monospace" font-size="12" fill="#E65100" text-anchor="middle" font-weight="bold">[("pvc-db", 100), ("pvc-old", 50)]</text>
+  </g>
+
+  <!-- Step 3: Comparison Logic -->
+  <g transform="translate(60, 375)">
+    <rect width="1160" height="315" rx="10" fill="#F3E5F5" stroke="#9C27B0" stroke-width="3" />
+    
+    <text x="580" y="32" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#6A1B9A" text-anchor="middle">Step 3: Set Difference - Find Orphans</text>
+    
+    <!-- Visual set comparison -->
+    <g transform="translate(50, 55)">
+      <!-- Left circle: mounted_pvcs -->
+      <circle cx="200" cy="110" r="75" fill="#E3F2FD" stroke="#2196F3" stroke-width="3" opacity="0.8" />
+      <text x="200" y="92" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#1565C0" text-anchor="middle">mounted_pvcs</text>
+      <text x="200" y="115" font-family="monospace" font-size="12" fill="#0D47A1" text-anchor="middle">pvc-db</text>
+      <text x="200" y="132" font-family="monospace" font-size="12" fill="#0D47A1" text-anchor="middle">pvc-cache</text>
+      
+      <!-- Right circle: all_pvcs -->
+      <circle cx="350" cy="110" r="75" fill="#FFF3E0" stroke="#FF9800" stroke-width="3" opacity="0.8" />
+      <text x="350" y="92" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#E65100" text-anchor="middle">all_pvcs</text>
+      <text x="350" y="110" font-family="monospace" font-size="12" fill="#D84315" text-anchor="middle">pvc-db</text>
+      <text x="350" y="127" font-family="monospace" font-size="12" fill="#D84315" text-anchor="middle">pvc-cache</text>
+      <text x="350" y="147" font-family="monospace" font-size="12" fill="#EF5350" text-anchor="middle" font-weight="bold">pvc-old</text>
+      
+      <!-- Highlight orphan -->
+      <ellipse cx="350" cy="147" rx="48" ry="18" fill="none" stroke="#D32F2F" stroke-width="3" stroke-dasharray="4,2" />
+    </g>
+    
+    <!-- Arrow -->
+    <path d="M 500 165 L 560 165" stroke="#6A1B9A" stroke-width="3" />
+    <path d="M 555 160 L 570 165 L 555 170" fill="#6A1B9A" />
+    
+    <!-- Decision logic box -->
+    <g transform="translate(580, 65)">
+      <rect width="490" height="145" rx="8" fill="#E1BEE7" stroke="#7B1FA2" stroke-width="2" />
+      <text x="245" y="28" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#4A148C" text-anchor="middle">Membership Test:</text>
+      
+      <rect x="25" y="40" width="440" height="90" rx="6" fill="#FFFFFF" stroke="#9C27B0" stroke-width="2" />
+      <text x="35" y="62" font-family="monospace" font-size="13" fill="#4A148C">for pvc in all_pvcs:</text>
+      <text x="55" y="82" font-family="monospace" font-size="13" fill="#6A1B9A" font-weight="bold">if pvc NOT IN mounted_pvcs:</text>
+      <text x="75" y="102" font-family="monospace" font-size="13" fill="#C62828" font-weight="bold">pvc.is_orphaned = True</text>
+    </g>
+    
+    <!-- Output result -->
+    <g transform="translate(50, 245)">
+      <rect width="1040" height="45" rx="8" fill="#FFEBEE" stroke="#EF5350" stroke-width="2" />
+      <text x="520" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#C62828" text-anchor="middle">RESULT: pvc-old flagged (50 GiB wasted)</text>
+    </g>
+  </g>
+</svg>
