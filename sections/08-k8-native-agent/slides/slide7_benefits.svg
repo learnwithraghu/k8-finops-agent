@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="highlight-gradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#028090"/>
+      <stop offset="100%" stop-color="#02C39A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#F8F9FA"/>
+  
+  <!-- Title -->
+  <text x="640" y="60" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#0F1689" text-anchor="middle">Why Helm Over Raw Manifests</text>
+  
+  <!-- Two Column Layout -->
+  <!-- Left Column: Benefits -->
+  <text x="120" y="130" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#028090">Benefits</text>
+  
+  <g>
+    <!-- Benefit 1 -->
+    <circle cx="120" cy="180" r="12" fill="#34A853"/>
+    <text x="150" y="190" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Templating:</tspan> Reusable across environments
+    </text>
+    
+    <!-- Benefit 2 -->
+    <circle cx="120" cy="230" r="12" fill="#34A853"/>
+    <text x="150" y="240" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Versioning:</tspan> Track all changes with helm history
+    </text>
+    
+    <!-- Benefit 3 -->
+    <circle cx="120" cy="280" r="12" fill="#34A853"/>
+    <text x="150" y="290" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Rollback:</tspan> Undo changes with one command
+    </text>
+    
+    <!-- Benefit 4 -->
+    <circle cx="120" cy="330" r="12" fill="#34A853"/>
+    <text x="150" y="340" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Testing:</tspan> Validate deployments with helm test
+    </text>
+    
+    <!-- Benefit 5 -->
+    <circle cx="120" cy="380" r="12" fill="#34A853"/>
+    <text x="150" y="390" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Customization:</tspan> Override via values.yaml
+    </text>
+    
+    <!-- Benefit 6 -->
+    <circle cx="120" cy="430" r="12" fill="#34A853"/>
+    <text x="150" y="440" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      <tspan font-weight="bold">Documentation:</tspan> Built-in NOTES.txt and README
+    </text>
+  </g>
+  
+  <!-- Right Column: Best Practices -->
+  <text x="690" y="130" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#F57C00">Best Practices</text>
+  
+  <g>
+    <!-- Practice 1 -->
+    <text x="690" y="180" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="190" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Keep secrets external to Helm
+    </text>
+    
+    <!-- Practice 2 -->
+    <text x="690" y="230" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="240" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Use _helpers.tpl for common labels
+    </text>
+    
+    <!-- Practice 3 -->
+    <text x="690" y="280" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="290" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Version chart independently from app
+    </text>
+    
+    <!-- Practice 4 -->
+    <text x="690" y="330" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="340" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Document in NOTES.txt and README
+    </text>
+    
+    <!-- Practice 5 -->
+    <text x="690" y="380" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="390" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Lint before installing
+    </text>
+    
+    <!-- Practice 6 -->
+    <text x="690" y="430" font-family="Arial, sans-serif" font-size="20" fill="#E65100">⚠️</text>
+    <text x="725" y="440" font-family="Arial, sans-serif" font-size="18" fill="#3C4043">
+      Use dry-run to preview changes
+    </text>
+  </g>
+  
+  <!-- Key Takeaway Box -->
+  <rect x="80" y="490" width="1120" height="160" rx="12" fill="url(#highlight-gradient)"/>
+  <text x="640" y="535" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    💡 Key Takeaway
+  </text>
+  <text x="640" y="575" font-family="Arial, sans-serif" font-size="19" fill="#FFFFFF" text-anchor="middle">
+    Helm transforms Kubernetes manifests from static files into maintainable,
+  </text>
+  <text x="640" y="605" font-family="Arial, sans-serif" font-size="19" fill="#FFFFFF" text-anchor="middle">
+    version-controlled infrastructure-as-code. Configuration changes no longer
+  </text>
+  <text x="640" y="635" font-family="Arial, sans-serif" font-size="19" fill="#FFFFFF" text-anchor="middle">
+    require image rebuilds – just helm upgrade.
+  </text>
+</svg>

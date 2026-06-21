@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="code-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E1E1E"/>
+      <stop offset="100%" stop-color="#2D2D30"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#F8F9FA"/>
+  
+  <!-- Title -->
+  <text x="640" y="50" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#0F1689" text-anchor="middle">Configuration Management</text>
+  <text x="640" y="85" font-family="Arial, sans-serif" font-size="20" fill="#5F6368" text-anchor="middle" font-style="italic">
+    Customize via values.yaml – No image rebuild needed
+  </text>
+  
+  <!-- Left: values.yaml code -->
+  <rect x="60" y="120" width="550" height="550" rx="8" fill="url(#code-bg)" stroke="#028090" stroke-width="2"/>
+  <text x="85" y="155" font-family="Consolas, monospace" font-size="18" fill="#02C39A" font-weight="bold">values.yaml</text>
+  
+  <text font-family="Consolas, monospace" font-size="15" fill="#FFFFFF">
+    <tspan x="85" y="195" fill="#E06C75">namespace:</tspan>
+    <tspan x="85" y="220" fill="#98C379">  name: </tspan><tspan fill="#E5C07B">finops-agent</tspan>
+    
+    <tspan x="85" y="265" fill="#E06C75">schedule: </tspan><tspan fill="#E5C07B">"0 * * * *"</tspan><tspan fill="#5C6370">  # Hourly</tspan>
+    
+    <tspan x="85" y="310" fill="#E06C75">resources:</tspan>
+    <tspan x="85" y="335" fill="#98C379">  requests:</tspan>
+    <tspan x="85" y="360" fill="#61AFEF">    memory: </tspan><tspan fill="#E5C07B">128Mi</tspan>
+    <tspan x="85" y="385" fill="#98C379">  limits:</tspan>
+    <tspan x="85" y="410" fill="#61AFEF">    memory: </tspan><tspan fill="#E5C07B">512Mi</tspan>
+    
+    <tspan x="85" y="455" fill="#E06C75">taggingRules:</tspan>
+    <tspan x="85" y="480" fill="#98C379">  required_tags:</tspan>
+    <tspan x="85" y="505" fill="#E5C07B">    - owner</tspan>
+    <tspan x="85" y="530" fill="#E5C07B">    - environment</tspan>
+    <tspan x="85" y="555" fill="#E5C07B">    - cost-center</tspan>
+    <tspan x="85" y="580" fill="#E5C07B">    - application</tspan>
+    <tspan x="85" y="605" fill="#E5C07B">    - tier</tspan>
+  </text>
+  
+  <!-- Right: Customization Options -->
+  <!-- Option 1: Change Schedule -->
+  <rect x="670" y="120" width="550" height="110" rx="8" fill="#FFFFFF" stroke="#1E88E5" stroke-width="2"/>
+  <text x="690" y="150" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0F1689">Change Schedule</text>
+  <text x="690" y="180" font-family="Consolas, monospace" font-size="14" fill="#3C4043">
+    <tspan x="690" dy="0">helm upgrade finops-agent ... \</tspan>
+    <tspan x="690" dy="22">  --set schedule="*/30 * * * *"</tspan>
+  </text>
+  
+  <!-- Option 2: Add Required Tag -->
+  <rect x="670" y="250" width="550" height="110" rx="8" fill="#FFFFFF" stroke="#34A853" stroke-width="2"/>
+  <text x="690" y="280" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0F1689">Add Required Tag</text>
+  <text x="690" y="310" font-family="Consolas, monospace" font-size="14" fill="#3C4043">
+    <tspan x="690" dy="0">Create custom-values.yaml with</tspan>
+    <tspan x="690" dy="22">additional required_tags, then:</tspan>
+    <tspan x="690" dy="22">helm upgrade ... -f custom-values.yaml</tspan>
+  </text>
+  
+  <!-- Option 3: Scan Specific Namespace -->
+  <rect x="670" y="380" width="550" height="110" rx="8" fill="#FFFFFF" stroke="#F57C00" stroke-width="2"/>
+  <text x="690" y="410" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0F1689">Scan Specific Namespace</text>
+  <text x="690" y="440" font-family="Consolas, monospace" font-size="14" fill="#3C4043">
+    <tspan x="690" dy="0">helm upgrade finops-agent ... \</tspan>
+    <tspan x="690" dy="22">  --set targetNamespace="booking-api"</tspan>
+  </text>
+  
+  <!-- Option 4: Increase Resources -->
+  <rect x="670" y="510" width="550" height="110" rx="8" fill="#FFFFFF" stroke="#9C27B0" stroke-width="2"/>
+  <text x="690" y="540" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#0F1689">Increase Resources</text>
+  <text x="690" y="570" font-family="Consolas, monospace" font-size="14" fill="#3C4043">
+    <tspan x="690" dy="0">helm upgrade finops-agent ... \</tspan>
+    <tspan x="690" dy="22">  --set resources.limits.memory="1Gi"</tspan>
+  </text>
+  
+  <!-- Bottom note -->
+  <text x="640" y="660" font-family="Arial, sans-serif" font-size="18" fill="#028090" text-anchor="middle" font-weight="bold">
+    💡 Configuration-as-Code: Change settings without rebuilding images
+  </text>
+</svg>
