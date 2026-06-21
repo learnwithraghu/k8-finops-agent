@@ -1,0 +1,16 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "k8-finops-agent.fullname" . }}-reader
+  labels:
+    {{- include "k8-finops-agent.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "k8-finops-agent.serviceAccountName" . }}
+    namespace: {{ .Values.namespace.name }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "k8-finops-agent.fullname" . }}-reader
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
