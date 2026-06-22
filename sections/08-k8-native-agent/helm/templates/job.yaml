@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "k8-finops-agent.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "k8-finops-agent.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        {{- include "k8-finops-agent.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "k8-finops-agent.serviceAccountName" . }}
+      restartPolicy: OnFailure
+      containers:
+        - name: finops-agent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "-m", "agent.main"]
+          envFrom:
+            - configMapRef:
+                name: {{ include "k8-finops-agent.fullname" . }}-llm-config
+            - secretRef:
+                name: {{ .Values.secretName }}
+          {{- if .Values.targetNamespace }}
+          env:
+            - name: TARGET_NAMESPACE
+              value: {{ .Values.targetNamespace | quote }}
+          {{- end }}
+          volumeMounts:
+            - name: tagging-rules
+              mountPath: /app/config
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: tagging-rules
+          configMap:
+            name: {{ include "k8-finops-agent.fullname" . }}-tagging-rules

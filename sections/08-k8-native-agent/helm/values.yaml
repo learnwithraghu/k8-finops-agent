@@ -13,11 +13,9 @@ image:
   tag: latest
   pullPolicy: Never  # For local Kind deployment
 
-# CronJob schedule configuration
-schedule: "0 * * * *"  # Every hour on the hour
-concurrencyPolicy: Forbid
-successfulJobsHistoryLimit: 3
-failedJobsHistoryLimit: 3
+# Job configuration
+# The Helm chart deploys a one-shot Job that runs once on install.
+backoffLimit: 1
 
 # Resource limits and requests
 resources:

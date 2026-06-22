@@ -334,42 +334,39 @@ kubectl get clusterrole,clusterrolebinding | grep finops
 ```
 
 What to notice:
-- CronJob `k8-finops-agent` is created and scheduled
+- Job `k8-finops-agent` is created and completed successfully
 - ServiceAccount `finops-agent` exists
 - ClusterRole and ClusterRoleBinding for RBAC are created
 - Two ConfigMaps: one for LLM config, one for tagging rules
-- No jobs yet (waiting for schedule or manual trigger)
+- The Job runs once and exits after the scan completes
 
-## Step 10: Verify the CronJob schedule
+## Step 10: Verify the Job run
 
-Inspect the CronJob:
+Inspect the Job:
 
 ```bash
-kubectl get cronjob -n finops-agent
+kubectl get job -n finops-agent
 ```
 
 What to look for:
-- SCHEDULE column shows `0 * * * *` (every hour on the hour)
-- SUSPEND is `False`
-- ACTIVE shows `0` (no running jobs yet)
-- LAST SCHEDULE shows when the next run will occur
+- The Job name is `finops-agent`
+- `COMPLETIONS` should show `1` and `DURATION` should be non-empty after completion
+- `AGE` shows how long ago the Job was created
 
 Get more details:
 
 ```bash
-kubectl describe cronjob k8-finops-agent -n finops-agent
+kubectl describe job finops-agent -n finops-agent
 ```
 
 What to notice:
-- Schedule matches `values.yaml`
-- Concurrency policy is `Forbid` (prevents overlapping runs)
-- Success/failed history limits control cleanup
-- Job template matches the pod spec from `templates/cronjob.yaml`
-- Events show the CronJob was created successfully
+- The Job uses the `finops-agent` service account
+- The Job pod is created with the expected container and volume mount
+- Any pod-level errors are visible under Events
 
 ## Step 11: Run Helm test for validation
 
-Instead of waiting for the schedule, use Helm's built-in test feature to validate the deployment immediately:
+Use Helm's built-in test feature to validate the deployment immediately:
 
 ```bash
 helm test finops-agent
@@ -430,91 +427,25 @@ kubectl describe pod k8-finops-agent-test -n finops-agent
 # - LLM auth errors: check API key in secret
 ```
 
-## Step 12: Wait for or trigger a scheduled run
+## Step 12: Re-run the Job manually
 
-Option A - Wait for the next scheduled run (every hour):
-
-```bash
-kubectl get cronjob -n finops-agent --watch
-```
-
-Press Ctrl+C when you see a job appear.
-
-Option B - Trigger a manual run immediately:
+If you want to run another scan, delete the finished Job and upgrade the release so Helm recreates it:
 
 ```bash
-kubectl create job --from=cronjob/k8-finops-agent manual-run -n finops-agent
+kubectl delete job finops-agent -n finops-agent || true
+helm upgrade finops-agent sections/08-k8-native-agent/helm/ --reuse-values
 ```
 
-Wait for the job to complete:
+Then view the renewed Job:
 
 ```bash
-kubectl wait --for=condition=complete job/manual-run -n finops-agent --timeout=120s
+kubectl get job -n finops-agent
+kubectl logs -n finops-agent job/finops-agent
 ```
 
-View the job logs:
+## Step 13: Customize tagging rules via Helm
 
-```bash
-kubectl logs -n finops-agent job/manual-run -f
-```
-
-What to notice:
-- The scheduled job behaves identically to the Helm test
-- CronJob automatically creates new jobs based on the schedule
-- Completed jobs are kept according to `successfulJobsHistoryLimit`
-- Each job creates a pod, runs the agent, and exits
-
-View all jobs created by the CronJob:
-
-```bash
-kubectl get jobs -n finops-agent
-```
-
-## Step 13: Customize the schedule
-
-Let's change the CronJob to run every 30 minutes instead of hourly:
-
-```bash
-helm upgrade finops-agent sections/08-k8-native-agent/helm/ --set schedule="*/30 * * * *"
-```
-
-What to look for:
-- Upgrade succeeds
-- Helm shows what changed in the release
-
-Verify the change:
-
-```bash
-kubectl get cronjob k8-finops-agent -n finops-agent -o jsonpath='{.spec.schedule}'
-```
-
-Should output: `*/30 * * * *`
-
-You can also check the full CronJob:
-
-```bash
-kubectl describe cronjob k8-finops-agent -n finops-agent | grep Schedule
-```
-
-What to notice:
-- Helm upgrade modifies the existing CronJob
-- No need to manually edit manifests
-- Schedule takes effect immediately
-- Next job will run according to the new schedule
-
-Other useful schedule examples:
-```bash
-# Every 15 minutes (for demos)
-helm upgrade finops-agent sections/08-k8-native-agent/helm/ --set schedule="*/15 * * * *"
-
-# Every 6 hours
-helm upgrade finops-agent sections/08-k8-native-agent/helm/ --set schedule="0 */6 * * *"
-
-# Daily at 2 AM
-helm upgrade finops-agent sections/08-k8-native-agent/helm/ --set schedule="0 2 * * *"
-```
-
-## Step 14: Customize tagging rules via Helm
+Let's add `compliance` as a required tag. Create a custom values file:
 
 Let's add `compliance` as a required tag. Create a custom values file:
 

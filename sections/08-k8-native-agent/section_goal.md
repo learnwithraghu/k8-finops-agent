@@ -1,14 +1,14 @@
 # Section 08 Goal: Helm-Based Deployment
 
 ## Goal
-Package the Section 05 LLM decision-flow agent as a Helm chart and deploy it inside Kubernetes as a scheduled CronJob. Instead of managing raw Kubernetes manifests, use Helm for templating, versioning, and lifecycle management, so the FinOps scan runs in-cluster with professional packaging.
+Package the Section 05 LLM decision-flow agent as a Helm chart and deploy it inside Kubernetes as a one-shot Job. Instead of managing raw Kubernetes manifests, use Helm for templating, versioning, and lifecycle management, so the FinOps scan runs once in-cluster and exits cleanly.
 
 ## Scope
 - Reuse the Section 05 agent code unchanged
 - Containerize the agent with a Dockerfile
 - Create a complete Helm chart with templated manifests
 - Embed the tagging-rules.yaml configuration as ConfigMap values
-- Include namespace, ServiceAccount, RBAC, ConfigMaps, and CronJob templates
+- Include namespace, ServiceAccount, RBAC, ConfigMaps, and Job templates
 - Add Helm test hook for deployment validation
 - Support local image deployment (imagePullPolicy: Never)
 - Document secret creation workflow (external to Helm)

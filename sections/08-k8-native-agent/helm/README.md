@@ -1,7 +1,7 @@
 # K8s FinOps Agent - Helm Chart
 
 ## Overview
-This Helm chart deploys the K8s FinOps Agent as a scheduled CronJob that scans Kubernetes resources for tagging compliance using an LLM-powered analysis engine.
+This Helm chart deploys the K8s FinOps Agent as a one-shot Kubernetes Job that runs once on install and exits. It scans Kubernetes resources for tagging compliance using an LLM-powered analysis engine.
 
 ## Prerequisites
 - Kubernetes 1.23+
@@ -54,10 +54,7 @@ helm test finops-agent
 | `image.repository` | Image repository | `finops-agent` |
 | `image.tag` | Image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `Never` |
-| `schedule` | CronJob schedule (cron syntax) | `0 * * * *` (hourly) |
-| `concurrencyPolicy` | CronJob concurrency policy | `Forbid` |
-| `successfulJobsHistoryLimit` | Number of successful jobs to keep | `3` |
-| `failedJobsHistoryLimit` | Number of failed jobs to keep | `3` |
+| `backoffLimit` | Job retry limit | `1` |
 | `resources.requests.cpu` | CPU request | `100m` |
 | `resources.requests.memory` | Memory request | `128Mi` |
 | `resources.limits.cpu` | CPU limit | `500m` |
@@ -134,10 +131,10 @@ helm upgrade finops-agent ./helm --set schedule="0 */6 * * *"
 helm upgrade finops-agent ./helm --set targetNamespace="booking-api"
 ```
 
-### View CronJob details
+### View Job details
 ```bash
-kubectl get cronjob -n finops-agent
-kubectl describe cronjob k8-finops-agent -n finops-agent
+kubectl get job -n finops-agent
+kubectl describe job finops-agent -n finops-agent
 ```
 
 ### View logs from completed jobs
@@ -195,19 +192,19 @@ kubectl logs -n finops-agent job/<job-name>
   kind load docker-image finops-agent:latest --name <your-cluster-name>
   ```
 
-### No jobs are being created
-**Symptom:** CronJob exists but no jobs appear
+### No job is running or the Job is missing
+**Symptom:** The Job does not appear in the namespace or the scan did not run.
 
 **Solution:**
-- Check CronJob exists: `kubectl get cronjob -n finops-agent`
-- Verify schedule syntax is valid (cron format)
-- Check CronJob is not suspended:
+- Check the Job exists: `kubectl get job -n finops-agent`
+- If the Job is missing, rerun it by deleting any old Job and upgrading the release:
   ```bash
-  kubectl get cronjob k8-finops-agent -n finops-agent -o jsonpath='{.spec.suspend}'
+  kubectl delete job finops-agent -n finops-agent || true
+  helm upgrade finops-agent ./helm
   ```
-- Review CronJob events:
+- Review Job events:
   ```bash
-  kubectl describe cronjob k8-finops-agent -n finops-agent
+  kubectl describe job finops-agent -n finops-agent
   ```
 
 ### ConfigMap not mounted correctly
