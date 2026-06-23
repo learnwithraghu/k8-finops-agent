@@ -3,7 +3,7 @@
 **Skill ID:** `infographic-metaphor`
 
 **Purpose:**
-Provide a structured approach to designing visual infographics and metaphor‑based explanations for complex technical concepts. This skill can be invoked from other skills (e.g., `create-presentation-svgs.md`) to generate consistent, high‑impact visual assets.
+Provide a fast metaphor-first ideation pass for a single slide. For the full workflow (visual plan, pencil-sketch SVG, QA, `presentation_guide.md`), use **`finops-slide-visuals/SKILL.md`**.
 
 **Key Steps**
 1. **Clarify the Core Message** – Define the single sentence that captures the concept.

@@ -2,10 +2,24 @@
 
 ## Purpose
 
-This skill provides the design guidelines, code structure, and checklist for creating and refining visually stunning, high-quality SVG slide graphics for presentation decks (PowerPoint, Keynote, Google Slides).
+This skill provides PPT-safe SVG rules and a legacy checklist for presentation decks (PowerPoint, Keynote, Google Slides).
+
+**For full slide workflows (plan → pencil-sketch SVG → QA), use `finops-slide-visuals/SKILL.md` first.** It is modeled on the [substack-visuals](https://github.com/learnwithraghu/substack/tree/main/skills/substack-visuals) skill pattern with repo-specific Teal Trust styling and Section 05 gold-standard references.
+
+### Integration with FinOps Slide Visuals
+
+Primary workflow skill: `.kilo/skills/finops-slide-visuals/SKILL.md`
+
+Reference files (read as needed):
+- `references/style-dna.md` — white pencil-sketch aesthetic
+- `references/visual-types.md` — slide type picker
+- `references/composition-patterns.md` — FinOps layout patterns
+- `references/svg-recipes.md` — copy-paste SVG snippets
+- `references/qa-checklist.md` — post-edit gate
+
 ### Integration with Infographic & Metaphor Skill
 
-The `infographic-metaphor` skill (located at `.kilo/skills/infographic-metaphor.md`) provides a reusable workflow for building metaphor‑driven infographics. When creating a new slide, invoke it like:
+The `infographic-metaphor` skill (located at `.kilo/skills/infographic-metaphor.md`) provides fast metaphor parameters for a single slide. When ideating, invoke it like:
 
 ```markdown
 {{% call_skill "infographic-metaphor"
@@ -43,28 +57,19 @@ Always use a standard **16:9 widescreen** canvas for slides. Set the outer conta
 **Teal Trust** (default for Section 05+):
 | Token | Hex | Use |
 |-------|-----|-----|
-| Slide bg | `#FFFFFF` | Content area |
-| Title bar | `#21295C` | Top 72px band on every slide |
+| Slide bg | `#FFFFFF` | Full canvas |
+| Charcoal text | `#232F3E` | Titles, pencil strokes |
+| Muted | `#607D8B` | One subtitle line |
 | Primary teal | `#028090` | Accents, active cards, arrows |
 | Seafoam | `#00A896` | Secondary highlights |
 | Mint | `#02C39A` | Success / winner highlight |
-| Charcoal text | `#232F3E` | Body on white |
-| Muted | `#607D8B` | Subtitles (max 1 line) |
-| Card fill | `#F2F2F2` | Neutral blocks |
+| Warm | `#FFB84D` | Policy / YAML emphasis |
+| Card fill | `#FAFAFA` | Light sketch panels |
 | Warning | `#EF5350` | Violations / crosses |
 
-**Premium dark variant** (preferred when the deck should feel more impressive):
-- **Canvas / dominant color**: `#0B1020`
-- **Panel dark**: `#111827`
-- **Panel mid**: `#18233A`
-- **Primary teal**: `#028090`
-- **Seafoam**: `#00A896`
-- **Mint**: `#02C39A`
-- **Warm highlight**: `#FFB84D`
-- **Soft text**: `#C7D2E0`
-- **Hard white**: `#F8FAFC`
+**Pencil sketch (Section 05+ default):** hand-drawn `<path>` panels, white background, minimal lines, max 40 words. See `finops-slide-visuals/references/style-dna.md`.
 
-Use the dark palette for 60-70% of the slide area so the deck feels deliberate, not like default white cards with colored borders.
+**Legacy dark variant (deprecated for new Section 05+ work):** do not use `#0B1020` stage layouts for new slides. Rework existing dark slides to white pencil sketch when touching a deck.
 
 **AWS/GCP** (legacy sections):
 - **Base Text / Charcoal**: `#232F3E` (AWS Charcoal) or `#37474F` (GCP Slate)
@@ -134,16 +139,15 @@ PowerPoint's "Convert to Shape" breaks on overlapping or complex SVG. Enforce:
 7. **Lines**: Separate `<line>`/`<path>` elements, not shared borders with text
 8. **Text budget**: Max 40 visible words per slide
 
-### Step 5B: Make It Feel Premium
+### Step 5B: Make It Feel Premium (Pencil Sketch)
 
 If a slide looks "fine" but not memorable, push it further:
 - Use a **dominant visual metaphor** first, supporting labels second
-- Prefer **big-number or big-icon anchors** over many small cards
-- Give each slide **one focal region** that owns most of the attention
-- Use **depth through layering**, not filters: stacked panels, offset cards, framed windows
-- Repeat one motif across the deck: e.g. glowing teal rings, dark console windows, or split-screen reveal panels
-- Vary layouts across the section so every slide does not feel like the same card grid
-- For before/after slides, make the two states feel obviously different in mood, not just different text
+- Prefer **big-icon or hub anchors** over many small cards
+- Give each slide **one focal region** (~35–45% of canvas)
+- Use **hand-drawn paths and whitespace**, not dark layers or shadow stacks
+- Vary layout types across the section (split, hub, rail, before/after) — not the same card grid
+- For before/after slides, tint and badge the two states (red BEFORE vs mint AFTER)
 
 ### Step 6: Keep Connections & Lines Clean ("No Spaghetti")
 - **Avoid Crossing Lines**: Prevent lines from intersecting. Instead of drawing a complex maze of connections, align components vertically or horizontally and use straight or clear curved lines.
@@ -161,7 +165,8 @@ When showing file contents or JSON snippets (e.g., metadata structures):
 ## Checklist
 
 - [ ] Does the SVG use the `viewBox="0 0 1280 720"` standard?
-- [ ] Does every slide have a dark title bar (`#21295C`, 72px) + Teal Trust accents?
+- [ ] White canvas + Teal Trust accents (Section 05+); title at `x=80,y=88` without dark title bar?
+- [ ] Pencil-sketch hand-drawn panels (irregular paths, not dark stacked cards)?
 - [ ] Does the slide have a clear focal point within 2 seconds of viewing?
 - [ ] Are Lucide icons inlined in `<defs>` and placed via `<use>`?
 - [ ] Is typography consistent (`Arial` or system-ui sans-serif)?
