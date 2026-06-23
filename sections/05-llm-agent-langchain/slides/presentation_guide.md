@@ -2,7 +2,7 @@
 
 This guide provides the slide-by-slide narration scripts and live demo handoff instructions for **Section 05: LLM Decision Flow**.
 
-> **Design System**: White canvas, pencil-sketch outlines (hand-drawn paths, minimal text), Teal Trust accents, inline Lucide icons, `viewBox="0 0 1280 720"` (16:9), and `anim-*` groups for PPT step animations. **Presentation order differs from filenames** - follow the order below.
+> **Design System**: High-tech Light canvas (#FFFFFF background with subtle dot grid pattern), rounded cards (rx="12" or rx="16"), high-contrast accents (Teal Trust #028090, Success Emerald #10B981, Warning Amber #D97706, Rose Red #EF4444), inline Lucide icons, `viewBox="0 0 1280 720"` (16:9), and `anim-*` groups for PPT step animations. **Presentation order differs from filenames** - follow the order below.
 
 ---
 

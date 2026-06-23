@@ -1,54 +1,128 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
   <defs>
-    <g id="lucide-triangle-alert">
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M12 9v4" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M12 17h.01" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap');
+      text { font-family: 'Inter', -apple-system, sans-serif; }
+      .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+    <filter id="card-shadow" x="-5%" y="-5%" width="115%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#1B2559" flood-opacity="0.08"/>
+    </filter>
+    <filter id="xray-glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#FF4D4F" flood-opacity="0.3"/>
+    </filter>
+    <pattern id="bg-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F0F2F5" stroke-width="1"/>
+    </pattern>
   </defs>
 
   <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="720" fill="url(#bg-grid)" opacity="0.6"/>
+  <rect x="0" y="0" width="6" height="720" fill="#FF4D4F"/>
 
-  <g id="anim-titlebar">
-    <text x="80" y="88" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">Raw Scan Output</text>
-    <text x="80" y="128" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Violations without routing or next steps.</text>
-    <path d="M 80 148 L 168 146 L 170 174 L 78 176 Z" fill="#FFF0F2" stroke="#EF5350" stroke-width="1.8" stroke-linecap="round"/>
-    <text x="124" y="166" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#EF5350" text-anchor="middle">BEFORE</text>
+  <!-- Header with red accent for "before" state -->
+  <rect x="40" y="32" width="160" height="28" rx="4" fill="#FFF0F0"/>
+  <text x="120" y="51" font-size="12" font-weight="700" fill="#FF4D4F" text-anchor="middle" letter-spacing="1.5">SECTION 05</text>
+  <text x="40" y="110" font-size="44" font-weight="800" fill="#141414" letter-spacing="-1">Raw Scan</text>
+  <text x="40" y="162" font-size="44" font-weight="800" fill="#FF4D4F" letter-spacing="-1">Output</text>
+  <text x="40" y="200" font-size="17" font-weight="400" fill="#8C8C8C">Violations without routing or next steps.</text>
+
+  <!-- BEFORE badge -->
+  <rect x="40" y="214" width="84" height="28" rx="14" fill="#FFF0F0" stroke="#FF4D4F" stroke-width="1.5"/>
+  <text x="82" y="233" font-size="12" font-weight="800" fill="#FF4D4F" text-anchor="middle" letter-spacing="1">BEFORE</text>
+
+  <line x1="40" y1="254" x2="1240" y2="254" stroke="#F0F2F5" stroke-width="1.5"/>
+
+  <!-- ── Left: Terminal / X-Ray Film Card ── -->
+  <g id="anim-terminal" transform="translate(40, 272)" filter="url(#card-shadow)">
+    <!-- Card frame -->
+    <rect width="760" height="340" rx="12" fill="#0D1117" stroke="#1E2130" stroke-width="2"/>
+    <!-- Terminal titlebar -->
+    <rect width="760" height="40" rx="12" fill="#161B22"/>
+    <rect width="760" height="10" y="30" fill="#161B22"/>
+    <circle cx="22" cy="20" r="5" fill="#FF5F57"/>
+    <circle cx="40" cy="20" r="5" fill="#FEBC2E"/>
+    <circle cx="58" cy="20" r="5" fill="#28C840"/>
+    <text x="380" y="26" font-size="12" font-weight="600" fill="#484F58" text-anchor="middle" class="mono">section-04 scan output</text>
+
+    <!-- Skeleton pod graphic area -->
+    <g transform="translate(40, 56)">
+      <!-- Pod outline skeleton -->
+      <polygon points="80,10 140,40 140,100 80,130 20,100 20,40" fill="none" stroke="#FF4D4F" stroke-width="2" stroke-dasharray="6 4" opacity="0.6"/>
+      <line x1="80" y1="10" x2="80" y2="130" stroke="#FF4D4F" stroke-width="1.5" opacity="0.4"/>
+      <line x1="20" y1="70" x2="140" y2="70" stroke="#FF4D4F" stroke-width="1.5" opacity="0.4"/>
+      <circle cx="80" cy="70" r="20" fill="none" stroke="#FF4D4F" stroke-width="2.5"/>
+      <line x1="72" y1="62" x2="88" y2="78" stroke="#FF4D4F" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="88" y1="62" x2="72" y2="78" stroke="#FF4D4F" stroke-width="2.5" stroke-linecap="round"/>
+
+      <!-- Diagnosis text -->
+      <text x="164" y="24" font-size="12" font-weight="700" fill="#FF4D4F" class="mono">⚠ DIAGNOSIS: VIOLATION</text>
+      <text x="164" y="48" font-size="14" font-weight="700" fill="#E6EDF3" class="mono">TARGET: payment-gateway-svc</text>
+    </g>
+
+    <!-- Violations list in terminal style -->
+    <g transform="translate(40, 200)" class="mono" font-family="JetBrains Mono, monospace">
+      <rect width="680" height="30" rx="4" fill="#FF4D4F" opacity="0.08"/>
+      <text x="16" y="21" font-size="13" font-weight="500" fill="#FF6B6B">▸  missing: owner tag ..................... [FRACTURED]</text>
+    </g>
+    <g transform="translate(40, 238)" class="mono" font-family="JetBrains Mono, monospace">
+      <rect width="680" height="30" rx="4" fill="#FF4D4F" opacity="0.06"/>
+      <text x="16" y="21" font-size="13" font-weight="500" fill="#FF6B6B">▸  missing: cost-center tag .............. [FRACTURED]</text>
+    </g>
+    <g transform="translate(40, 276)" class="mono" font-family="JetBrains Mono, monospace">
+      <text x="16" y="21" font-size="13" font-weight="500" fill="#6B7280">▸  treatment prescription ................ [UNKNOWN]</text>
+    </g>
+
+    <!-- Bottom error bar -->
+    <rect x="20" y="306" width="720" height="20" rx="4" fill="#FF4D4F" opacity="0.12"/>
+    <text x="380" y="321" font-size="12" font-weight="600" fill="#FF4D4F" text-anchor="middle" class="mono">Facts only — diagnosis without treatment</text>
   </g>
 
-  <g id="anim-terminal" transform="translate(80,200)">
-    <path d="M 6 4 L 720 6 L 722 360 L 4 358 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="28" cy="32" r="6" fill="#EF5350"/>
-    <circle cx="48" cy="32" r="6" fill="#FFB84D"/>
-    <circle cx="68" cy="32" r="6" fill="#02C39A"/>
-    <text x="360" y="38" font-family="Arial, sans-serif" font-size="14" fill="#607D8B" text-anchor="middle">section-04 terminal</text>
+  <!-- ── Right: Missing Items Clipboard ── -->
+  <g id="anim-summary" transform="translate(840, 272)" filter="url(#card-shadow)">
+    <rect width="400" height="340" rx="12" fill="#FFFFFF" stroke="#F0F2F5" stroke-width="1.5"/>
+    <!-- Clipboard hang tabs -->
+    <rect x="150" y="-10" width="100" height="18" rx="4" fill="#8C8C8C"/>
 
-    <g transform="translate(32,72)">
-      <use href="#lucide-triangle-alert" x="0" y="0" width="22" height="22"/>
-      <text x="32" y="18" font-family="Courier New, monospace" font-size="15" font-weight="bold" fill="#EF5350">VIOLATION</text>
-      <text x="140" y="18" font-family="Courier New, monospace" font-size="14" fill="#232F3E">payment-gateway-svc</text>
-      <text x="32" y="52" font-family="Courier New, monospace" font-size="13" fill="#607D8B">Missing tag: owner</text>
-      <text x="32" y="78" font-family="Courier New, monospace" font-size="13" fill="#607D8B">Missing tag: cost-center</text>
+    <text x="200" y="42" font-size="18" font-weight="800" fill="#262626" text-anchor="middle">Patient Chart</text>
+    <text x="200" y="62" font-size="11" font-weight="600" fill="#8C8C8C" text-anchor="middle" class="mono">ID: section-04-scan</text>
+    <line x1="24" y1="76" x2="376" y2="76" stroke="#F0F2F5" stroke-width="1"/>
+
+    <!-- Missing items list -->
+    <g transform="translate(24, 96)">
+      <rect width="352" height="52" rx="8" fill="#FFF0F0" stroke="#FFD6D6" stroke-width="1.5"/>
+      <!-- Warning icon -->
+      <path d="M24 12 L30 36 L18 36 Z" fill="none" stroke="#FF4D4F" stroke-width="2.5" stroke-linejoin="round"/>
+      <text x="24" y="22" font-size="14" font-weight="500" fill="#FF4D4F" text-anchor="middle">⚠</text>
+      <text x="48" y="28" font-size="14" font-weight="700" fill="#262626">No owner routing</text>
+      <text x="48" y="44" font-size="12" font-weight="400" fill="#8C8C8C">Cannot assign to responsible team</text>
     </g>
 
-    <path d="M 28 200 L 660 198 L 662 248 L 26 250 Z" fill="#FFF8F8" stroke="#EF5350" stroke-width="1.8" stroke-linecap="round"/>
-    <text x="344" y="228" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#232F3E" text-anchor="middle">Facts only — no draft, no routing</text>
+    <g transform="translate(24, 162)">
+      <rect width="352" height="52" rx="8" fill="#FFF0F0" stroke="#FFD6D6" stroke-width="1.5"/>
+      <text x="24" y="32" font-size="14" font-weight="500" fill="#FF4D4F" text-anchor="middle">⚠</text>
+      <text x="48" y="28" font-size="14" font-weight="700" fill="#262626">No issue draft</text>
+      <text x="48" y="44" font-size="12" font-weight="400" fill="#8C8C8C">Zero actionable ticket generated</text>
+    </g>
+
+    <g transform="translate(24, 228)">
+      <rect width="352" height="52" rx="8" fill="#FFF0F0" stroke="#FFD6D6" stroke-width="1.5"/>
+      <text x="24" y="32" font-size="14" font-weight="500" fill="#FF4D4F" text-anchor="middle">⚠</text>
+      <text x="48" y="28" font-size="14" font-weight="700" fill="#262626">No priority metrics</text>
+      <text x="48" y="44" font-size="12" font-weight="400" fill="#8C8C8C">Cannot triage severity or impact</text>
+    </g>
+
+    <!-- Score bar -->
+    <rect x="24" y="296" width="352" height="24" rx="6" fill="#F0F2F5"/>
+    <text x="200" y="314" font-size="11" font-weight="700" fill="#8C8C8C" text-anchor="middle">Actionability Score: 0%</text>
   </g>
 
-  <g id="anim-summary" transform="translate(860,240)">
-    <path d="M 4 6 L 296 4 L 298 220 L 6 222 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="28" y="48" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#232F3E">Missing</text>
-    <g transform="translate(28,80)">
-      <use href="#lucide-triangle-alert" x="0" y="0" width="20" height="20"/>
-      <text x="30" y="16" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">owner routing</text>
-    </g>
-    <g transform="translate(28,130)">
-      <use href="#lucide-triangle-alert" x="0" y="0" width="20" height="20"/>
-      <text x="30" y="16" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">issue draft</text>
-    </g>
-    <g transform="translate(28,180)">
-      <use href="#lucide-triangle-alert" x="0" y="0" width="20" height="20"/>
-      <text x="30" y="16" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">priority</text>
-    </g>
+  <!-- Bottom arrow pointing to next slide -->
+  <g transform="translate(40, 646)" filter="url(#card-shadow)">
+    <rect width="1200" height="52" rx="10" fill="#FFF0F0" stroke="#FF4D4F" stroke-width="1"/>
+    <text x="530" y="32" font-size="15" font-weight="600" fill="#FF4D4F" text-anchor="middle">These are facts — not decisions. The LLM changes everything →</text>
+    <text x="1140" y="32" font-size="18" fill="#FF4D4F">8b</text>
   </g>
+
+  <text x="1220" y="700" font-size="13" font-weight="500" fill="#BFBFBF" text-anchor="end">8a / 9</text>
 </svg>
