@@ -1,174 +1,79 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
   <defs>
-    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4285F4"/>
-      <stop offset="100%" stop-color="#1E88E5"/>
-    </linearGradient>
-    <linearGradient id="accent-orange" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FF9900"/>
-      <stop offset="100%" stop-color="#F57C00"/>
-    </linearGradient>
-    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#34A853"/>
-      <stop offset="100%" stop-color="#2E7D32"/>
-    </linearGradient>
-    <linearGradient id="fusion-gradient" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#E8F0FE"/>
-      <stop offset="50%" stop-color="#F3E5F5"/>
-      <stop offset="100%" stop-color="#FFF3E0"/>
-    </linearGradient>
-    <linearGradient id="fusion-stroke" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4285F4"/>
-      <stop offset="50%" stop-color="#9C27B0"/>
-      <stop offset="100%" stop-color="#FF9900"/>
-    </linearGradient>
-
-    <!-- ConfigMap / YAML Document Icon -->
-    <g id="icon-cm">
-      <path d="M -9,-12 L 3,-12 L 9,-6 L 9,12 L -9,12 Z" fill="none" stroke="#FFB300" stroke-width="1.5"/>
-      <path d="M 3,-12 L 3,-6 L 9,-6" fill="none" stroke="#FFB300" stroke-width="1.5"/>
-      <line x1="-5" y1="-2" x2="5" y2="-2" stroke="#FFB300" stroke-width="1.2" opacity="0.8"/>
+    <g id="lucide-brain">
+      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-file-text">
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="#FFB84D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="#FFB84D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-settings-2">
+      <path d="M20 7h-9" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14 17H5" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="17" cy="17" r="3" fill="none" stroke="#028090" stroke-width="2"/>
+      <circle cx="7" cy="7" r="3" fill="none" stroke="#028090" stroke-width="2"/>
+    </g>
+    <g id="lucide-sparkles">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </defs>
 
-  <!-- Background -->
   <rect width="1280" height="720" fill="#FFFFFF"/>
 
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
-
-  <!-- Section Badge -->
-  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
-  <text x="130" y="54" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
-
-  <!-- Slide Header -->
-  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">Prompt Template &amp; Policy Fusion</text>
-  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Combining live cluster facts and corporate guidelines into a single LLM request</text>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- LEFT TOP: Live K8s Resource Metadata        -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(60, 170)">
-    <rect width="360" height="155" rx="10" fill="#F8F9FA" stroke="#4285F4" stroke-width="1.5"/>
-    <path d="M 0 10 A 10 10 0 0 1 10 0 L 350 0 A 10 10 0 0 1 360 10 L 360 36 L 0 36 Z" fill="url(#accent-blue)"/>
-    <text x="180" y="23" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Live K8s Resource Metadata (JSON)</text>
-
-    <g transform="translate(18, 50)">
-      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">name:</text>
-      <text x="55" y="15" font-family="Courier New, monospace" font-size="12" fill="#37474F">"payment-api-pod"</text>
-
-      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">namespace:</text>
-      <text x="95" y="35" font-family="Courier New, monospace" font-size="12" fill="#37474F">"airline-prod"</text>
-
-      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#1A73E8">labels:</text>
-      <text x="65" y="55" font-family="Courier New, monospace" font-size="12" fill="#37474F">{"env":"prod", "tier":"backend"}</text>
-
-      <text x="0" y="80" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">... cpu_request, replica_count, pv_links</text>
-    </g>
+  <g id="anim-titlebar">
+    <text x="80" y="88" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">Prompt Beats Parsers</text>
+    <text x="80" y="128" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Fuse role, policy, and facts into one LLM request.</text>
   </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- LEFT BOTTOM: FinOps Tagging Policy YAML     -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(60, 360)">
-    <rect width="360" height="155" rx="10" fill="#FFF8E1" stroke="#FF9900" stroke-width="1.5"/>
-    <path d="M 0 10 A 10 10 0 0 1 10 0 L 350 0 A 10 10 0 0 1 360 10 L 360 36 L 0 36 Z" fill="url(#accent-orange)"/>
-    <use href="#icon-cm" x="18" y="18" transform="scale(0.8)"/>
-    <text x="188" y="23" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">FinOps Tagging Policy (YAML)</text>
-
-    <g transform="translate(18, 50)">
-      <text x="0" y="15" font-family="Courier New, monospace" font-size="12" fill="#E65100">required_tags:</text>
-      <text x="125" y="15" font-family="Courier New, monospace" font-size="12" fill="#37474F">[owner, cost-center, tier]</text>
-
-      <text x="0" y="35" font-family="Courier New, monospace" font-size="12" fill="#E65100">label_mappings:</text>
-      <text x="125" y="35" font-family="Courier New, monospace" font-size="12" fill="#37474F">{owner: [app.k8s.io/owner]}</text>
-
-      <text x="0" y="55" font-family="Courier New, monospace" font-size="12" fill="#E65100">cost_centers:</text>
-      <text x="115" y="55" font-family="Courier New, monospace" font-size="12" fill="#37474F">[booking, payment, platform]</text>
-
-      <text x="0" y="80" font-family="Courier New, monospace" font-size="11" fill="#90A4AE">... excluded_namespaces, compliance_rules</text>
-    </g>
+  <g id="anim-input-system" transform="translate(80,240)">
+    <path d="M 6 4 L 268 6 L 270 88 L 4 90 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-settings-2" x="24" y="24" width="28" height="28"/>
+    <text x="64" y="52" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">system prompt</text>
   </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CONNECTORS: Left inputs → Center reactor    -->
-  <!-- ═══════════════════════════════════════════ -->
-  <path d="M 420 248 Q 475 248 490 305" fill="none" stroke="#4285F4" stroke-width="2.5" stroke-dasharray="5 4"/>
-  <polygon points="485,303 490,313 495,303" fill="#4285F4"/>
-
-  <path d="M 420 438 Q 475 438 490 380" fill="none" stroke="#FF9900" stroke-width="2.5" stroke-dasharray="5 4"/>
-  <polygon points="485,382 490,372 495,382" fill="#FF9900"/>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CENTER: Fusion Reactor — Prompt Template    -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(500, 220)">
-    <rect width="250" height="245" rx="20" fill="url(#fusion-gradient)" stroke="url(#fusion-stroke)" stroke-width="2"/>
-
-    <text x="125" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#7B1FA2" text-anchor="middle">PROMPT TEMPLATE</text>
-
-    <!-- Inner template container -->
-    <rect x="18" y="52" width="214" height="160" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
-
-    <g transform="translate(30, 72)">
-      <text x="0" y="12" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#37474F">SYSTEM INSTRUCTIONS</text>
-      <line x1="0" y1="20" x2="180" y2="20" stroke="#E0E0E0" stroke-width="1"/>
-
-      <text x="0" y="38" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">Analyze compliance matching:</text>
-
-      <rect x="-4" y="44" width="190" height="20" rx="3" fill="#FFF3E0" stroke="#FF9900" stroke-width="0.8"/>
-      <text x="0" y="58" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#E65100">{tagging_rules}</text>
-
-      <text x="0" y="82" font-family="Arial, sans-serif" font-size="11" fill="#607D8B">against K8s config data:</text>
-
-      <rect x="-4" y="88" width="190" height="20" rx="3" fill="#E8F0FE" stroke="#4285F4" stroke-width="0.8"/>
-      <text x="0" y="102" font-family="Courier New, monospace" font-size="11" font-weight="bold" fill="#1A73E8">{resource_metadata}</text>
-
-      <text x="0" y="126" font-family="Arial, sans-serif" font-size="11" fill="#2E7D32">→ output structured JSON schema</text>
-    </g>
+  <g id="anim-input-yaml" transform="translate(80,360)">
+    <path d="M 4 6 L 270 4 L 268 88 L 6 90 Z" fill="#FFFBF2" stroke="#FFB84D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-file-text" x="24" y="24" width="28" height="28"/>
+    <text x="64" y="52" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">tagging-rules.yaml</text>
   </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CONNECTOR: Center → Right LLM Node          -->
-  <!-- ═══════════════════════════════════════════ -->
-  <path d="M 750 343 L 860 343" stroke="#34A853" stroke-width="4"/>
-  <polygon points="858,335 878,343 858,351" fill="#34A853"/>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- RIGHT: LLM Inference Node                   -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(885, 210)">
-    <rect width="330" height="270" rx="14" fill="#E8F5E9" stroke="#34A853" stroke-width="1.5"/>
-    <path d="M 0 14 A 14 14 0 0 1 14 0 L 316 0 A 14 14 0 0 1 330 14 L 330 50 L 0 50 Z" fill="url(#accent-green)"/>
-    <text x="165" y="32" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">LLM Inference Node</text>
-
-    <g transform="translate(25, 70)">
-      <text x="0" y="18" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#232F3E">Model: ChatOpenAI (GPT-4o)</text>
-      <line x1="0" y1="28" x2="280" y2="28" stroke="#C8E6C9" stroke-width="1"/>
-
-      <circle cx="8" cy="50" r="4" fill="#34A853"/>
-      <text x="22" y="55" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Evaluates alias variations intelligently</text>
-
-      <circle cx="8" cy="78" r="4" fill="#34A853"/>
-      <text x="22" y="83" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Resolves owner context heuristically</text>
-
-      <circle cx="8" cy="106" r="4" fill="#34A853"/>
-      <text x="22" y="111" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Assesses priority level dynamically</text>
-
-      <circle cx="8" cy="134" r="4" fill="#34A853"/>
-      <text x="22" y="139" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Drafts structured correction advice</text>
-
-      <circle cx="8" cy="162" r="4" fill="#34A853"/>
-      <text x="22" y="167" font-family="Arial, sans-serif" font-size="13" fill="#37474F">Outputs typed ResourceDecision JSON</text>
-    </g>
+  <g id="anim-input-facts" transform="translate(80,480)">
+    <path d="M 6 4 L 268 6 L 270 88 L 4 90 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-brain" x="24" y="24" width="28" height="28"/>
+    <text x="64" y="52" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">resource facts</text>
   </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- BOTTOM: Key Takeaway Bar                    -->
-  <!-- ═══════════════════════════════════════════ -->
-  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
-  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
-  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">CORE SHIFT</text>
-  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Policy rules are no longer hardcoded into Python algorithms. We feed the entire policy YAML block alongside cluster</text>
-  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">metadata directly into the LLM context prompt — transferring analysis work completely to AI reasoning.</text>
+  <g id="anim-arrow-1">
+    <path d="M 358 282 C 420 300 460 320 500 340" fill="none" stroke="#028090" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 500 340 L 484 328 L 486 352 Z" fill="#028090"/>
+  </g>
+  <g id="anim-arrow-2">
+    <path d="M 358 404 L 500 404" fill="none" stroke="#FFB84D" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 500 404 L 484 392 L 484 416 Z" fill="#FFB84D"/>
+  </g>
+  <g id="anim-arrow-3">
+    <path d="M 358 526 C 420 508 460 488 500 468" fill="none" stroke="#028090" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 500 468 L 486 456 L 488 480 Z" fill="#028090"/>
+  </g>
+
+  <g id="anim-reactor" transform="translate(520,280)">
+    <ellipse cx="150" cy="150" rx="138" ry="134" fill="#F5FFFC" stroke="#028090" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="150" cy="150" rx="88" ry="86" fill="none" stroke="#02C39A" stroke-width="2" stroke-dasharray="6 5"/>
+    <g transform="translate(126,126) scale(2)">
+      <use href="#lucide-brain" x="0" y="0" width="24" height="24"/>
+    </g>
+    <text x="150" y="248" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#232F3E" text-anchor="middle">PROMPT_TEMPLATE</text>
+  </g>
+
+  <g id="anim-output" transform="translate(900,300)">
+    <path d="M 6 4 L 258 6 L 260 238 L 4 240 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-sparkles" x="24" y="24" width="28" height="28"/>
+    <text x="64" y="48" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#232F3E">LLM decision</text>
+    <text x="28" y="100" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">verdict</text>
+    <text x="28" y="136" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">issue draft</text>
+    <text x="28" y="172" font-family="Arial, sans-serif" font-size="16" fill="#232F3E">owner routing</text>
+    <path d="M 24 196 L 230 194 L 232 222 L 22 224 Z" fill="#E8FBF6" stroke="#02C39A" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="128" y="214" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#028090" text-anchor="middle">change YAML, not code</text>
+  </g>
 </svg>

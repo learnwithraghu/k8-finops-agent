@@ -39,7 +39,34 @@ Always use a standard **16:9 widescreen** canvas for slides. Set the outer conta
 ```
 
 ### Step 2: Establish the Tech Color Palette
-Use a clean, modern color scheme (e.g., AWS/GCP style colors):
+
+**Teal Trust** (default for Section 05+):
+| Token | Hex | Use |
+|-------|-----|-----|
+| Slide bg | `#FFFFFF` | Content area |
+| Title bar | `#21295C` | Top 72px band on every slide |
+| Primary teal | `#028090` | Accents, active cards, arrows |
+| Seafoam | `#00A896` | Secondary highlights |
+| Mint | `#02C39A` | Success / winner highlight |
+| Charcoal text | `#232F3E` | Body on white |
+| Muted | `#607D8B` | Subtitles (max 1 line) |
+| Card fill | `#F2F2F2` | Neutral blocks |
+| Warning | `#EF5350` | Violations / crosses |
+
+**Premium dark variant** (preferred when the deck should feel more impressive):
+- **Canvas / dominant color**: `#0B1020`
+- **Panel dark**: `#111827`
+- **Panel mid**: `#18233A`
+- **Primary teal**: `#028090`
+- **Seafoam**: `#00A896`
+- **Mint**: `#02C39A`
+- **Warm highlight**: `#FFB84D`
+- **Soft text**: `#C7D2E0`
+- **Hard white**: `#F8FAFC`
+
+Use the dark palette for 60-70% of the slide area so the deck feels deliberate, not like default white cards with colored borders.
+
+**AWS/GCP** (legacy sections):
 - **Base Text / Charcoal**: `#232F3E` (AWS Charcoal) or `#37474F` (GCP Slate)
 - **Primary / Action Blue**: `#4285F4` (GCP Blue) or `#1E88E5`
 - **Exclusion / Config Orange**: `#FF9900` (AWS Orange) or `#B78103`
@@ -47,7 +74,24 @@ Use a clean, modern color scheme (e.g., AWS/GCP style colors):
 - **Warning / Non-compliance Red**: `#EF5350` or `#C62828`
 - **Card Backgrounds**: Light neutral tints like `#F8F9FA` or `#ECEFF1`
 
-### Step 3: Leverage Reusable Icon Definitions
+### Step 3: Embed Lucide Icons Inline
+
+Use [Lucide icons](https://lucide.dev/icons/) for UI metaphors. Copy the SVG path from lucide.dev, normalize to a 24×24 viewBox, and place in `<defs>`:
+
+```xml
+<defs>
+  <g id="lucide-brain">
+  <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</defs>
+<!-- Place at (x,y) with 24px size: -->
+<use href="#lucide-brain" x="100" y="200" width="24" height="24"/>
+```
+
+Keep custom K8s icons (hexagon pod, YAML doc) alongside Lucide for domain-specific metaphors.
+
+### Step 4: Leverage Reusable Icon Definitions
 Do not draw shapes ad-hoc inside the code body. Instead, declare standard icons inside a `<defs>` block at the top of the file, then reference them with `<use href="#icon-id" x="..." y="..." />`.
 
 Common project icons:
@@ -77,12 +121,36 @@ Common project icons:
 </defs>
 ```
 
-### Step 4: Keep Connections & Lines Clean ("No Spaghetti")
+### Step 5: PPT-Safe SVG Rules (Convert to Shape)
+
+PowerPoint's "Convert to Shape" breaks on overlapping or complex SVG. Enforce:
+
+1. **Safe zone**: All content inside `x=80..1200, y=100..660`
+2. **No overlaps**: Minimum 24px gap between sibling elements
+3. **Animation groups**: Wrap each animatable unit in `<g id="anim-{name}">`
+4. **Text isolation**: Each label in its own `<g>`; 8px inset from card edges
+5. **No filters/masks/clippath**
+6. **Gradients**: Max 1 per slide; prefer flat fills for cards
+7. **Lines**: Separate `<line>`/`<path>` elements, not shared borders with text
+8. **Text budget**: Max 40 visible words per slide
+
+### Step 5B: Make It Feel Premium
+
+If a slide looks "fine" but not memorable, push it further:
+- Use a **dominant visual metaphor** first, supporting labels second
+- Prefer **big-number or big-icon anchors** over many small cards
+- Give each slide **one focal region** that owns most of the attention
+- Use **depth through layering**, not filters: stacked panels, offset cards, framed windows
+- Repeat one motif across the deck: e.g. glowing teal rings, dark console windows, or split-screen reveal panels
+- Vary layouts across the section so every slide does not feel like the same card grid
+- For before/after slides, make the two states feel obviously different in mood, not just different text
+
+### Step 6: Keep Connections & Lines Clean ("No Spaghetti")
 - **Avoid Crossing Lines**: Prevent lines from intersecting. Instead of drawing a complex maze of connections, align components vertically or horizontally and use straight or clear curved lines.
 - **Dashed vs. Solid**: Use solid lines for primary active routing (e.g. data pipelines) and dashed lines for logic references or validations.
 - **Arrows**: Add small polygons as arrowheads at the ends of connection paths for clear flow direction.
 
-### Step 5: Code Annotations & Diagnostic Callouts
+### Step 7: Code Annotations & Diagnostic Callouts
 When showing file contents or JSON snippets (e.g., metadata structures):
 - Display the snippet in a stylized IDE window container (complete with browser control dots).
 - Draw highlighting rects over key properties.
@@ -93,9 +161,17 @@ When showing file contents or JSON snippets (e.g., metadata structures):
 ## Checklist
 
 - [ ] Does the SVG use the `viewBox="0 0 1280 720"` standard?
-- [ ] Is the typography consistent (using `Arial` or system-ui sans-serif fonts)?
+- [ ] Does every slide have a dark title bar (`#21295C`, 72px) + Teal Trust accents?
+- [ ] Does the slide have a clear focal point within 2 seconds of viewing?
+- [ ] Are Lucide icons inlined in `<defs>` and placed via `<use>`?
+- [ ] Is typography consistent (`Arial` or system-ui sans-serif)?
 - [ ] Are all fonts set with absolute sizes to avoid scaling rendering issues?
 - [ ] Are vector icons defined in `<defs>` and reused with `<use>`?
+- [ ] Are animatable elements wrapped in `<g id="anim-*">` groups?
+- [ ] Is visible text ≤ 40 words per slide?
 - [ ] Are connections straight, parallel, or neatly curved (no intersecting lines)?
-- [ ] Is there sufficient margins (headers at X=80, slides bounded inside Y=640)?
+- [ ] Is content inside safe zone (`x=80..1200, y=100..660`) with 24px gaps?
+- [ ] No filters, masks, or clippath?
 - [ ] Does the SVG scale responsively inside PPT via `width="100%"` and `height="100%"`?
+- [ ] **Redo-in-place**: edit existing slide files; do not add new files unless approved
+- [ ] Does this feel like a presentation slide, not an app mockup with a title pasted on top?

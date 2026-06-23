@@ -1,88 +1,68 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
-  <!-- Background -->
-  <rect width="1280" height="720" fill="#FFFFFF" />
-  
   <defs>
-    <!-- Check Icon -->
-    <g id="icon-check">
-      <circle cx="0" cy="0" r="12" fill="#34A853" />
-      <path d="M-5,0 L-2,4 L6,-4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <g id="lucide-cloud">
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="none" stroke="#607D8B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    
-    <!-- Cross Icon -->
-    <g id="icon-cross">
-      <circle cx="0" cy="0" r="12" fill="#EF5350" />
-      <path d="M-4,-4 L4,4 M-4,4 L4,-4" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
+    <g id="lucide-x">
+      <path d="M18 6 6 18" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="m6 6 12 12" fill="none" stroke="#EF5350" stroke-width="2.2" stroke-linecap="round"/>
     </g>
-
-    <!-- LangChain Logo -->
-    <g id="icon-langchain" transform="scale(1.5) translate(-12, -12)">
-      <path d="M7.531 15.976a7.534 7.534 0 000-10.651L2.206 0A7.537 7.537 0 000 5.326c0 1.996.794 3.913 2.206 5.325l5.325 5.325zM18.674 16.469a7.535 7.535 0 00-10.65 0l5.325 5.325a7.536 7.536 0 0010.651 0l-5.326-5.325zM2.218 21.782a7.536 7.536 0 005.326 2.206v-7.531H.012c0 1.996.795 3.914 2.206 5.325zM20.73 8.595a7.534 7.534 0 00-10.651.001l5.325 5.326 5.326-5.327z" fill="#37474F"/>
+    <g id="lucide-check">
+      <path d="M20 6 9 17l-5-5" fill="none" stroke="#02C39A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-
-    <!-- Generic Agent Icon (for others) -->
-    <g id="icon-agent">
-      <circle cx="0" cy="0" r="16" fill="none" stroke="#4285F4" stroke-width="2"/>
-      <path d="M-6,-4 L-2,-4 M6,-4 L2,-4 M-4,4 Q0,8 4,4" fill="none" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-    </g>
-    
-    <!-- Cloud Icon -->
-    <g id="icon-cloud">
-      <path d="M0,10 A8,8 0 0,0 8,2 A10,10 0 0,0 -8,-6 A12,12 0 0,0 -12,10 Z" fill="none" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round" />
+    <g id="lucide-link">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </defs>
 
-  <!-- Title -->
-  <text x="80" y="80" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#232F3E">The Agent Framework Landscape</text>
-  <text x="80" y="120" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Comparing tools to build our LLM decision engine</text>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
 
-  <!-- Framework Cards -->
-  
-  <!-- LlamaIndex -->
-  <g transform="translate(60, 250)">
-    <rect x="0" y="0" width="260" height="180" rx="8" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5" />
-    <use href="#icon-agent" x="130" y="40" />
-    <text x="130" y="90" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#37474F" text-anchor="middle">LlamaIndex</text>
-    <text x="130" y="120" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">Excellent for RAG &amp;</text>
-    <text x="130" y="145" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">data connections</text>
-    <use href="#icon-cross" x="130" y="180" />
+  <g id="anim-titlebar">
+    <text x="80" y="88" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">Agent Harness Shootout</text>
+    <text x="80" y="128" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Cloud SDKs lock you in. We need typed local pipelines.</text>
   </g>
 
-  <!-- AutoGen -->
-  <g transform="translate(340, 250)">
-    <rect x="0" y="0" width="260" height="180" rx="8" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5" />
-    <use href="#icon-agent" x="130" y="40" />
-    <text x="130" y="90" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#37474F" text-anchor="middle">AutoGen / CrewAI</text>
-    <text x="130" y="120" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">Multi-agent</text>
-    <text x="130" y="145" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">conversational swarms</text>
-    <use href="#icon-cross" x="130" y="180" />
+  <g id="anim-card-aws" transform="translate(80,260)">
+    <path d="M 4 6 L 198 4 L 200 148 L 6 150 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-cloud" x="24" y="24" width="28" height="28"/>
+    <text x="24" y="82" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">AWS Bedrock</text>
+    <use href="#lucide-x" x="24" y="100" width="24" height="24"/>
   </g>
 
-  <!-- Cloud Managed Agents -->
-  <g transform="translate(620, 250)">
-    <rect x="0" y="0" width="260" height="180" rx="8" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5" />
-    <use href="#icon-cloud" x="130" y="35" />
-    <text x="130" y="90" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#37474F" text-anchor="middle">Cloud Agents</text>
-    <text x="130" y="120" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">Bedrock / Vertex AI</text>
-    <text x="130" y="145" font-family="Arial, sans-serif" font-size="16" fill="#607D8B" text-anchor="middle">Vendor lock-in, harder testing</text>
-    <use href="#icon-cross" x="130" y="180" />
+  <g id="anim-card-azure" transform="translate(300,260)">
+    <path d="M 6 4 L 200 6 L 198 150 L 4 148 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-cloud" x="24" y="24" width="28" height="28"/>
+    <text x="24" y="82" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">Azure OpenAI</text>
+    <use href="#lucide-x" x="24" y="100" width="24" height="24"/>
   </g>
 
-  <!-- LangChain (Highlighted) -->
-  <g transform="translate(900, 230)">
-    <rect x="0" y="0" width="280" height="220" rx="12" fill="#E8F0FE" stroke="#4285F4" stroke-width="3" />
-    <use href="#icon-langchain" x="140" y="50" />
-    <text x="140" y="110" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1E88E5" text-anchor="middle">LangChain</text>
-    <text x="140" y="145" font-family="Arial, sans-serif" font-size="18" fill="#37474F" text-anchor="middle">Structured workflows,</text>
-    <text x="140" y="170" font-family="Arial, sans-serif" font-size="18" fill="#37474F" text-anchor="middle">robust parsers &amp; adapters</text>
-    <use href="#icon-check" x="140" y="220" />
-    <!-- Badge -->
-    <rect x="195" y="-15" width="90" height="30" rx="15" fill="#34A853" />
-    <text x="240" y="5" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FFF" text-anchor="middle">Our Choice</text>
+  <g id="anim-card-gcp" transform="translate(520,260)">
+    <path d="M 4 6 L 198 4 L 200 148 L 6 150 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <use href="#lucide-cloud" x="24" y="24" width="28" height="28"/>
+    <text x="24" y="82" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">GCP Vertex AI</text>
+    <use href="#lucide-x" x="24" y="100" width="24" height="24"/>
   </g>
 
-  <!-- Conclusion text at bottom -->
-  <rect x="150" y="520" width="980" height="80" rx="8" fill="#F1F3F4" />
-  <text x="640" y="565" font-family="Arial, sans-serif" font-size="20" fill="#232F3E" text-anchor="middle">For K8s FinOps, we don't need swarms of chatting agents. We need <tspan font-weight="bold">predictable, typed data pipelines.</tspan></text>
+  <g id="anim-card-langchain" transform="translate(780,220)">
+    <path d="M 8 6 L 418 4 L 420 268 L 6 270 Z" fill="#F5FFFC" stroke="#02C39A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 28 28 L 392 26 L 394 52 L 26 54 Z" fill="#02C39A" stroke="none"/>
+    <text x="210" y="46" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">WINNER</text>
+    <use href="#lucide-link" x="40" y="80" width="36" height="36"/>
+    <text x="90" y="108" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#232F3E">LangChain OSS</text>
+    <text x="90" y="140" font-family="Arial, sans-serif" font-size="15" fill="#607D8B">prompt | llm | parser</text>
+    <g transform="translate(36,170)">
+      <use href="#lucide-check" x="0" y="0" width="22" height="22"/>
+      <text x="30" y="18" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">typed outputs</text>
+    </g>
+    <g transform="translate(36,210)">
+      <use href="#lucide-check" x="0" y="0" width="22" height="22"/>
+      <text x="30" y="18" font-family="Arial, sans-serif" font-size="15" fill="#232F3E">any base_url</text>
+    </g>
+  </g>
 
+  <g id="anim-bottom-note" transform="translate(80,540)">
+    <path d="M 4 6 L 1116 4 L 1118 58 L 6 60 Z" fill="#FAFAFA" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="560" y="40" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#232F3E" text-anchor="middle">Structured decisions in. Typed JSON out.</text>
+  </g>
 </svg>

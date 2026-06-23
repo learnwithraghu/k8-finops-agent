@@ -1,167 +1,68 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
   <defs>
-    <linearGradient id="accent-blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4285F4"/>
-      <stop offset="100%" stop-color="#1E88E5"/>
-    </linearGradient>
-    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#34A853"/>
-      <stop offset="100%" stop-color="#2E7D32"/>
-    </linearGradient>
-
-    <!-- Wavy text icon for unstructured data -->
-    <g id="icon-wavy">
-      <path d="M -14 -6 Q -7 -12 0 -6 Q 7 0 14 -6" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
-      <path d="M -14 0 Q -7 -6 0 0 Q 7 6 14 0" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
-      <path d="M -14 6 Q -7 0 0 6 Q 7 12 14 6" fill="none" stroke="#B0BEC5" stroke-width="1.5"/>
+    <g id="lucide-search">
+      <circle cx="11" cy="11" r="8" fill="none" stroke="#028090" stroke-width="2"/>
+      <path d="m21 21-4.3-4.3" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-file-text">
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="#FFB84D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="#FFB84D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-brain">
+      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-braces">
+      <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1" fill="none" stroke="#02C39A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="lucide-clipboard-list">
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" fill="none" stroke="#028090" stroke-width="2"/>
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 11h4" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 16h4" fill="none" stroke="#028090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
   </defs>
 
-  <!-- Background -->
   <rect width="1280" height="720" fill="#FFFFFF"/>
 
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="1280" height="4" fill="url(#accent-blue)"/>
-
-  <!-- Section Badge -->
-  <rect x="80" y="35" width="100" height="28" rx="14" fill="#E8F0FE" stroke="#4285F4" stroke-width="1"/>
-  <text x="130" y="54" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4285F4" text-anchor="middle">SECTION 05</text>
-
-  <!-- Slide Header -->
-  <text x="80" y="100" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#232F3E">Structured Outputs with Pydantic</text>
-  <text x="80" y="135" font-family="Arial, sans-serif" font-size="18" fill="#607D8B">Molding raw text responses into typed, validated Python structures</text>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- LEFT: Raw LLM Output (Unstructured Cloud)  -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(60, 175)">
-    <rect width="310" height="360" rx="14" fill="#F8F9FA" stroke="#CFD8DC" stroke-width="1.5"/>
-    <path d="M 0 14 A 14 14 0 0 1 14 0 L 296 0 A 14 14 0 0 1 310 14 L 310 48 L 0 48 Z" fill="#78909C"/>
-    <text x="155" y="30" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Raw LLM Response</text>
-
-    <!-- Amorphous cloud shape -->
-    <g transform="translate(155, 170)">
-      <path d="M -80 30 C -100 30, -110 10, -90 -10 C -100 -40, -60 -60, -30 -40 C -10 -70, 40 -70, 60 -40 C 90 -50, 120 -30, 110 -5 C 130 15, 110 55, 80 45 C 60 75, 10 75, -20 55 C -50 75, -80 55, -80 30 Z"
-            fill="#ECEFF1" stroke="#B0BEC5" stroke-width="1.5"/>
-
-      <use href="#icon-wavy" x="-40" y="-25" transform="scale(1.5)"/>
-      <use href="#icon-wavy" x="20" y="5" transform="scale(1.2)"/>
-
-      <text x="0" y="-10" font-family="Courier New, monospace" font-size="10" fill="#455A64" text-anchor="middle">"This pod is not compliant</text>
-      <text x="0" y="5" font-family="Courier New, monospace" font-size="10" fill="#455A64" text-anchor="middle">because owner tag is missing.</text>
-      <text x="0" y="20" font-family="Courier New, monospace" font-size="10" fill="#455A64" text-anchor="middle">Create ticket for payments..."</text>
-    </g>
-
-    <!-- Label -->
-    <rect x="75" y="305" width="160" height="28" rx="14" fill="#FFEBEE" stroke="#EF5350" stroke-width="1"/>
-    <text x="155" y="324" font-family="Arial, sans-serif" font-size="12" fill="#EF5350" text-anchor="middle" font-weight="bold">Unpredictable Layout</text>
+  <g id="anim-titlebar">
+    <text x="80" y="88" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#232F3E">Agent Pipeline Blocks</text>
+    <text x="80" y="128" font-family="Arial, sans-serif" font-size="20" fill="#607D8B">Scan, fuse, infer, structure, report.</text>
   </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CONNECTOR: Left → Center                   -->
-  <!-- ═══════════════════════════════════════════ -->
-  <path d="M 370 355 L 420 355" stroke="#4285F4" stroke-width="3.5"/>
-  <polygon points="418,348 435,355 418,362" fill="#4285F4"/>
+  <g id="anim-step-rail" transform="translate(60,300)">
+    <path d="M 8 6 L 1140 4 L 1142 168 L 6 170 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 140 88 C 400 84 800 92 1004 88" fill="none" stroke="#028090" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 6"/>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CENTER: Pydantic Schema Mold                -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(440, 175)">
-    <rect width="360" height="360" rx="16" fill="#E8F0FE" stroke="#4285F4" stroke-width="2"/>
-    <path d="M 0 16 A 16 16 0 0 1 16 0 L 344 0 A 16 16 0 0 1 360 16 L 360 52 L 0 52 Z" fill="url(#accent-blue)"/>
-    <text x="180" y="33" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Pydantic Schema Mold</text>
-
-    <!-- Schema fields -->
-    <g transform="translate(22, 68)">
-      <!-- Field 1: is_compliant -->
-      <rect x="0" y="0" width="316" height="42" rx="6" fill="#FFFFFF" stroke="#4285F4" stroke-width="1"/>
-      <rect x="0" y="0" width="4" height="42" rx="2" fill="#4285F4"/>
-      <text x="18" y="26" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#232F3E">is_compliant:</text>
-      <text x="150" y="26" font-family="Courier New, monospace" font-size="13" fill="#34A853">bool</text>
-      <rect x="260" y="10" width="44" height="20" rx="10" fill="#E8F5E9" stroke="#34A853" stroke-width="0.8"/>
-      <text x="282" y="24" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#2E7D32" text-anchor="middle">REQ</text>
-
-      <!-- Field 2: category -->
-      <rect x="0" y="52" width="316" height="42" rx="6" fill="#FFFFFF" stroke="#4285F4" stroke-width="1"/>
-      <rect x="0" y="52" width="4" height="42" rx="2" fill="#4285F4"/>
-      <text x="18" y="78" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#232F3E">category:</text>
-      <text x="115" y="78" font-family="Courier New, monospace" font-size="13" fill="#4285F4">str</text>
-
-      <!-- Field 3: missing_tags -->
-      <rect x="0" y="104" width="316" height="42" rx="6" fill="#FFFFFF" stroke="#4285F4" stroke-width="1"/>
-      <rect x="0" y="104" width="4" height="42" rx="2" fill="#FF9900"/>
-      <text x="18" y="130" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#232F3E">missing_tags:</text>
-      <text x="145" y="130" font-family="Courier New, monospace" font-size="13" fill="#E65100">List[str]</text>
-
-      <!-- Field 4: reason -->
-      <rect x="0" y="156" width="316" height="42" rx="6" fill="#FFFFFF" stroke="#4285F4" stroke-width="1"/>
-      <rect x="0" y="156" width="4" height="42" rx="2" fill="#4285F4"/>
-      <text x="18" y="182" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#232F3E">reason:</text>
-      <text x="90" y="182" font-family="Courier New, monospace" font-size="13" fill="#4285F4">str</text>
-
-      <!-- Field 5: issue_body -->
-      <rect x="0" y="208" width="316" height="42" rx="6" fill="#FFFFFF" stroke="#4285F4" stroke-width="1"/>
-      <rect x="0" y="208" width="4" height="42" rx="2" fill="#4285F4"/>
-      <text x="18" y="234" font-family="Courier New, monospace" font-size="13" font-weight="bold" fill="#232F3E">issue_body:</text>
-      <text x="130" y="234" font-family="Courier New, monospace" font-size="13" fill="#4285F4">str</text>
-    </g>
-  </g>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- CONNECTOR: Center → Right                   -->
-  <!-- ═══════════════════════════════════════════ -->
-  <path d="M 800 355 L 850 355" stroke="#34A853" stroke-width="3.5"/>
-  <polygon points="848,348 865,355 848,362" fill="#34A853"/>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- RIGHT: Structured Output Instance           -->
-  <!-- ═══════════════════════════════════════════ -->
-  <g transform="translate(870, 175)">
-    <rect width="345" height="360" rx="14" fill="#E8F5E9" stroke="#34A853" stroke-width="1.5"/>
-    <path d="M 0 14 A 14 14 0 0 1 14 0 L 331 0 A 14 14 0 0 1 345 14 L 345 48 L 0 48 Z" fill="url(#accent-green)"/>
-    <text x="172" y="30" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ResourceDecision Instance</text>
-
-    <!-- Structured output values -->
-    <g transform="translate(18, 65)">
-      <rect x="0" y="0" width="309" height="30" rx="4" fill="#FFFFFF"/>
-      <text x="12" y="20" font-family="Courier New, monospace" font-size="12" fill="#2E7D32">is_compliant</text>
-      <text x="135" y="20" font-family="Courier New, monospace" font-size="12" fill="#607D8B">=</text>
-      <text x="148" y="20" font-family="Courier New, monospace" font-size="12" font-weight="bold" fill="#EF5350">False</text>
-
-      <rect x="0" y="38" width="309" height="30" rx="4" fill="#FFFFFF"/>
-      <text x="12" y="58" font-family="Courier New, monospace" font-size="12" fill="#2E7D32">category</text>
-      <text x="100" y="58" font-family="Courier New, monospace" font-size="12" fill="#607D8B">=</text>
-      <text x="113" y="58" font-family="Courier New, monospace" font-size="12" fill="#37474F">"unowned"</text>
-
-      <rect x="0" y="76" width="309" height="30" rx="4" fill="#FFFFFF"/>
-      <text x="12" y="96" font-family="Courier New, monospace" font-size="12" fill="#2E7D32">missing_tags</text>
-      <text x="135" y="96" font-family="Courier New, monospace" font-size="12" fill="#607D8B">=</text>
-      <text x="148" y="96" font-family="Courier New, monospace" font-size="12" fill="#E65100">["owner"]</text>
-
-      <rect x="0" y="114" width="309" height="30" rx="4" fill="#FFFFFF"/>
-      <text x="12" y="134" font-family="Courier New, monospace" font-size="12" fill="#2E7D32">reason</text>
-      <text x="78" y="134" font-family="Courier New, monospace" font-size="12" fill="#607D8B">=</text>
-      <text x="91" y="134" font-family="Courier New, monospace" font-size="12" fill="#37474F">"No owner label found"</text>
-
-      <rect x="0" y="152" width="309" height="85" rx="4" fill="#FFFFFF"/>
-      <text x="12" y="172" font-family="Courier New, monospace" font-size="12" fill="#2E7D32">issue_body</text>
-      <text x="118" y="172" font-family="Courier New, monospace" font-size="12" fill="#607D8B">=</text>
-      <text x="12" y="195" font-family="Courier New, monospace" font-size="10" fill="#455A64">"### Missing Tag Details</text>
-      <text x="12" y="212" font-family="Courier New, monospace" font-size="10" fill="#455A64">The pod payment-api-pod in</text>
-      <text x="12" y="229" font-family="Courier New, monospace" font-size="10" fill="#455A64">airline-prod misses label owner..."</text>
+    <g id="anim-step-1" transform="translate(50,28)">
+      <ellipse cx="56" cy="56" rx="48" ry="46" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+      <use href="#lucide-search" x="44" y="44" width="24" height="24"/>
+      <text x="56" y="124" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">K8sScanner</text>
     </g>
 
-    <!-- Status badge -->
-    <rect x="80" y="312" width="185" height="28" rx="14" fill="#C8E6C9" stroke="#34A853" stroke-width="1"/>
-    <text x="172" y="330" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2E7D32" text-anchor="middle">Ready for Downstream APIs</text>
-  </g>
+    <g id="anim-step-2" transform="translate(274,28)">
+      <ellipse cx="56" cy="56" rx="48" ry="46" fill="#FFFBF2" stroke="#FFB84D" stroke-width="2"/>
+      <use href="#lucide-file-text" x="44" y="44" width="24" height="24"/>
+      <text x="56" y="124" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#232F3E" text-anchor="middle">PROMPT</text>
+    </g>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- BOTTOM: Key Takeaway Bar                    -->
-  <!-- ═══════════════════════════════════════════ -->
-  <rect x="80" y="590" width="1120" height="80" rx="12" fill="#F1F3F4" stroke="#E0E0E0" stroke-width="1"/>
-  <rect x="80" y="590" width="6" height="80" rx="3" fill="url(#accent-blue)"/>
-  <text x="110" y="622" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4285F4">WHY THIS MATTERS</text>
-  <text x="110" y="648" font-family="Arial, sans-serif" font-size="15" fill="#37474F">Standard Chat LLMs respond in natural text. To build automated systems, we need structured, parseable schemas.</text>
-  <text x="110" y="666" font-family="Arial, sans-serif" font-size="15" fill="#37474F">The PydanticOutputParser injects schema instructions into the prompt and validates output for clean API integration.</text>
+    <g id="anim-step-3" transform="translate(498,28)">
+      <ellipse cx="56" cy="56" rx="48" ry="46" fill="#F5FFFC" stroke="#02C39A" stroke-width="2"/>
+      <use href="#lucide-brain" x="44" y="44" width="24" height="24"/>
+      <text x="56" y="124" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">ChatOpenAI</text>
+    </g>
+
+    <g id="anim-step-4" transform="translate(722,28)">
+      <ellipse cx="56" cy="56" rx="48" ry="46" fill="#F5FFFC" stroke="#02C39A" stroke-width="2"/>
+      <use href="#lucide-braces" x="44" y="44" width="24" height="24"/>
+      <text x="56" y="124" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">Pydantic</text>
+    </g>
+
+    <g id="anim-step-5" transform="translate(946,28)">
+      <ellipse cx="56" cy="56" rx="48" ry="46" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+      <use href="#lucide-clipboard-list" x="44" y="44" width="24" height="24"/>
+      <text x="56" y="124" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#232F3E" text-anchor="middle">Report</text>
+    </g>
+  </g>
 </svg>
