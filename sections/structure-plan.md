@@ -1,6 +1,6 @@
 # Teaching Flow Restructure Plan
 
-This document maps the current repository into the 8 teaching sections.
+This document maps the current repository into the 9 teaching sections.
 
 ## Guiding rule
 Each section should be self-contained for learning, but later sections may refer back to earlier artifacts instead of duplicating them.
@@ -40,12 +40,18 @@ sections/
 │   ├── section_goal.md
 │   ├── guide.md
 │   └── agent/
-└── 08-k8-native-agent/
+├── 08-k8-native-agent/
+│   ├── section_goal.md
+│   ├── guide.md
+│   ├── docker/
+│   ├── manifests/
+│   └── cronjob/
+└── 09-mcp-k8-agent/
     ├── section_goal.md
     ├── guide.md
-    ├── docker/
-    ├── manifests/
-    └── cronjob/
+    ├── mcp_server/
+    ├── agent/
+    └── config/
 ```
 
 ## Current code -> future section mapping
@@ -124,6 +130,17 @@ sections/
   - containerization
   - deployment in a dedicated namespace
   - scheduled execution
+
+### Section 09: MCP-powered K8s cluster access
+- Keep:
+  - `mcp_server/`
+  - `agent/`
+  - `config/tagging-rules.yaml`
+- Output should teach:
+  - tool-based cluster access
+  - deterministic collection
+  - compliance analysis as a separate LLM step
+  - tracker writing from structured compliance output
 
 ## File placement rules
 - Section-specific docs stay inside that section folder.

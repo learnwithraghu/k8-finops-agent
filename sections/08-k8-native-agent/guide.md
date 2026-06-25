@@ -764,7 +764,7 @@ kubectl describe cronjob k8-finops-agent -n finops-agent | grep -A 10 Volumes
 
 ## Handoff to Section 09
 
-Section 09 is a standalone simple-agent reference. It is not part of the main teaching flow.
+Section 09 is a standalone MCP-powered cluster access reference. It sits outside the main Helm flow and shows how to replace the hand-written scanner with tools + a deterministic collector.
 
 If you want to extend the Helm deployment next, typical follow-ups are:
 - Integrating with the issue tracker service from Section 06/07

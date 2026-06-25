@@ -15,6 +15,7 @@ This directory is the curriculum skeleton for the repo.
 - `sections/04-local-python-agent/config/` → Sections 04, 05, 07
 - Future issue tracker service → Section 06
 - Future Kubernetes-native deployment/cronjob → Section 08
+- Future MCP-powered cluster interface → Section 09
 
 ## Section index
 1. Cluster setup and namespaces
@@ -25,3 +26,4 @@ This directory is the curriculum skeleton for the repo.
 6. Issue tracker service
 7. Agent to tracker integration
 8. Kubernetes deployment and scheduled runs
+9. MCP-powered K8s cluster access and compliance analysis
