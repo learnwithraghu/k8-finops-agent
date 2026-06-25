@@ -1,47 +1,73 @@
-# Plan: Section 09 — MCP-Powered K8s FinOps Agent
+# Plan: Section 09 — Prompt-First MCP FinOps Demo
 
 ## Why This Section Exists
 
-Section 08 teaches the packaged, Kubernetes-native agent. The next step is to remove the hand-written `scanner.py` layer and replace it with a protocol-based cluster interface.
+Section 05 proved the first big lesson: a few prompts can do a lot more than a pile of hand-written logic.
 
-The key idea:
-- Kubernetes data collection should be exposed as tools
-- the collector should be deterministic
-- the LLM should only do compliance analysis
-- the tracker writer should consume structured compliance output
+Section 09 should make that idea even clearer.
+
+The point of this section is **not** to teach a bigger codebase.
+The point is to show a learner that:
+
+- MCP gives us tools, not a new framework to babysit
+- prompts can do the heavy lifting
+- the code can stay tiny
+- the pipeline can still end in tracker tickets
+
+If this section grows more complex than Section 05, we missed the point.
 
 ---
 
-## What We Are Fixing
+## Core Teaching Idea
 
-The current Python scanner is doing too much:
+**Less code. More prompt.**
 
-- cluster discovery
-- namespace iteration
-- resource parsing
-- orphan detection
-- reporting shape
+Instead of building many classes, wrappers, and models, the demo should use:
 
-That creates a few problems:
+- one thin MCP server
+- one simple prompt-driven collector
+- one simple prompt-driven analyst
+- one tiny tracker writer step
 
-1. **Tight coupling** — the scan logic only works inside this agent.
-2. **No reuse** — another tool or agent cannot easily consume the same cluster data.
-3. **No selective querying** — the whole cluster is scanned even when only one namespace is needed.
-4. **Too much hidden behavior** — `main.py` knows scanner internals it should not own.
-
-MCP solves the interface problem by making Kubernetes operations callable tools.
+The learner should feel:
+> “Oh — this is mostly prompt design and orchestration, not a huge Python architecture.”
 
 ---
 
 ## Section Goal
 
-Build a three-step pipeline:
+Build a **three-step pipeline** with minimal code:
 
-- **Collector**: uses MCP tools to fetch raw cluster data and emit structured JSON.
-- **Analyst**: uses the raw JSON + tagging policy to produce a compliance report.
-- **Tracker**: converts non-compliant assessments into issue tracker tickets.
+1. **Agent 1 — Collector**
+   - uses MCP tools
+   - gathers raw Kubernetes facts
+   - outputs plain JSON
 
-**Important:** the collector is not an LLM agent. It is a deterministic orchestrator.
+2. **Agent 2 — Analyst**
+   - receives Agent 1’s JSON
+   - receives tagging rules in the prompt
+   - outputs structured compliance JSON
+
+3. **Agent 3 — Tracker writer**
+   - receives the structured compliance JSON
+   - POSTs only the violations to the issue tracker
+
+**Important:** avoid creating a new class hierarchy for each step.
+The whole lesson is that prompts + a little glue are enough.
+
+---
+
+## What We Are Simplifying
+
+We should deliberately avoid the kind of code that makes the lesson feel heavy:
+
+- no collector class just to loop namespaces
+- no analyzer service layer
+- no deep model hierarchy
+- no tracker domain objects unless absolutely needed
+- no custom abstraction over MCP that hides what is happening
+
+The learner should still be able to read the whole section in one sitting.
 
 ---
 
@@ -57,175 +83,176 @@ No renumbering of Sections 06–08.
 
 ---
 
-## Architecture
+## Simplified Architecture
 
 ```text
 kind cluster
      │
      ▼
 ┌─────────────────────────────────┐
-│ kubernetes-mcp-server           │
-│ (stdio MCP process)             │
+│ MCP server                      │
+│ 6 read-only Kubernetes tools    │
 └────────────────┬────────────────┘
                  │
                  ▼
 ┌─────────────────────────────────┐
-│ Collector                        │
-│ deterministic MCP client         │
-│ raw JSON snapshot                │
+│ Agent 1 — Collector             │
+│ prompt + tool calls              │
+│ raw JSON                         │
 └────────────────┬────────────────┘
                  │
                  ▼
 ┌─────────────────────────────────┐
-│ Analyst                          │
-│ LLM + tagging rules              │
-│ ComplianceReport JSON            │
+│ Agent 2 — Analyst               │
+│ prompt + tagging rules           │
+│ compliance JSON                  │
 └────────────────┬────────────────┘
                  │
                  ▼
 ┌─────────────────────────────────┐
-│ Tracker                          │
-│ HTTP client to local issue board  │
-│ created tickets                  │
+│ Agent 3 — Tracker writer        │
+│ tiny POST step                   │
+│ Jira-style ticket(s)             │
 └─────────────────────────────────┘
 ```
 
 ---
 
-## Step 1: Build the MCP server
+## Step 1: Keep the MCP server thin
 
-Use a thin Kubernetes client wrapper that talks directly to the K8s API.
-
-### Tools to expose
+The MCP server should expose only the Kubernetes reads we need:
 
 | Tool | Purpose |
 |---|---|
 | `list_namespaces` | Return non-system namespaces |
-| `list_deployments(namespace)` | Return deployment metadata and resource requests |
-| `list_pods(namespace)` | Return pod phase, node, owners, restarts, labels |
-| `list_services(namespace)` | Return service type and selector info |
-| `list_pvcs(namespace)` | Return PVC size, access mode, binding status |
-| `list_configmaps(namespace)` | Return configmaps excluding system ones |
+| `list_deployments(namespace)` | Return basic deployment metadata |
+| `list_pods(namespace)` | Return pod metadata and status |
+| `list_services(namespace)` | Return service metadata |
+| `list_pvcs(namespace)` | Return PVC metadata |
+| `list_configmaps(namespace)` | Return configmap metadata |
 
-### Important constraint
+### Keep it simple
 
-Do **not** require `metrics-server` for the MVP.
-
-- If pod CPU/memory usage is needed later, gate it behind an optional metrics API client.
-- For the first version, keep the server usable on a plain kind cluster.
+- return plain JSON-friendly dicts
+- avoid optional features for the first pass
+- do not require metrics-server
+- do not add clever wrappers just to normalize every field
 
 ### Why this matters
 
-This keeps the server portable and avoids a hidden cluster prerequisite.
+The MCP server should feel like a thin adapter over the cluster, not another mini-framework.
 
 ---
 
-## Step 2: Write the collector
+## Step 2: Make Agent 1 mostly prompt-driven
 
-The collector should:
+Agent 1 should be a **small orchestrator**, not a rich Python subsystem.
+
+### What it does
 
 - call `list_namespaces`
-- query each namespace with the MCP tools
-- build one raw JSON snapshot
-- do **no compliance logic**
-- do **no ticket logic**
+- call the resource tools for each namespace
+- assemble a raw snapshot
+- emit plain JSON
 
-### Output shape
+### What it should not do
 
-```json
-{
-  "scanned_at": "<ISO timestamp>",
-  "cluster": "kind",
-  "namespaces": ["airline", "payment"],
-  "resources": [
-    {
-      "kind": "Deployment",
-      "namespace": "airline",
-      "name": "booking-api",
-      "labels": {},
-      "annotations": {},
-      "replicas": 2,
-      "cpu_request_m": 100,
-      "memory_request_mi": 128,
-      "owners": []
-    }
-  ]
-}
-```
+- no compliance judgments
+- no cost interpretation
+- no tracker logic
+- no custom domain object graph
 
-### Notes
+### Teaching angle
 
-- Keep it deterministic.
-- Accept an optional namespace filter.
-- Keep the raw snapshot stable so it can be reused by future tools.
+This is where we show that the “collector” is mostly just a prompt-guided loop over tools.
+The learner should not feel like they are building an SDK.
 
 ---
 
-## Step 3: Write the analyst
+## Step 3: Make Agent 2 a pure prompt + schema step
 
-The analyst receives:
+Agent 2 receives:
 
-- the raw JSON snapshot
+- the raw JSON from Agent 1
 - the tagging rules YAML
 
-It returns a structured compliance report.
+It returns:
 
-### Model shape
+- one structured report in JSON
+- one entry per resource
+- compliance verdicts and remediation hints
 
-Use a clean report model, not a Jira model.
+### Keep the output shape minimal
 
-Suggested fields:
+Only keep the fields that help the lesson:
 
-- `kind`
-- `namespace`
-- `name`
-- `is_compliant`
-- `missing_tags`
-- `category`
-- `priority`
-- `reason`
-- `suggested_owner`
-- `suggested_cost_center`
-- `suggested_tags`
+- resource identity
+- compliance flag
+- category
+- missing tags
+- reason
+- suggested owner / cost center
+- suggested tags
 
-### What to avoid here
+### Avoid
 
-Do **not** put `jira_*` fields in the compliance model.
-That mapping belongs to the tracker step.
+- Jira fields in the compliance model
+- extra nested objects
+- long-form “analysis” blobs
+- multiple schema classes for the same idea
 
----
+### Teaching angle
 
-## Step 4: Keep the prompt bounded
-
-Inject the tagging policy as runtime context, but keep the prompt focused.
-
-Recommended pattern:
-
-- system message: role + output rules
-- user message: raw JSON snapshot
-- user message or appended context: tagging policy YAML
-
-This is safer than relying on a huge system prompt and makes the policy easier to swap.
+The learner should see that the LLM is doing the policy application, not the code.
 
 ---
 
-## Step 5: Add tests around the seams
+## Step 4: Make Agent 3 a tiny tracker writer
 
-Test each layer independently:
+Agent 3 should be the smallest piece of the whole demo.
 
-- MCP server tool responses
-- collector JSON assembly
-- analyst schema validation
-- one end-to-end run against kind
+### What it does
 
-### Keep the MCP tests realistic
+- read the structured compliance JSON
+- filter non-compliant items
+- POST one issue per finding to the tracker
 
-Mock the Kubernetes client, not the JSON output.
-That way the server contract stays honest.
+### What it should feel like
+
+Not a separate subsystem.
+Just a final transport step.
+
+### Keep the lesson clear
+
+Agent 3 exists only to prove the output from Agent 2 is already structured enough to become work items.
+No extra transformation layer should be needed.
 
 ---
 
-## Directory Structure
+## Step 5: Keep the prompt bounded
+
+This is the main learning payoff.
+
+The prompt should do the work that classes usually do in heavier designs.
+
+### Prompt pattern
+
+- **System prompt**: role, rules, output discipline
+- **User prompt**: raw JSON snapshot
+- **User prompt**: tagging policy YAML
+- **User prompt**: output schema instructions
+
+### Why this matters
+
+We want the student to notice that the difference between “a lot of code” and “a useful system” is often prompt structure, not architecture.
+
+---
+
+## Step 6: Keep files and code surface small
+
+The section should be teachable in one short walkthrough.
+
+### Suggested file set
 
 ```text
 sections/09-mcp-k8-agent/
@@ -234,52 +261,57 @@ sections/09-mcp-k8-agent/
 ├── config/
 │   └── tagging-rules.yaml
 ├── mcp_server/
-│   ├── __init__.py
-│   ├── server.py
-│   └── k8s_client.py
+│   └── server.py
 ├── agent/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── collector.py
-│   ├── analyser.py
-│   ├── tracker.py
-│   └── models.py
-├── requirements.txt
+│   └── main.py
+└── requirements.txt
 ```
+
+### Optional only if truly needed
+
+- `prompts.py` if it keeps `main.py` shorter
+- `schemas.py` if the output shape becomes hard to read inline
+
+### What to avoid
+
+If the code starts producing `collector.py`, `analyser.py`, `tracker.py`, `models.py`, and helper classes for each, that is a sign the demo has become too heavy.
+
+---
+
+## Step 7: Keep the section docs aligned with the simplicity message
+
+The docs should reinforce the same lesson:
+
+- this is a prompt-first demo
+- MCP is just the tool seam
+- the pipeline is small
+- the LLM is doing the real work
+- the tracker step is only the handoff
+
+The docs should not over-teach implementation details the learner does not need.
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Create `sections/09-mcp-k8-agent/` with `section_goal.md` and `guide.md`
-- [ ] Build `mcp_server/server.py` with the six Kubernetes tools
-- [ ] Keep the MCP server usable on plain kind without metrics-server
-- [ ] Write `agent/collector.py` as a deterministic MCP client
-- [ ] Write `agent/models.py` for the raw snapshot and compliance report
-- [ ] Write `agent/analyser.py` with the tagging-policy prompt
-- [ ] Wire the collector, analyst, and tracker in `agent/main.py`
-- [ ] Add tests for server, collector, analyst, and tracker client
-- [ ] Run an end-to-end validation against the local kind cluster
-
----
-
-## What Changes in Existing Sections
-
-| Section | Change |
-|---|---|
-| 05-llm-agent-langchain | No change |
-| 06-issue-tracker-service | No change |
-| 07-agent-to-tracker-integration | No change |
-| 08-k8-native-agent | No change |
+- [ ] Keep the MCP server thin and tool-focused
+- [ ] Keep Agent 1 as a minimal tool-orchestrated collector
+- [ ] Keep Agent 2 as a prompt-first analyzer with a small output schema
+- [ ] Keep Agent 3 as a tiny tracker POST step
+- [ ] Avoid class-heavy design unless a single tiny schema is unavoidable
+- [ ] Use the root `.env` as the only runtime source of truth
+- [ ] Keep the code surface smaller than Section 05 if possible
+- [ ] Make the section easy to teach in one pass
 
 ---
 
 ## Success Criteria
 
-You should be able to:
+A learner should be able to say:
 
-- query Kubernetes through MCP tools
-- collect a full raw cluster snapshot without `scanner.py`
-- generate a compliance report from the snapshot
-- explain why the collector is deterministic and the analyst is the only LLM step
-- create issue tracker tickets from non-compliant results
+- “MCP gave us tools.”
+- “Prompts did the heavy lifting.”
+- “The code stayed small.”
+- “We still got a compliance report and tracker tickets.”
+
+That is the whole point of the section.
