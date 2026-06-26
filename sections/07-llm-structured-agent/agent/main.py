@@ -1,4 +1,9 @@
-"""Entry point for the MCP-powered K8s FinOps agent."""
+"""Entry point for the Section 07 LLM structured agent.
+
+Consumes a raw cluster snapshot (produced by Section 06) and emits structured
+FinOps findings as a TicketBatch. Analysis-only: no collection, no tracker
+posting (those live in Sections 06 and 09 respectively).
+"""
 
 from __future__ import annotations
 
@@ -6,26 +11,43 @@ import argparse
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 
 import yaml
 from dotenv import load_dotenv
 
 from agent.analyser import analyze_snapshot
-from agent.collector import collect_snapshot_sync
-from agent.tracker import post_tickets
+from agent.models import TicketBatch
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
 ROOT_ENV_PATH = REPO_ROOT / ".env"
 
 
+def _load_snapshot(snapshot_path: str | None) -> dict:
+    """Load the Section 06 snapshot from a file path or stdin."""
+    if snapshot_path:
+        data = json.loads(Path(snapshot_path).read_text())
+    else:
+        logger.info("--snapshot not provided; reading Section 06 snapshot from stdin")
+        data = json.loads(sys.stdin.read())
+    return data
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="MCP-powered K8s FinOps agent")
-    parser.add_argument("--dump-raw", action="store_true", help="Print the raw snapshot JSON before the report")
+    parser = argparse.ArgumentParser(description="Section 07 LLM structured agent")
+    parser.add_argument(
+        "--snapshot",
+        default=os.getenv("SNAPSHOT_PATH"),
+        help="Path to the Section 06 raw snapshot JSON (default: stdin or $SNAPSHOT_PATH)",
+    )
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
     logger = logging.getLogger(__name__)
 
     if ROOT_ENV_PATH.exists():
@@ -36,9 +58,10 @@ def main() -> None:
         logger.error("OPENAI_API_KEY not set in environment or .env file")
         raise SystemExit(1)
 
-    snapshot = collect_snapshot_sync(cluster_name=os.getenv("CLUSTER_NAME", "kind"))
-    if args.dump_raw:
-        print(json.dumps(snapshot, indent=2))
+    # TODO(work-on-first-agent): wire the live 06 -> 07 handoff (collector emits
+    # snapshot to a known path; this agent reads it). For now --snapshot / stdin
+    # is the contract.
+    snapshot = _load_snapshot(args.snapshot)
 
     bundle = analyze_snapshot(
         snapshot=snapshot,
@@ -50,15 +73,8 @@ def main() -> None:
         temperature=float(os.getenv("OPENAI_TEMPERATURE", "0.2")),
     )
 
-    tracker_result = post_tickets(
-        base_url=os.getenv("ISSUE_TRACKER_URL", "http://localhost:8085"),
-        tickets=bundle.tickets,
-        timeout=int(os.getenv("ISSUE_TRACKER_TIMEOUT", "10")),
-    )
-
-    print(json.dumps(bundle.model_dump(), indent=2))
-    print(json.dumps(tracker_result, indent=2))
-    logger.info("MCP FinOps pipeline completed successfully")
+    print(bundle.model_dump_json(indent=2))
+    logger.info("Section 07 analysis completed: %s ticket(s)", len(bundle.tickets))
 
 
 if __name__ == "__main__":

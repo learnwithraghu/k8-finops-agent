@@ -3,10 +3,10 @@
 This is the only file you need for Section 04.
 
 ## Goal
-Build and run a tiny local Python agent that collects raw Kubernetes metadata and dumps it as JSON. This is the bridge between the cluster and the LLM in Section 08.
+Build and run a tiny local Python agent that collects raw Kubernetes metadata and dumps it as JSON. This is the bridge between the cluster and the LLM in Section 07.
 
 ## Tutor note
-Run the commands one by one. After each step, point out what the learner should notice in the output. This section deliberately does **not** decide compliance or draft issues. Those decisions are delegated to the LLM in Section 08.
+Run the commands one by one. After each step, point out what the learner should notice in the output. This section deliberately does **not** decide compliance or draft issues. Those decisions are delegated to the LLM in Section 07.
 
 ## What students will learn
 - how to read Kubernetes metadata from Python
@@ -115,7 +115,7 @@ PYTHONPATH=sections/04-local-python-agent python -m agent.collect --namespace bo
 
 What to look for:
 - the JSON file is much smaller
-- this is useful for focused demos in Section 08
+- this is useful for focused demos in Section 07
 
 ## Step 10: Use `kubectl` to spot the missing labels
 The point of this section is to show that the raw data is messy. Run a few quick checks:
@@ -166,7 +166,7 @@ But the JSON does not say which resource violates which rule. The YAML does not 
 >
 > A better approach: hand the metadata and the policy to something that can reason about both — a Large Language Model.
 
-This is the handoff to Section 08.
+This is the handoff to Section 07.
 
 ## Expected outcome
 You should be able to run the collector and explain:
@@ -176,8 +176,8 @@ You should be able to run the collector and explain:
 - why raw metadata alone is not enough
 - why the next section adds an LLM to interpret this data
 
-## Handoff to Section 08
+## Handoff to Section 07
 Once the collection works, move to:
-- `sections/08-llm-agent-langchain/guide.md`
+- `sections/07-llm-structured-agent/guide.md`
 
-Section 08 takes the JSON you just produced, sends each resource plus the tagging policy to an LLM, and lets the LLM decide compliance and draft the fix.
+Section 07 takes the JSON you just produced, sends each resource plus the tagging policy to an LLM, and lets the LLM decide compliance and draft the fix.

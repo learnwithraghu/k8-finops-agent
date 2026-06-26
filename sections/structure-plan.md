@@ -52,25 +52,18 @@ sections/
 │   ├── requirements.txt
 │   ├── agent/
 │   └── config/
-├── 08-llm-agent-langchain/
-│   ├── section_goal.md
-│   ├── guide.md
-│   ├── agent.md
-│   ├── agent/
-│   ├── config/
-│   └── slides/
-├── 09-issue-tracker-service/
+├── 08-issue-tracker-service/
 │   ├── section_goal.md
 │   ├── guide.md
 │   ├── service/
 │   └── slides/
-├── 10-agent-to-tracker-integration/
+├── 09-agent-to-tracker-integration/
 │   ├── section_goal.md
 │   ├── guide.md
 │   ├── agent.md
 │   ├── agent/
 │   └── config/
-└── 11-k8-native-agent/
+└── 10-k8-native-agent/
     ├── section_goal.md
     ├── guide.md
     ├── agent/
@@ -151,16 +144,7 @@ sections/
   - producing structured findings
   - why analysis is separate from collection
 
-### Section 08: LLM decision flow (LangChain)
-- Keep:
-  - `agent/analyzer.py`
-  - any prompt/config changes
-- Output should teach:
-  - prompt design
-  - structured decision output
-  - better report clarity
-
-### Section 09: Issue tracker service
+### Section 08: Issue tracker service
 - Future content:
   - Dockerized FastAPI service
   - `/raise-issue` endpoint
@@ -169,19 +153,21 @@ sections/
   - payload contract
   - issue lifecycle basics
 
-### Section 10: Agent to tracker integration
+### Section 09: Agent to tracker integration
 - Keep:
   - `agent/tracker.py` (moved from the previous advanced pipeline)
   - `agent/main.py` integration orchestrator
   - metadata mapping logic
+- Note: this section's agent is being retargeted to consume Section 07's `TicketBatch` structured findings. The legacy scanner-based code currently present is transitional; the agent rewrite happens in the follow-up "work on 1st agent" session.
 - Output should teach:
   - K8 metadata collection → LLM → issue translation
   - create issue end-to-end
 
-### Section 11: Kubernetes-native agent (Helm)
+### Section 10: Kubernetes-native agent (Helm)
 - Keep:
   - Dockerfile/build logic
   - Helm chart for deployment/cronjob
+- Note: in-cluster MCP architecture (deploying Section 05's MCP server inside the cluster) is follow-up work; for now the chart packages the agent code as-is.
 - Output should teach:
   - containerization
   - deployment in a dedicated namespace

@@ -58,26 +58,21 @@ Flow legend: Video -> Video -> Video -> Demo -> Quiz
 | 07 LLM Structured Agent | 3 | Video | Schemas that keep LLM output auditable | 3 to 4 min |
 | 07 LLM Structured Agent | 4 | Demo | Feed Section 06 snapshot + rules to the LLM and read structured findings | 7 to 8 min |
 | 07 LLM Structured Agent | 5 | Quiz | Why separate collection (06) from analysis (07)? How do tagging rules constrain the LLM? Which field ties a finding to a rule? | 2 to 3 min |
-| 08 LLM Agent (LangChain) | 1 | Video | Where LLM helps in FinOps reasoning | 3 to 4 min |
-| 08 LLM Agent (LangChain) | 2 | Video | Prompt design for deterministic recommendations | 3 to 4 min |
-| 08 LLM Agent (LangChain) | 3 | Video | Safety boundaries and fallback logic | 3 to 4 min |
-| 08 LLM Agent (LangChain) | 4 | Demo | Compare static rules vs LLM-assisted findings | 7 to 8 min |
-| 08 LLM Agent (LangChain) | 5 | Quiz | Which decisions should remain rule-only? How do you reduce hallucination risk? What is a good fallback when model output is uncertain? | 2 to 3 min |
-| 09 Issue Tracker Service | 1 | Video | Why findings must become trackable work | 3 to 4 min |
-| 09 Issue Tracker Service | 2 | Video | Minimal API design for issue lifecycle | 3 to 4 min |
-| 09 Issue Tracker Service | 3 | Video | Data model and severity conventions | 3 to 4 min |
-| 09 Issue Tracker Service | 4 | Demo | Stand up tracker service and create issues from findings | 7 to 8 min |
-| 09 Issue Tracker Service | 5 | Quiz | What fields are mandatory in a FinOps issue? Why severity normalization matters? What closes the loop from alert to action? | 2 to 3 min |
-| 10 Agent to Tracker Integration | 1 | Video | Integration contract: payload and idempotency | 3 to 4 min |
-| 10 Agent to Tracker Integration | 2 | Video | De-dup and retry strategies | 3 to 4 min |
-| 10 Agent to Tracker Integration | 3 | Video | Traceability from scan to ticket | 3 to 4 min |
-| 10 Agent to Tracker Integration | 4 | Demo | Auto-create and update tracker tickets from agent output | 7 to 8 min |
-| 10 Agent to Tracker Integration | 5 | Quiz | Why idempotency is critical? How to avoid duplicate issue spam? Which correlation key should be stable? | 2 to 3 min |
-| 11 Kubernetes-Native Agent | 1 | Video | Containerizing the agent runtime | 3 to 4 min |
-| 11 Kubernetes-Native Agent | 2 | Video | Helm chart patterns for scheduled scans | 3 to 4 min |
-| 11 Kubernetes-Native Agent | 3 | Video | Config and secret handling in-cluster | 3 to 4 min |
-| 11 Kubernetes-Native Agent | 4 | Demo | Deploy agent via Helm and validate periodic scans | 7 to 8 min |
-| 11 Kubernetes-Native Agent | 5 | Quiz | Why Helm over raw manifests here? What should be ConfigMap vs Secret? Which signals confirm schedule reliability? | 2 to 3 min |
+| 08 Issue Tracker Service | 1 | Video | Why findings must become trackable work | 3 to 4 min |
+| 08 Issue Tracker Service | 2 | Video | Minimal API design for issue lifecycle | 3 to 4 min |
+| 08 Issue Tracker Service | 3 | Video | Data model and severity conventions | 3 to 4 min |
+| 08 Issue Tracker Service | 4 | Demo | Stand up tracker service and create issues from findings | 7 to 8 min |
+| 08 Issue Tracker Service | 5 | Quiz | What fields are mandatory in a FinOps issue? Why severity normalization matters? What closes the loop from alert to action? | 2 to 3 min |
+| 09 Agent to Tracker Integration | 1 | Video | Integration contract: payload and idempotency | 3 to 4 min |
+| 09 Agent to Tracker Integration | 2 | Video | De-dup and retry strategies | 3 to 4 min |
+| 09 Agent to Tracker Integration | 3 | Video | Traceability from scan to ticket | 3 to 4 min |
+| 09 Agent to Tracker Integration | 4 | Demo | Auto-create and update tracker tickets from structured findings | 7 to 8 min |
+| 09 Agent to Tracker Integration | 5 | Quiz | Why idempotency is critical? How to avoid duplicate issue spam? Which correlation key should be stable? | 2 to 3 min |
+| 10 Kubernetes-Native Agent | 1 | Video | Containerizing the agent runtime | 3 to 4 min |
+| 10 Kubernetes-Native Agent | 2 | Video | Helm chart patterns for scheduled scans | 3 to 4 min |
+| 10 Kubernetes-Native Agent | 3 | Video | Config and secret handling in-cluster | 3 to 4 min |
+| 10 Kubernetes-Native Agent | 4 | Demo | Deploy agent via Helm and validate periodic scans | 7 to 8 min |
+| 10 Kubernetes-Native Agent | 5 | Quiz | Why Helm over raw manifests here? What should be ConfigMap vs Secret? Which signals confirm schedule reliability? | 2 to 3 min |
 
 ## Practical delivery pattern per section
 

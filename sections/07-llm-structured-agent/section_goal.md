@@ -12,7 +12,7 @@ Take the **unstructured** cluster snapshot produced by Section 06, add the `tagg
 
 ## Out of scope
 - Collecting cluster data directly (Section 06)
-- Posting findings to the issue tracker (Section 10)
+- Posting findings to the issue tracker (Section 09)
 - Building or recreating the MCP server (Section 05)
 - Multi-cluster scale or metrics-server cost telemetry
 

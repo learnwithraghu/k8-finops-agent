@@ -4,17 +4,21 @@
 This document captures the original authoring-first design and is preserved as history. Section numbers below refer to the **old** numbering. For the current numbering see `sections/README.md` and `sections/structure-plan.md`.
 
 Reorg note (applies to this historical doc only):
-- old Section 05 LLM LangChain  → now Section 08
-- old Section 06 Issue Tracker  → now Section 09
-- old Section 07 Integration      → now Section 10
-- old Section 08 K8s-Native       → now Section 11
+- old Section 05 LLM LangChain  → retired
+- old Section 06 Issue Tracker  → now Section 08
+- old Section 07 Integration      → now Section 09
+- old Section 08 K8s-Native       → now Section 10
 - old Section 09 MCP Setup        → now Section 05
-- old Section 10 Advanced MCP     → decommissioned; code split into new Section 06 (collector) and Section 07 (analyser/models/main + tagging rules), tracker.py moved to Section 10
+- old Section 10 Advanced MCP     → decommissioned; code split into new Section 06 (collector) and Section 07 (analyser/models/main + tagging rules), tracker.py moved to Section 09
+- langchain-only agent track retired — the MCP-agent track (05 → 06 → 07) now covers structured findings, and Section 09 consumes Section 07's `TicketBatch` to create tracker tickets
 
 Current curriculum split:
 - Section 05: curl-validated prebuilt MCP setup
 - Section 06: first MCP data agent (prompt → MCP → unstructured data)
 - Section 07: LLM structured agent (snapshot + tagging rules → structured findings)
+- Section 08: issue tracker service
+- Section 09: agent to tracker integration (consumes Section 07's TicketBatch)
+- Section 10: Kubernetes-native agent (Helm)
 
 ## Why This Section Exists
 

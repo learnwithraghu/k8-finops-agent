@@ -13,7 +13,7 @@ Build the first agent that takes a prompt, calls MCP tools against the local kin
 ## Out of scope
 - LLM analysis and structured findings (Section 07)
 - Tagging rules / compliance evaluation (Section 07)
-- Posting to the issue tracker (Section 10)
+- Posting to the issue tracker (Section 09)
 - Writing or customizing the MCP server itself (Section 05)
 
 ## Success criteria
