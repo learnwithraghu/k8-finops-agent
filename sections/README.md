@@ -11,21 +11,26 @@ This directory is the curriculum skeleton for the repo.
 ## Current repo mapping
 - `sections/01-cluster-foundation/commands/setup.sh` → Section 01
 - `sections/02-airline-app-deployment/manifests/airline-k8-deployment/` → Sections 02, 03
-- `sections/04-local-python-agent/agent/` → Sections 04, 05, 07
-- `sections/04-local-python-agent/config/` → Sections 04, 05, 07
-- Future issue tracker service → Section 06
-- Future Kubernetes-native deployment/cronjob → Section 08
-- `sections/09-mcp-k8-agent/` → Section 09 (prebuilt MCP setup and validation)
-- `sections/10-advanced-mcp-finops/` → Section 10 (advanced MCP pipeline)
+- `sections/04-local-python-agent/agent/` → Section 04
+- `sections/04-local-python-agent/config/` → Section 04
+- `sections/05-mcp-k8-agent/` → Section 05 (prebuilt MCP setup and curl validation)
+- `sections/06-mcp-data-agent/agent/` → Section 06 (prompt → MCP → unstructured data)
+- `sections/07-llm-structured-agent/agent/` and `config/` → Section 07 (snapshot + tagging rules → structured findings)
+- `sections/08-llm-agent-langchain/agent/` and `config/` → Section 08
+- `sections/09-issue-tracker-service/service/` → Section 09
+- `sections/10-agent-to-tracker-integration/agent/` → Section 10
+- `sections/11-k8-native-agent/` (docker, helm) → Section 11
 
 ## Section index
 1. Cluster setup and namespaces
 2. Deploy airline services and kubectl basics
+2a. Payment gateway down — incident triage
 3. FinOps problems: tagging, orphaned resources, ownership gaps
 4. Local Python agent: scan + report
-5. LLM decision flow (LangChain)
-6. Issue tracker service
-7. Agent to tracker integration
-8. Kubernetes deployment and scheduled runs
-9. Prebuilt MCP setup for local cluster access
-10. Advanced MCP FinOps pipeline
+5. Prebuilt MCP setup and curl validation
+6. First MCP data agent: prompt → MCP → unstructured data
+7. LLM structured agent: snapshot + tagging rules → structured findings
+8. LLM decision flow (LangChain)
+9. Issue tracker service
+10. Agent to tracker integration
+11. Kubernetes-native agent (Helm)

@@ -264,7 +264,7 @@ docker run --rm \
 kind load docker-image k8-finops-agent:latest --name finops-cluster
 
 # Deploy the agent job
-kubectl apply -f sections/08-k8-native-agent/cronjob/agent-job.yaml
+kubectl apply -f sections/11-k8-native-agent/cronjob/agent-job.yaml
 
 # Check job logs
 kubectl logs -l job-name=finops-agent-scan

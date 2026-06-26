@@ -1,0 +1,52 @@
+✅ K8s FinOps Agent has been deployed successfully!
+
+🔍 Deployment Details:
+   Namespace: {{ .Values.namespace.name }}
+   Schedule:  {{ .Values.schedule }}
+   Image:     {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+📋 Next Steps:
+
+1. Verify the CronJob is scheduled:
+   
+   kubectl get cronjob -n {{ .Values.namespace.name }}
+
+2. Run the test to validate the deployment:
+   
+   helm test {{ .Release.Name }}
+
+3. View the test results:
+   
+   kubectl logs -n {{ .Values.namespace.name }} {{ include "k8-finops-agent.fullname" . }}-test
+
+4. Trigger a manual run (optional):
+   
+   kubectl create job --from=cronjob/{{ include "k8-finops-agent.fullname" . }} \
+     manual-run-$(date +%s) -n {{ .Values.namespace.name }}
+
+5. Monitor upcoming scheduled runs:
+   
+   kubectl get cronjob -n {{ .Values.namespace.name }} -w
+
+6. View logs from a completed job:
+   
+   kubectl logs -n {{ .Values.namespace.name }} -l app.kubernetes.io/name={{ include "k8-finops-agent.name" . }} --tail=100
+
+⚠️  Important Reminders:
+
+   • The OpenAI API key secret must exist: {{ .Values.secretName }}
+   • If the secret is missing, jobs will fail with authentication errors
+   • To create the secret:
+     
+     kubectl create secret generic {{ .Values.secretName }} \
+       --namespace {{ .Values.namespace.name }} \
+       --from-literal=OPENAI_API_KEY="your-api-key-here"
+
+📚 Configuration:
+
+   • Customize tagging rules in values.yaml under 'taggingRules'
+   • Adjust schedule with: --set schedule="*/30 * * * *"
+   • Scan specific namespace: --set targetNamespace="booking-api"
+   • Upgrade with: helm upgrade {{ .Release.Name }} ./helm
+
+🔗 Documentation: See sections/11-k8-native-agent/guide.md
