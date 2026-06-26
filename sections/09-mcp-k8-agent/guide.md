@@ -64,69 +64,51 @@ test -f "$KUBECONFIG_FILE" && echo "Using $KUBECONFIG_FILE"
 Expected:
 - kubeconfig file path resolves correctly
 
-## Step 3: Install collector dependencies
+## Step 3: Install Section 09 dependencies
 Run:
 
 ```bash
-python3 -m pip install -r sections/10-advanced-mcp-finops/requirements.txt
+python3 -m pip install -r sections/09-mcp-k8-agent/requirements.txt
 ```
 
 Expected:
-- Python MCP client dependencies are installed
+- only Section 09 MCP + LLM dependencies are installed
 
-## Step 4: Verify MCP by querying through the Docker image
+## Step 4: Super simple MCP prompt -> result flow
 Set MCP runtime variables in the same shell:
 
 ```bash
 export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
 export MCP_SERVER_COMMAND=docker
-export MCP_SERVER_ARGS="run --rm -i --user 0:0 -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig mcp/kubernetes:latest"
+export MCP_SERVER_ARGS="run --rm -i --network host --user 0:0 -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig mcp/kubernetes:latest"
 ```
 
-Then run a quick collector check that uses Docker as the MCP server process:
+Make sure root `.env` contains your OpenAI-compatible settings (`OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL_ID`).
+
+Then run one tiny script that:
+- asks MCP for namespaces
+- sends your prompt + MCP context to the LLM
+- prints the result
 
 ```bash
-python3 - <<'PY'
-from pathlib import Path
-import sys
-
-sys.path.insert(0, str(Path("sections/10-advanced-mcp-finops").resolve()))
-from agent.collector import collect_snapshot_sync
-
-snapshot = collect_snapshot_sync(cluster_name="kind")
-print("namespaces:", len(snapshot.get("namespaces", [])))
-print("resources:", len(snapshot.get("resources", [])))
-print("sample_namespaces:", snapshot.get("namespaces", [])[:5])
-PY
+python3 sections/09-mcp-k8-agent/simple_mcp_prompt.py "What does MCP see in this cluster, and is payment namespace present?"
 ```
 
 Expected:
-- command completes successfully
-- non-zero namespace/resource counts are returned
+- script completes successfully
+- you see MCP namespace data printed
+- you see an LLM response based on MCP data
 
 ## Step 5: Run read-only MCP queries
-Inspect a small portion of raw MCP-collected data:
+Try a second prompt:
 
 ```bash
-python3 - <<'PY'
-from pathlib import Path
-import json
-import sys
-
-sys.path.insert(0, str(Path("sections/10-advanced-mcp-finops").resolve()))
-from agent.collector import collect_snapshot_sync
-
-snapshot = collect_snapshot_sync(cluster_name="kind")
-print(json.dumps({
-    "namespaces": snapshot.get("namespaces", [])[:5],
-    "resources_sample": snapshot.get("resources", [])[:5],
-}, indent=2))
-PY
+python3 sections/09-mcp-k8-agent/simple_mcp_prompt.py "Give me a short health summary from namespace data only."
 ```
 
 Expected:
-- responses are structured and parseable
-- returned namespace/workload data matches `kubectl` spot checks
+- MCP query succeeds again
+- LLM output changes according to your prompt
 
 ## Step 6: Discuss FinOps relevance
 Use returned metadata to explain:
@@ -147,6 +129,7 @@ docker image rm mcp/kubernetes:latest
 ## Troubleshooting
 - If no cluster data appears, verify kubeconfig mount and context.
 - If collector checks fail with kubeconfig permission issues, keep `--user 0:0` in `MCP_SERVER_ARGS`.
+- In Codespaces/local container networking, use `--network host` in `MCP_SERVER_ARGS` so MCP can reach the Kubernetes API endpoint from kubeconfig.
 - If collector checks fail with missing file, verify `KUBECONFIG_FILE` points to a real kubeconfig.
 - If permissions fail, ensure the kubeconfig user has namespace read permissions.
 

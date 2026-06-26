@@ -17,7 +17,7 @@ ASSUME_YES=false
 
 # Resolve repo root regardless of where the script is called from
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 log()     { echo -e "\033[1;34m[setup]\033[0m $*"; }
