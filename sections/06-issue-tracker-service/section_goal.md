@@ -1,12 +1,12 @@
 # Section 06 Goal: Issue Tracker Service
 
 ## Goal
-Build a simple Jira-style Kanban board with FastAPI so FinOps findings can be created programmatically, opened, assigned, and moved.
+Build a lightweight Jira-style tracker with FastAPI that later FinOps agent sections can use to create, open, assign, and move findings as tickets.
 
 ## Scope
-- Build and run the tracker container locally
+- Run the tracker container locally
 - Serve a simple Kanban board UI
-- Expose `/create-issue` as the main creation endpoint
+- Expose `/create-issue` as the main ticket-creation endpoint
 - Expose `/issue/{id}` to open a ticket
 - Allow assignment and status movement
 - Show the API response and docs
@@ -17,4 +17,4 @@ Build a simple Jira-style Kanban board with FastAPI so FinOps findings can be cr
 - Kubernetes-native deployment
 
 ## Success criteria
-The learner can create a ticket through `/issue`, open it in the UI, assign it, and move it across the board.
+The learner can create a ticket through `/create-issue`, open it in the UI, assign it, and move it across the board.

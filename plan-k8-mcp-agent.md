@@ -4,7 +4,7 @@
 
 Section 05 proved the first big lesson: a few prompts can do a lot more than a pile of hand-written logic.
 
-Section 09 should make that idea even clearer.
+Section 09 should make the handoff even clearer: MCP reads cluster data, prompts do the reasoning, and the Section 06 tracker service receives the final tickets.
 
 The point of this section is **not** to teach a bigger codebase.
 The point is to show a learner that:
@@ -50,7 +50,7 @@ Build a **three-step pipeline** with minimal code:
 
 3. **Agent 3 — Tracker writer**
    - receives the structured compliance JSON
-   - POSTs only the violations to the issue tracker
+   - POSTs only the violations to the Section 06 issue tracker service (`POST /create-issue`)
 
 **Important:** avoid creating a new class hierarchy for each step.
 The whole lesson is that prompts + a little glue are enough.
@@ -210,6 +210,7 @@ The learner should see that the LLM is doing the policy application, not the cod
 ## Step 4: Make Agent 3 a tiny tracker writer
 
 Agent 3 should be the smallest piece of the whole demo.
+It should treat the Section 06 tracker as the final ticket sink, not another subsystem.
 
 ### What it does
 
@@ -282,11 +283,13 @@ If the code starts producing `collector.py`, `analyser.py`, `tracker.py`, `model
 
 The docs should reinforce the same lesson:
 
+- Section 06 provides the ticket sink
+
 - this is a prompt-first demo
 - MCP is just the tool seam
 - the pipeline is small
 - the LLM is doing the real work
-- the tracker step is only the handoff
+- the tracker step is only the handoff into Section 06
 
 The docs should not over-teach implementation details the learner does not need.
 

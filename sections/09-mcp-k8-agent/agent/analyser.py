@@ -1,78 +1,41 @@
-"""LLM compliance analysis for raw MCP cluster snapshots."""
+"""LLM analysis for raw MCP cluster snapshots."""
 
 from __future__ import annotations
 
 import json
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import yaml
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-from pydantic import BaseModel
-
-from agent.models import ClusterSnapshot, ComplianceReport, ResourceAssessment
+from agent.models import TicketBatch
 
 logger = logging.getLogger(__name__)
 
+SYSTEM_PROMPT = """You are a FinOps assistant for a Kubernetes-based airline platform.
 
-class AssessmentBundle(BaseModel):
-    """Top-level parser model for the LLM output."""
+Read the cluster snapshot and tagging policy.
+Return only JSON matching this schema:
+{"tickets": [{"title": "...", "summary": "...", "body": "...", "namespace": "...", "resource_name": "...", "resource_kind": "...", "category": "...", "priority": "high", "cost_impact": 0.0, "assignee": "...", "suggested_owner": "...", "suggested_cost_center": "...", "labels": ["..."], "reasoning": "...", "source": "mcp-llm-agent"}]}
 
-    assessments: List[ResourceAssessment]
-
-
-SYSTEM_PROMPT = """You are a FinOps compliance analyser for a Kubernetes-based airline platform.
-
-Your job is to inspect a raw cluster snapshot, apply the tagging policy carefully, and return one assessment per resource.
-
-Do not create Jira fields or suggest tracker workflow steps.
-Return only structured JSON that matches the parser schema.
-"""
-
-USER_PROMPT = """Cluster snapshot:
-{cluster_snapshot}
-
-Tagging policy:
-{tagging_rules}
-
-{format_instructions}
-
-Rules:
-- Match labels against required_tags and label_mappings.
-- If a resource is an orphaned PVC, it is never compliant.
-- If a resource is missing cost-center, category must be "unallocated".
-- If a resource has cost-center but no owner, category must be "unowned".
-- If a resource has no labels and lives in the default namespace, category must be "unknown".
-- If all required tags are present, category must be "tagged" and is_compliant must be true.
-- Keep reason concise, specific, and actionable.
-- Use concrete values for suggested_owner, suggested_cost_center, and suggested_tags.
+Create ticket objects only for resources that need action.
+Each ticket must be ready to POST to /create-issue with no extra transformation.
 """
 
 
 def analyze_snapshot(
-    snapshot: ClusterSnapshot,
+    snapshot: Dict[str, Any],
     tagging_rules: Dict[str, Any],
     model_id: str,
     base_url: str | None = None,
     api_key: str | None = None,
     max_tokens: int = 2048,
     temperature: float = 0.2,
-) -> ComplianceReport:
-    """Send the full snapshot and policy to the LLM and return a structured report."""
+) -> TicketBatch:
+    logger.info("Sending %s resources to the LLM analyst", len(snapshot.get("resources", [])))
 
-    logger.info("Sending %s resources to the LLM analyst", len(snapshot.resources))
-
-    parser = PydanticOutputParser(pydantic_object=AssessmentBundle)
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", SYSTEM_PROMPT),
-            ("human", USER_PROMPT),
-        ]
-    )
     llm = ChatOpenAI(
         model=model_id,
         base_url=base_url or os.getenv("OPENAI_BASE_URL", "https://api.ai.kodekloud.com/v1"),
@@ -80,29 +43,25 @@ def analyze_snapshot(
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    chain = prompt | llm | parser
-
-    response = chain.invoke(
-        {
-            "cluster_snapshot": json.dumps(snapshot.model_dump(), indent=2),
-            "tagging_rules": yaml.safe_dump(tagging_rules, sort_keys=False),
-            "format_instructions": parser.get_format_instructions(),
-        }
+    prompt = (
+        f"Cluster snapshot:\n{json.dumps(snapshot, indent=2)}\n\n"
+        f"Tagging policy:\n{yaml.safe_dump(tagging_rules, sort_keys=False)}\n\n"
+        "Rules:\n"
+        "- Match labels against required_tags and label_mappings.\n"
+        "- If a resource is an orphaned PVC, create a ticket.\n"
+        "- If a resource is missing cost-center, create a ticket.\n"
+        "- If a resource has cost-center but no owner, create a ticket.\n"
+        "- If a resource has no labels and lives in the default namespace, create a ticket.\n"
+        "- If all required tags are present, do not create a ticket.\n"
+        "- Keep summary and reasoning short.\n"
+        "- Fill in suggested_owner, suggested_cost_center, and suggested_tags with concrete values.\n"
+        "- Make labels useful for triage.\n"
     )
+    response = llm.invoke([("system", SYSTEM_PROMPT), ("human", prompt)])
 
-    assessments_raw = response.assessments if hasattr(response, "assessments") else response["assessments"]
-    assessments = [
-        item if isinstance(item, ResourceAssessment) else ResourceAssessment.model_validate(item)
-        for item in assessments_raw
-    ]
-    compliant_count = sum(1 for item in assessments if item.is_compliant)
-    violation_count = len(assessments) - compliant_count
-
-    return ComplianceReport(
-        scanned_at=snapshot.scanned_at,
-        cluster=snapshot.cluster,
-        total_resources=len(snapshot.resources),
-        compliant_count=compliant_count,
-        violation_count=violation_count,
-        assessments=assessments,
-    )
+    content = str(response.content if hasattr(response, "content") else response).strip()
+    if content.startswith("```"):
+        content = content.strip("`").strip()
+        if content.startswith("json"):
+            content = content[4:].strip()
+    return TicketBatch.model_validate_json(content)

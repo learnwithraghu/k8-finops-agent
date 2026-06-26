@@ -13,10 +13,11 @@ Keep the distinction clear:
 
 ## What students will learn
 - how MCP exposes Kubernetes operations as reusable tools
-- how a deterministic collector can talk to an MCP server over stdio
+- how a simple collector function can talk to an MCP server over stdio
 - how the raw cluster snapshot is assembled
 - how the LLM analyst applies tagging rules to the snapshot
-- how a tracker writer turns violations into tickets
+- how the LLM can draft tracker-ready tickets directly
+- how a tiny tracker function just POSTs those tickets
 
 ## What you need before starting
 Complete Sections 01 through 08 first.
@@ -64,29 +65,29 @@ What to look for:
 - the thin Kubernetes client wrapper
 - no dependency on `kubectl` subprocess calls
 
-## Step 3: Inspect the deterministic collector
+## Step 3: Inspect the collector function
 Open:
 ```bash
 cat sections/09-mcp-k8-agent/agent/collector.py
 ```
 
 What to look for:
-- the collector launches or connects to the MCP server over stdio
+- a single function that connects to the MCP server over stdio
 - it calls `list_namespaces` first
 - it iterates namespaces and gathers raw resource data
 - it does not score or judge resources
 
-## Step 4: Inspect the raw snapshot models
+## Step 4: Inspect the tiny models
 Open:
 ```bash
 cat sections/09-mcp-k8-agent/agent/models.py
 ```
 
 What to look for:
-- a cluster snapshot model
-- a resource snapshot model
-- a compliance report model
-- the envelope that carries the report to the tracker step
+- the ticket model matches `/create-issue`
+- the batch model only wraps the LLM output
+- no compliance report layer
+- no envelope object between the analyst and tracker
 
 ## Step 5: Inspect the analyst
 Open:
@@ -97,8 +98,8 @@ cat sections/09-mcp-k8-agent/agent/analyser.py
 What to look for:
 - the full tagging policy is injected at runtime
 - the snapshot is sent as JSON
-- the LLM returns structured assessments
-- counts are computed in code, not guessed by the model
+- the LLM returns tracker-ready ticket drafts directly
+- the code does not compute a separate compliance report
 
 ## Step 6: Inspect the orchestrator
 Open:
@@ -110,7 +111,8 @@ What to look for:
 - the collector runs first
 - the analyst runs second
 - the tracker runs third
-- the pipeline is wired with LangChain `|`
+- the code reads like a straight script, not a framework demo
+- the LLM already produced the final ticket payloads
 
 ## Step 7: Run the agent locally
 ```bash
