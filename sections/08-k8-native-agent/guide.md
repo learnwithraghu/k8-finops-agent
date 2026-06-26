@@ -764,7 +764,9 @@ kubectl describe cronjob k8-finops-agent -n finops-agent | grep -A 10 Volumes
 
 ## Handoff to Section 09
 
-Section 09 is a standalone MCP-powered cluster access reference. It sits outside the main Helm flow and shows how to replace the hand-written scanner with tools + a deterministic collector.
+Section 09 is now setup-only for prebuilt MCP access to the local cluster. It sits outside the main Helm flow and focuses on connecting to an existing Kubernetes MCP server, validating read-only tools, and cleaning up.
+
+If you want the full custom collector + analyst + tracker implementation track, continue to Section 10.
 
 If you want to extend the Helm deployment next, typical follow-ups are:
 - Integrating with the issue tracker service from Section 06/07

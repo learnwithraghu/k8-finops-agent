@@ -1,6 +1,6 @@
 # Teaching Flow Restructure Plan
 
-This document maps the current repository into the 9 teaching sections.
+This document maps the current repository into the teaching sections.
 
 ## Guiding rule
 Each section should be self-contained for learning, but later sections may refer back to earlier artifacts instead of duplicating them.
@@ -46,10 +46,12 @@ sections/
 │   ├── docker/
 │   ├── manifests/
 │   └── cronjob/
-└── 09-mcp-k8-agent/
+├── 09-mcp-k8-agent/
+│   ├── section_goal.md
+│   └── guide.md
+└── 10-advanced-mcp-finops/
     ├── section_goal.md
     ├── guide.md
-    ├── mcp_server/
     ├── agent/
     └── config/
 ```
@@ -131,15 +133,23 @@ sections/
   - deployment in a dedicated namespace
   - scheduled execution
 
-### Section 09: MCP-powered K8s cluster access
+### Section 09: Prebuilt MCP setup for local cluster access
 - Keep:
-  - `mcp_server/`
+  - `guide.md`
+  - `section_goal.md`
+- Output should teach:
+  - prebuilt MCP server startup
+  - kubeconfig wiring and connectivity verification
+  - read-only tool invocation against the local cluster
+  - cleanup after demo run
+
+### Section 10: Advanced MCP FinOps pipeline
+- Keep:
   - `agent/`
   - `config/tagging-rules.yaml`
 - Output should teach:
-  - tool-based cluster access
-  - deterministic collection
-  - compliance analysis as a separate LLM step
+  - advanced analysis orchestration beyond setup-only MCP usage
+  - deterministic collection and structured analysis handoff
   - tracker writing from structured compliance output
 
 ## File placement rules

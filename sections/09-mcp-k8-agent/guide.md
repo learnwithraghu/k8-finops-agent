@@ -1,139 +1,157 @@
-# Section 09 Guide: MCP-Powered K8s FinOps Agent
+# Section 09 Guide: MCP Setup for Local Cluster (Docker Hub OSS Image)
 
-This is the only file you need for Section 09.
+This section is setup-only. You do not write custom MCP code here.
 
 ## Goal
-Use MCP tools to collect Kubernetes data, then send the raw snapshot through an LLM analyst and a tracker writer so actionable findings become Jira-style tickets.
+Use an open-source Kubernetes MCP server image from Docker Hub, connect it to your local cluster, validate read-only tool calls, and establish a clean MCP baseline for later sections.
 
 ## Tutor note
-Keep the distinction clear:
-- the collector just gathers data
-- the analyst applies the policy
-- the tracker writer turns violations into tickets
+Keep this section practical and short:
+- no MCP tool authoring
+- no custom Python server implementation
+- only setup, verify, query, and clean up
 
 ## What students will learn
-- how MCP exposes Kubernetes operations as reusable tools
-- how a simple collector function can talk to an MCP server over stdio
-- how the raw cluster snapshot is assembled
-- how the LLM analyst applies tagging rules to the snapshot
-- how the LLM can draft tracker-ready tickets directly
-- how a tiny tracker function just POSTs those tickets
+- how to run an OSS MCP image from Docker Hub
+- how to wire kubeconfig for MCP server access
+- how to verify MCP tool availability and connectivity
+- how to run read-only queries for namespaces and workloads
+- how to clean up the demo environment after the run
 
 ## What you need before starting
 Complete Sections 01 through 08 first.
 
 You should already have:
-- a working Kind cluster
+- a working local cluster (Kind)
 - the airline app deployed
-- the Section 08 agent code available
-- a root `.env` file with the OpenAI-compatible API key and tracker URL
+- Docker running locally
+- a valid kubeconfig on the host
 
-## Where the code lives
-- `sections/09-mcp-k8-agent/mcp_server/`
-- `sections/09-mcp-k8-agent/agent/`
-- `sections/09-mcp-k8-agent/config/tagging-rules.yaml`
+## MCP image used in this section
+Use this Docker Hub image:
+- `mcp/kubernetes:latest`
 
-The root `.env` file is the source of truth for runtime settings.
+This image starts an MCP server over stdio and supports Kubernetes read operations.
 
-## Step 0: Make sure the issue tracker is running
-The pipeline posts actionable findings to the Section 06 tracker service.
-
-What to check:
-- the `finops-issue-tracker` container is running
-- `ISSUE_TRACKER_URL` in the root `.env` points to it
-
-## Step 1: Read the section goal
-Open:
+## Step 0: Validate local cluster access
+Run:
 ```bash
-cat sections/09-mcp-k8-agent/section_goal.md
+kubectl config current-context
+kubectl get ns
 ```
 
-What to look for:
-- the collector/analyst/tracker split
-- how actionable findings move into the tracker
+Expected:
+- current context points to your local cluster
+- non-system namespaces for your lab are visible
 
-## Step 2: Inspect the MCP server
-Open:
+## Step 1: Pull the OSS MCP image
+Run:
 ```bash
-cat sections/09-mcp-k8-agent/mcp_server/server.py
-cat sections/09-mcp-k8-agent/mcp_server/k8s_client.py
+docker pull mcp/kubernetes:latest
 ```
 
-What to look for:
-- the six Kubernetes tools
-- namespace filtering
-- the thin Kubernetes client wrapper
-- no dependency on `kubectl` subprocess calls
+Expected:
+- image pulls successfully
 
-## Step 3: Inspect the collector function
-Open:
+## Step 2: Pick the kubeconfig file to mount
+Use this to derive the kubeconfig path:
+
 ```bash
-cat sections/09-mcp-k8-agent/agent/collector.py
+export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
+test -f "$KUBECONFIG_FILE" && echo "Using $KUBECONFIG_FILE"
 ```
 
-What to look for:
-- a single function that connects to the MCP server over stdio
-- it calls `list_namespaces` first
-- it iterates namespaces and gathers raw resource data
-- it does not score or judge resources
+Expected:
+- kubeconfig file path resolves correctly
 
-## Step 4: Inspect the tiny models
-Open:
+## Step 3: Install collector dependencies
+Run:
+
 ```bash
-cat sections/09-mcp-k8-agent/agent/models.py
+python3 -m pip install -r sections/10-advanced-mcp-finops/requirements.txt
 ```
 
-What to look for:
-- the ticket model matches `/create-issue`
-- the batch model only wraps the LLM output
-- no compliance report layer
-- no envelope object between the analyst and tracker
+Expected:
+- Python MCP client dependencies are installed
 
-## Step 5: Inspect the analyst
-Open:
+## Step 4: Verify MCP by querying through the Docker image
+Set MCP runtime variables in the same shell:
+
 ```bash
-cat sections/09-mcp-k8-agent/agent/analyser.py
+export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
+export MCP_SERVER_COMMAND=docker
+export MCP_SERVER_ARGS="run --rm -i --user 0:0 -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig mcp/kubernetes:latest"
 ```
 
-What to look for:
-- the full tagging policy is injected at runtime
-- the snapshot is sent as JSON
-- the LLM returns tracker-ready ticket drafts directly
-- the code does not compute a separate compliance report
+Then run a quick collector check that uses Docker as the MCP server process:
 
-## Step 6: Inspect the orchestrator
-Open:
 ```bash
-cat sections/09-mcp-k8-agent/agent/main.py
+python3 - <<'PY'
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path("sections/10-advanced-mcp-finops").resolve()))
+from agent.collector import collect_snapshot_sync
+
+snapshot = collect_snapshot_sync(cluster_name="kind")
+print("namespaces:", len(snapshot.get("namespaces", [])))
+print("resources:", len(snapshot.get("resources", [])))
+print("sample_namespaces:", snapshot.get("namespaces", [])[:5])
+PY
 ```
 
-What to look for:
-- the collector runs first
-- the analyst runs second
-- the tracker runs third
-- the code reads like a straight script, not a framework demo
-- the LLM already produced the final ticket payloads
+Expected:
+- command completes successfully
+- non-zero namespace/resource counts are returned
 
-## Step 7: Run the agent locally
+## Step 5: Run read-only MCP queries
+Inspect a small portion of raw MCP-collected data:
+
 ```bash
-PYTHONPATH=sections/09-mcp-k8-agent python3 -m agent.main
+python3 - <<'PY'
+from pathlib import Path
+import json
+import sys
+
+sys.path.insert(0, str(Path("sections/10-advanced-mcp-finops").resolve()))
+from agent.collector import collect_snapshot_sync
+
+snapshot = collect_snapshot_sync(cluster_name="kind")
+print(json.dumps({
+    "namespaces": snapshot.get("namespaces", [])[:5],
+    "resources_sample": snapshot.get("resources", [])[:5],
+}, indent=2))
+PY
 ```
 
-What to look for:
-- the collector connects to the MCP server
-- the snapshot includes all non-system namespaces and their resources
-- the analyst returns structured compliance output
-- actionable items are POSTed to the tracker
+Expected:
+- responses are structured and parseable
+- returned namespace/workload data matches `kubectl` spot checks
 
-## What to notice
-- MCP removes the need for a bespoke scanner module
-- the collector is deterministic and reusable
-- the LLM is only used where judgment is needed
-- the tracker step is separate and only sees structured output
+## Step 6: Discuss FinOps relevance
+Use returned metadata to explain:
+- ownership visibility
+- label/tag completeness checks
+- where compliance analysis can be layered next
+
+Note: Advanced collector/analyst/tracker flow is in Section 10.
+
+## Step 7: Cleanup
+No long-running local MCP process is required in this flow because Docker is invoked per collection run.
+
+Optional cleanup:
+```bash
+docker image rm mcp/kubernetes:latest
+```
+
+## Troubleshooting
+- If no cluster data appears, verify kubeconfig mount and context.
+- If collector checks fail with kubeconfig permission issues, keep `--user 0:0` in `MCP_SERVER_ARGS`.
+- If collector checks fail with missing file, verify `KUBECONFIG_FILE` points to a real kubeconfig.
+- If permissions fail, ensure the kubeconfig user has namespace read permissions.
 
 ## Expected outcome
-You should be able to explain:
-- why MCP is a better seam than a custom scanner
-- how the collector, analyst, and tracker responsibilities differ
-- how the raw JSON snapshot feeds the compliance report
-- how actionable findings land in the issue tracker
+You should be able to:
+- run an OSS Kubernetes MCP image from Docker Hub
+- query local cluster data through MCP tools
+- explain how this setup feeds advanced automation in Section 10

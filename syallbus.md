@@ -63,11 +63,16 @@ Flow legend: Video -> Video -> Video -> Demo -> Quiz
 | 08 Kubernetes-Native Agent | 3 | Video | Config and secret handling in-cluster | 3 to 4 min |
 | 08 Kubernetes-Native Agent | 4 | Demo | Deploy agent as CronJob and validate periodic scans | 7 to 8 min |
 | 08 Kubernetes-Native Agent | 5 | Quiz | Why CronJob over long-running deployment here? What should be ConfigMap vs Secret? Which signals confirm schedule reliability? | 2 to 3 min |
-| 09 MCP K8 Agent | 1 | Video | MCP concept for controlled cluster interaction | 3 to 4 min |
-| 09 MCP K8 Agent | 2 | Video | Tooling boundary: what MCP should expose | 3 to 4 min |
-| 09 MCP K8 Agent | 3 | Video | Governance and compliance use cases | 3 to 4 min |
-| 09 MCP K8 Agent | 4 | Demo | Query cluster compliance context through MCP server | 7 to 8 min |
-| 09 MCP K8 Agent | 5 | Quiz | Why MCP is useful for operator workflows? Which actions must stay read-only? What is a safe first MCP capability set? | 2 to 3 min |
+| 09 MCP K8 Setup (Prebuilt) | 1 | Video | Why prebuilt MCP is enough for local cluster demos | 3 to 4 min |
+| 09 MCP K8 Setup (Prebuilt) | 2 | Video | Wiring kubeconfig and starting a prebuilt MCP server | 3 to 4 min |
+| 09 MCP K8 Setup (Prebuilt) | 3 | Video | Verifying read-only tools and guardrails | 3 to 4 min |
+| 09 MCP K8 Setup (Prebuilt) | 4 | Demo | Start prebuilt MCP and query the local cluster | 7 to 8 min |
+| 09 MCP K8 Setup (Prebuilt) | 5 | Quiz | Why avoid custom MCP code for this stage? Which checks confirm safe read-only access? What should be cleaned up after the demo? | 2 to 3 min |
+| 10 Advanced MCP FinOps | 1 | Video | When to move from setup-only MCP to advanced pipeline orchestration | 3 to 4 min |
+| 10 Advanced MCP FinOps | 2 | Video | Collector, analyst, and tracker as a pipeline contract | 3 to 4 min |
+| 10 Advanced MCP FinOps | 3 | Video | Extending MCP payloads for deeper compliance workflows | 3 to 4 min |
+| 10 Advanced MCP FinOps | 4 | Demo | Run MCP-powered pipeline from snapshot to tracker issues | 7 to 8 min |
+| 10 Advanced MCP FinOps | 5 | Quiz | What justifies advanced pipeline complexity? Which stage must remain deterministic? How do you keep tracker payloads reliable? | 2 to 3 min |
 
 ## Practical delivery pattern per section
 

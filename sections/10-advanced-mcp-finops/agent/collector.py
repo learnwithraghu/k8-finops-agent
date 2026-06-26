@@ -7,9 +7,9 @@ import json
 import logging
 import os
 import shlex
-import sys
 from contextlib import AsyncExitStack
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 try:
@@ -23,10 +23,37 @@ logger = logging.getLogger(__name__)
 TOOLS = ("list_deployments", "list_pods", "list_services", "list_pvcs", "list_configmaps")
 
 
+def _default_kubeconfig_file() -> str:
+    return os.getenv("KUBECONFIG_FILE") or os.getenv("KUBECONFIG") or str(Path.home() / ".kube" / "config")
+
+
+def _server_command_and_args() -> tuple[str, List[str]]:
+    command = os.getenv("MCP_SERVER_COMMAND", "docker")
+    explicit_args = os.getenv("MCP_SERVER_ARGS")
+    if explicit_args:
+        return command, shlex.split(explicit_args)
+
+    kubeconfig_file = _default_kubeconfig_file()
+    args = [
+        "run",
+        "--rm",
+        "-i",
+        "--user",
+        "0:0",
+        "-v",
+        f"{kubeconfig_file}:/kubeconfig:ro",
+        "-e",
+        "KUBECONFIG=/kubeconfig",
+        "mcp/kubernetes:latest",
+    ]
+    return command, args
+
+
 async def collect_snapshot(cluster_name: Optional[str] = None) -> Dict[str, Any]:
+    command, args = _server_command_and_args()
     server_params = StdioServerParameters(
-        command=os.getenv("MCP_SERVER_COMMAND", sys.executable),
-        args=shlex.split(os.getenv("MCP_SERVER_ARGS", "-m mcp_server.server")),
+        command=command,
+        args=args,
         env=os.environ.copy(),
     )
 

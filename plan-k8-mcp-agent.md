@@ -1,10 +1,17 @@
-# Plan: Section 09 — Prompt-First MCP FinOps Demo
+# Archived Plan (v1): Prompt-First MCP FinOps Demo
+
+## Status
+This document captures the original authoring-first design.
+
+Current curriculum split:
+- Section 09: prebuilt MCP setup-only for local cluster access
+- Section 10: advanced/custom MCP FinOps pipeline
 
 ## Why This Section Exists
 
 Section 05 proved the first big lesson: a few prompts can do a lot more than a pile of hand-written logic.
 
-Section 09 should make the handoff even clearer: MCP reads cluster data, prompts do the reasoning, and the Section 06 tracker service receives the final tickets.
+Section 10 now carries the handoff where MCP reads cluster data, prompts do the reasoning, and the Section 06 tracker service receives the final tickets.
 
 The point of this section is **not** to teach a bigger codebase.
 The point is to show a learner that:
@@ -34,7 +41,7 @@ The learner should feel:
 
 ---
 
-## Section Goal
+## Section 10 Goal
 
 Build a **three-step pipeline** with minimal code:
 
@@ -74,7 +81,7 @@ The learner should still be able to read the whole section in one sitting.
 ## Repo Location
 
 ```text
-sections/09-mcp-k8-agent/
+sections/10-advanced-mcp-finops/
 ```
 
 ### Existing sections remain unchanged
@@ -256,7 +263,7 @@ The section should be teachable in one short walkthrough.
 ### Suggested file set
 
 ```text
-sections/09-mcp-k8-agent/
+sections/10-advanced-mcp-finops/
 ├── section_goal.md
 ├── guide.md
 ├── config/
