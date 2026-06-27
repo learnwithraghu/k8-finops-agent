@@ -24,38 +24,38 @@ curl -X POST http://localhost:8085/create-issue \
 ```
 > *Talking point: Switch to browser to show the new ticket on the board.*
 
-### 2) Validate MCP endpoint
+### 2) Validate MCP endpoint & Create a ticket
 ```bash
-cat sections/08-issue-tracker-service/service/app/mcp_server.py
+cat << 'EOF' > test_mcp.py
+import asyncio
+from mcp.client.sse import sse_client
+from mcp.client.session import ClientSession
 
-curl -s http://localhost:8086/mcp -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}' | python3 -m json.tool
-```
+async def main():
+    async with sse_client("http://localhost:8086/sse") as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            print("Tools available:")
+            print(await session.list_tools())
+            print("\nCreating issue via MCP...")
+            result = await session.call_tool("create_issue", {
+                "title": "[MCP] payment/payment-processor - UNALLOCATED",
+                "summary": "Created via MCP tool call",
+                "namespace": "payment",
+                "resource_name": "payment-processor",
+                "resource_kind": "Deployment",
+                "category": "unallocated",
+                "priority": "high",
+                "cost_impact": 8.47,
+                "suggested_owner": "payment-team",
+                "source": "mcp-agent"
+            })
+            print(result)
 
-### 3) Create a ticket through MCP
-```bash
-curl -s http://localhost:8086/mcp -X POST \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "method": "tools/call",
-    "id": 2,
-    "params": {
-      "name": "create_issue",
-      "arguments": {
-        "title": "[MCP] payment/payment-processor - UNALLOCATED",
-        "summary": "Created via MCP tool call",
-        "namespace": "payment",
-        "resource_name": "payment-processor",
-        "resource_kind": "Deployment",
-        "category": "unallocated",
-        "priority": "high",
-        "cost_impact": 8.47,
-        "suggested_owner": "payment-team",
-        "source": "mcp-agent"
-      }
-    }
-  }' | python3 -m json.tool
+asyncio.run(main())
+EOF
+
+source venv/bin/activate
+python3 test_mcp.py
 ```
 > *Expected: See the second ticket appear on the Kanban board.*

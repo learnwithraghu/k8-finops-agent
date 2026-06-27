@@ -18,6 +18,8 @@ curl -s http://localhost:8000/healthz
 
 ### 3) Install dependencies
 ```bash
+python3 -m venv venv
+source venv/bin/activate
 python3 -m pip install -r sections/06-mcp-data-agent/requirements.txt
 ```
 
