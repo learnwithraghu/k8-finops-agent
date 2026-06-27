@@ -4,7 +4,7 @@
 
 ### 1) Clean old state
 ```bash
-./helper/cleanup.sh
+./helper/local-kind/cleanup.sh --yes
 ```
 > *Expected: Removes any old Kind clusters.*
 
