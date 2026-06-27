@@ -11,7 +11,7 @@ This folder contains the container build for the Section 10 Kubernetes-native ag
 Run from the section root:
 
 ```bash
-cd sections/10-k8-native-agent
+cd sections/11-k8-native-agent
 docker build -f docker/Dockerfile -t finops-agent:latest .
 ```
 

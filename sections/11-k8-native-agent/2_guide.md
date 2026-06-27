@@ -13,8 +13,8 @@ kubectl create secret generic finops-agent-llm \
 
 ### 2) Lint and Install the Helm chart
 ```bash
-helm lint sections/10-k8-native-agent/helm/
-helm install finops-agent sections/10-k8-native-agent/helm/
+helm lint sections/11-k8-native-agent/helm/
+helm install finops-agent sections/11-k8-native-agent/helm/
 ```
 > *Expected: See "STATUS: deployed"*
 

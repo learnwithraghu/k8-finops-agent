@@ -14,7 +14,7 @@ This Helm chart deploys the K8s FinOps Agent as a one-shot Kubernetes Job that r
 
 ### 1. Build and load the image
 ```bash
-cd sections/10-k8-native-agent
+cd sections/11-k8-native-agent
 docker build -f docker/Dockerfile -t finops-agent:latest .
 kind load docker-image finops-agent:latest --name <your-cluster-name>
 ```

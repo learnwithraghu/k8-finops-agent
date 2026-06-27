@@ -109,12 +109,12 @@ This guide accompanies the generated SVG slide assets to help you narrate this s
 
 After presenting the slides, transition to a live demo:
 
-1. **Show the chart structure**: `tree sections/10-k8-native-agent/helm/`
-2. **Inspect values.yaml**: `cat sections/10-k8-native-agent/helm/values.yaml`
+1. **Show the chart structure**: `tree sections/11-k8-native-agent/helm/`
+2. **Inspect values.yaml**: `cat sections/11-k8-native-agent/helm/values.yaml`
 3. **Build and load the image**: Show the Docker build and Kind load process
 4. **Create the secret**: Demonstrate manual secret creation
-5. **Lint the chart**: `helm lint sections/10-k8-native-agent/helm/`
-6. **Install the chart**: `helm install finops-agent sections/10-k8-native-agent/helm/`
+5. **Lint the chart**: `helm lint sections/11-k8-native-agent/helm/`
+6. **Install the chart**: `helm install finops-agent sections/11-k8-native-agent/helm/`
 7. **Run helm test**: `helm test finops-agent` and show the logs
 8. **Customize**: Change the schedule with `helm upgrade --set schedule="*/15 * * * *"`
 9. **Show history**: `helm history finops-agent`

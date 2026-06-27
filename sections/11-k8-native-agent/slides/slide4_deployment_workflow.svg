@@ -52,7 +52,7 @@
   <rect x="270" y="355" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
   <text x="290" y="385" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Lint Chart</text>
   <text x="290" y="417" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
-    helm lint sections/10-k8-native-agent/helm/
+    helm lint sections/11-k8-native-agent/helm/
   </text>
   
   <!-- Step 5: Install Chart -->
@@ -61,7 +61,7 @@
   <rect x="270" y="440" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
   <text x="290" y="470" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Install Chart</text>
   <text x="290" y="502" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
-    helm install finops-agent sections/10-k8-native-agent/helm/
+    helm install finops-agent sections/11-k8-native-agent/helm/
   </text>
   
   <!-- Step 6: Run Test -->

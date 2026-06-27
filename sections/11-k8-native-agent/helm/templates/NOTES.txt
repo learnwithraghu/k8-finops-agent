@@ -49,4 +49,4 @@
    • Scan specific namespace: --set targetNamespace="booking-api"
    • Upgrade with: helm upgrade {{ .Release.Name }} ./helm
 
-🔗 Documentation: See sections/10-k8-native-agent/guide.md
+🔗 Documentation: See sections/11-k8-native-agent/guide.md
