@@ -1,13 +1,15 @@
-"""Minimal client for the Section 08 issue tracker service.
+"""MCP client for the Section 08 issue tracker service.
 
-Converts LLM decisions (ResourceDecision + K8sResource) into tracker payloads
-and POSTs them to the local FastAPI service.
+Connects to the tracker's MCP server and calls the create_issue tool
+to create tickets from LLM decisions.
 """
 
+import asyncio
 import logging
 from typing import Any, Dict, List
 
-import requests
+from mcp import ClientSession
+from mcp.client.sse import sse_client
 
 from agent.analyzer import ResourceDecision
 from agent.scanner import K8sResource
@@ -16,31 +18,31 @@ logger = logging.getLogger(__name__)
 
 
 class IssueTrackerClient:
-    """Small client for the local FinOps issue tracker."""
+    """MCP client for the local FinOps issue tracker."""
 
-    def __init__(self, base_url: str, timeout: int = 10):
-        self.base_url = base_url.rstrip("/")
-        self.timeout = timeout
-        self.session = requests.Session()
+    def __init__(self, mcp_url: str = "http://localhost:8086/mcp"):
+        self.mcp_url = mcp_url
 
-    def connect(self) -> bool:
-        """Confirm the tracker is running before sending issues."""
+    async def connect(self) -> bool:
+        """Confirm the MCP server is reachable."""
         try:
-            response = self.session.get(f"{self.base_url}/health", timeout=self.timeout)
-            response.raise_for_status()
-            logger.info(f"Connected to issue tracker at {self.base_url}")
-            return True
+            async with sse_client(self.mcp_url) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    tools = await session.list_tools()
+                    logger.info(
+                        f"Connected to issue tracker MCP server, {len(tools.tools)} tools available"
+                    )
+                    return True
         except Exception as exc:
-            logger.error(
-                f"Failed to connect to issue tracker at {self.base_url}: {exc}"
-            )
+            logger.error(f"Failed to connect to issue tracker MCP server: {exc}")
             return False
 
-    def build_payload(
+    async def create_issue(
         self, resource: K8sResource, decision: ResourceDecision
     ) -> Dict[str, Any]:
-        """Map a resource + LLM decision to the tracker IssueCreate schema."""
-        return {
+        """Create one issue via MCP tool call."""
+        arguments = {
             "title": decision.issue_title,
             "summary": decision.reason,
             "body": decision.issue_body,
@@ -55,26 +57,21 @@ class IssueTrackerClient:
             else "",
             "suggested_owner": decision.suggested_owner,
             "suggested_cost_center": decision.suggested_cost_center,
-            "labels": decision.issue_labels,
             "reasoning": decision.reason,
-            "source": "llm-agent",
+            "source": "mcp-llm-agent",
         }
 
-    def create_issue(
-        self, resource: K8sResource, decision: ResourceDecision
-    ) -> Dict[str, Any]:
-        """Create one issue in the tracker."""
-        payload = self.build_payload(resource, decision)
+        async with sse_client(self.mcp_url) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+                result = await session.call_tool("create_issue", arguments)
+                if result.content:
+                    import json
 
-        response = self.session.post(
-            f"{self.base_url}/create-issue",
-            json=payload,
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        return response.json()
+                    return json.loads(result.content[0].text)
+                return {}
 
-    def create_issues(
+    async def create_issues(
         self,
         results: List[tuple[K8sResource, ResourceDecision]],
     ) -> Dict[str, List[Dict[str, Any]]]:
@@ -84,7 +81,7 @@ class IssueTrackerClient:
 
         for resource, decision in results:
             try:
-                issue = self.create_issue(resource, decision)
+                issue = await self.create_issue(resource, decision)
                 created.append(issue)
                 logger.info(
                     f"Created tracker issue for {resource.namespace}/{resource.name}"
@@ -102,3 +99,9 @@ class IssueTrackerClient:
                 )
 
         return {"created": created, "failed": failed}
+
+    def create_issues_sync(
+        self, results: List[tuple[K8sResource, ResourceDecision]]
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        """Synchronous wrapper for create_issues."""
+        return asyncio.run(self.create_issues(results))

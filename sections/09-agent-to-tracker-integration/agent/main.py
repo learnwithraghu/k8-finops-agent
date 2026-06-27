@@ -5,6 +5,7 @@ config to the LLM -> create tracker tickets for actionable findings.
 """
 
 import argparse
+import asyncio
 import logging
 import os
 import sys
@@ -26,9 +27,9 @@ def main():
         description="K8s FinOps Agent - tracker integration"
     )
     parser.add_argument(
-        "--issue-tracker-url",
+        "--mcp-url",
         default=None,
-        help="Issue tracker base URL (default: http://localhost:8085)",
+        help="Issue tracker MCP URL (default: http://localhost:8086/mcp)",
     )
     args = parser.parse_args()
 
@@ -51,13 +52,12 @@ def main():
         logger.error("OPENAI_API_KEY not set in environment or .env file")
         sys.exit(1)
 
-    tracker_url = args.issue_tracker_url or os.getenv(
-        "ISSUE_TRACKER_URL", "http://localhost:8085"
+    mcp_url = args.mcp_url or os.getenv(
+        "ISSUE_TRACKER_MCP_URL", "http://localhost:8086/mcp"
     )
-    tracker_timeout = int(os.getenv("ISSUE_TRACKER_TIMEOUT", "10"))
 
-    logger.info(f"Using OpenAI-compatible model: {model_id}")
-    logger.info(f"Using issue tracker: {tracker_url}")
+    logger.info(f"Using OpenAI compatible model: {model_id}")
+    logger.info(f"Using issue tracker MCP: {mcp_url}")
 
     tagging_rules = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
     excluded_namespaces = tagging_rules.get("excluded_namespaces", []) or []
@@ -108,12 +108,14 @@ def main():
 
     # 4. Send actionable findings to the tracker
     if actionable:
-        tracker = IssueTrackerClient(tracker_url, timeout=tracker_timeout)
-        if not tracker.connect():
-            logger.error("Issue tracker is not running. Start it with Section 06.")
+        tracker = IssueTrackerClient(mcp_url)
+        if not asyncio.run(tracker.connect()):
+            logger.error(
+                "Issue tracker MCP server is not running. Start it with Section 08."
+            )
             sys.exit(1)
 
-        tracker_results = tracker.create_issues(actionable)
+        tracker_results = tracker.create_issues_sync(actionable)
         created_count = len(tracker_results["created"])
         failed_count = len(tracker_results["failed"])
 

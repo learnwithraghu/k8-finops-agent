@@ -3,7 +3,7 @@
 This is the only file you need for Section 08.
 
 ## Goal
-Build a simple Jira-style Kanban board with FastAPI so FinOps findings can be created programmatically, opened, assigned, and moved.
+Build a simple Jira-style Kanban board with FastAPI so FinOps findings can be created programmatically, opened, assigned, and moved. The tracker exposes both a REST API and an MCP server, so agents can create tickets through either protocol.
 
 ## Tutor note
 Keep this section simple: show the board, show the `/create-issue` endpoint, create one ticket, and then assign or move it through the API.
@@ -14,6 +14,7 @@ Keep this section simple: show the board, show the `/create-issue` endpoint, cre
 - how the `/create-issue` endpoint creates a ticket
 - how to use Swagger to send the payload
 - how to assign and move a ticket across backlog, to do, in progress, and done
+- how the tracker exposes MCP tools on a separate port for agent integration
 
 ## What you need before starting
 Complete Sections 01, 02, 03, 04, and 08 first.
@@ -52,12 +53,13 @@ What to look for:
 ## Step 4: Run the tracker container
 Open a second terminal and run:
 ```bash
-docker run --rm -p 8085:8000 --name finops-issue-tracker finops-issue-tracker:latest
+docker run --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
 ```
 
 What to look for:
-- the app listens inside the container on port 8000
-- it is exposed on host port 8085
+- the REST API listens inside the container on port 8000, exposed on host port 8085
+- the MCP server listens inside the container on port 8001, exposed on host port 8086
+- both processes share the same `data/issues.json` store
 
 ## Step 5: Open the board UI
 Visit:
@@ -129,20 +131,78 @@ What to look for:
 - assignment should show on the card
 - the issue details panel should update when you open a card
 
+## Step 10: Inspect the MCP server code
+```bash
+cat sections/08-issue-tracker-service/service/app/mcp_server.py
+```
+
+What to look for:
+- the MCP server uses `FastMCP` from the `mcp` SDK
+- it exposes four tools: `create_issue`, `list_issues`, `get_issue`, `update_issue`
+- each tool delegates to the same `IssueStore` that the REST API uses
+- the server runs on port 8001 with SSE transport
+
+## Step 11: Validate the MCP endpoint with curl
+List available tools:
+```bash
+curl -s http://localhost:8086/mcp -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}' | python3 -m json.tool
+```
+
+What to look for:
+- four tools listed: `create_issue`, `list_issues`, `get_issue`, `update_issue`
+- each tool has a description and input schema
+
+## Step 12: Create a ticket through MCP
+```bash
+curl -s http://localhost:8086/mcp -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "id": 2,
+    "params": {
+      "name": "create_issue",
+      "arguments": {
+        "title": "[MCP] payment/payment-processor - UNALLOCATED",
+        "summary": "Created via MCP tool call",
+        "namespace": "payment",
+        "resource_name": "payment-processor",
+        "resource_kind": "Deployment",
+        "category": "unallocated",
+        "priority": "high",
+        "cost_impact": 8.47,
+        "suggested_owner": "payment-team",
+        "source": "mcp-agent"
+      }
+    }
+  }' | python3 -m json.tool
+```
+
+What to look for:
+- the response includes a new issue with `id` and `key` like `FINOPS-0002`
+- the ticket appears in the Kanban board UI at `http://localhost:8085`
+- the same data store backs both REST and MCP
+
 ## What to notice
 - the tracker is intentionally simple
 - it behaves like a lightweight Jira board
 - you can move cards by dragging them
 - you can open a card to inspect and edit its details
-- the `/create-issue` endpoint is the main contract to explain
+- the `/create-issue` REST endpoint is the main contract
+- the MCP server exposes the same operations as tools
+- both protocols share the same data store
 - the board is enough to demo the handoff from Bedrock to work tracking
 
 ## Expected outcome
 You should be able to explain:
-- how to run the tracker locally
+- how to run the tracker locally with both REST and MCP ports
 - how the board is organized
-- how to create an issue through `/create-issue`
+- how to create an issue through `/create-issue` (REST)
+- how to create an issue through the `create_issue` MCP tool
 - how to use the API to inspect, assign, and move it
+- why both protocols share the same data store
 
 ## Handoff to Section 09
 Once the tracker is clear, move to:
