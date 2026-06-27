@@ -1,19 +1,19 @@
 """LLM-powered FinOps analysis using LangChain + an OpenAI-compatible endpoint.
 
-For each resource, a single prompt sends the scanned K8s metadata plus the
-FinOps tagging policy to the LLM. The LLM returns one structured decision that
-covers both the compliance verdict and (if needed) a GitHub issue draft.
+When MCP tools are provided, the LLM calls create_issue directly for violations —
+the prompt drives the action, not manual code.
 """
 
 import json
 import logging
 import os
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.tools import BaseTool
 
 from agent.scanner import K8sResource
 
@@ -22,16 +22,33 @@ logger = logging.getLogger(__name__)
 
 class ResourceDecision(BaseModel):
     """Structured LLM output: compliance verdict + issue draft for one resource."""
-    is_compliant: bool = Field(description="True if all required tags are present and the resource is not an orphaned PVC")
-    category: str = Field(description="One of: tagged, unallocated, unowned, orphaned, unknown, other")
-    missing_tags: List[str] = Field(description="Required tags that are missing or empty")
-    reason: str = Field(description="Short human-readable reason for the compliance decision")
-    should_create_issue: bool = Field(description="Whether to create a GitHub issue for this resource")
-    issue_title: str = Field(description="GitHub issue title in format: [FinOps] namespace/name - CATEGORY")
-    issue_body: str = Field(description="Markdown body with summary, missing tags, and remediation steps")
+
+    is_compliant: bool = Field(
+        description="True if all required tags are present and the resource is not an orphaned PVC"
+    )
+    category: str = Field(
+        description="One of: tagged, unallocated, unowned, orphaned, unknown, other"
+    )
+    missing_tags: List[str] = Field(
+        description="Required tags that are missing or empty"
+    )
+    reason: str = Field(
+        description="Short human-readable reason for the compliance decision"
+    )
+    should_create_issue: bool = Field(
+        description="Whether to create a GitHub issue for this resource"
+    )
+    issue_title: str = Field(
+        description="GitHub issue title in format: [FinOps] namespace/name - CATEGORY"
+    )
+    issue_body: str = Field(
+        description="Markdown body with summary, missing tags, and remediation steps"
+    )
     issue_labels: List[str] = Field(description="GitHub issue labels")
     priority: str = Field(description="Priority level: critical, high, medium, or low")
-    suggested_cost_center: str = Field(description="Suggested cost center for the resource")
+    suggested_cost_center: str = Field(
+        description="Suggested cost center for the resource"
+    )
     suggested_owner: str = Field(description="Suggested team owner for the resource")
     suggested_tags: Dict[str, str] = Field(description="Suggested tags to apply")
 
@@ -57,6 +74,8 @@ Resource Facts:
 FinOps Tagging Policy:
 {tagging_rules}
 
+{tool_instruction}
+
 {format_instructions}
 
 Rules:
@@ -75,6 +94,16 @@ Rules:
 """
 
 
+def _make_tool_instruction(mcp_tools: Optional[Dict[str, BaseTool]]) -> str:
+    if not mcp_tools or "create_issue" not in mcp_tools:
+        return ""
+    return (
+        "\nYou also have access to the `create_issue` tool. "
+        "If this resource is NOT compliant, call `create_issue` with the "
+        "appropriate details to file a ticket automatically."
+    )
+
+
 def analyze_resource(
     resource: K8sResource,
     model_id: str,
@@ -83,26 +112,30 @@ def analyze_resource(
     max_tokens: int = 1024,
     temperature: float = 0.3,
     tagging_rules: Dict[str, Any] = None,
+    mcp_tools: Optional[Dict[str, BaseTool]] = None,
 ) -> ResourceDecision:
-    """Send one resource + the tagging policy to the LLM and return its decision."""
+    """Send one resource + the tagging policy to the LLM and return its decision.
+
+    When mcp_tools (from load_tracker_tools) is provided, the LLM can call
+    create_issue directly — no separate issue-creation step needed.
+    """
     tagging_rules = tagging_rules or {}
 
-    logger.info(
-        f"Sending resource to OpenAI-compatible endpoint: {resource.namespace}/{resource.name} ({resource.kind})"
-    )
+    logger.info(f"Analyzing {resource.namespace}/{resource.name} ({resource.kind})")
 
     parser = PydanticOutputParser(pydantic_object=ResourceDecision)
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     llm = ChatOpenAI(
         model=model_id,
-        base_url=base_url or os.getenv("OPENAI_BASE_URL", "https://api.ai.kodekloud.com/v1"),
+        base_url=base_url
+        or os.getenv("OPENAI_BASE_URL", "https://api.ai.kodekloud.com/v1"),
         api_key=api_key or os.getenv("OPENAI_API_KEY"),
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    chain = prompt | llm | parser
 
-    response = chain.invoke({
+    tool_instruction = _make_tool_instruction(mcp_tools)
+    inputs = {
         "resource_name": resource.name,
         "namespace": resource.namespace,
         "kind": resource.kind,
@@ -116,10 +149,19 @@ def analyze_resource(
         "is_orphaned": resource.is_orphaned,
         "tagging_rules": json.dumps(tagging_rules, indent=2),
         "format_instructions": parser.get_format_instructions(),
-    })
+        "tool_instruction": tool_instruction,
+    }
 
-    logger.info(f"LLM decision for {resource.namespace}/{resource.name}: {response.category}")
-    return response
+    if mcp_tools and "create_issue" in mcp_tools:
+        llm = llm.bind_tools([mcp_tools["create_issue"]])
+
+    chain = prompt | llm | parser
+    decision = chain.invoke(inputs)
+
+    logger.info(
+        f"Decision for {resource.namespace}/{resource.name}: {decision.category}"
+    )
+    return decision
 
 
 def generate_summary_report(results: List[Tuple[K8sResource, ResourceDecision]]) -> str:
@@ -155,7 +197,7 @@ def generate_summary_report(results: List[Tuple[K8sResource, ResourceDecision]])
     for i, (resource, decision) in enumerate(violations, 1):
         report += f"""### {i}. {resource.namespace}/{resource.name} ({resource.kind})
 - **Category**: {decision.category}
-- **Missing Tags**: {', '.join(decision.missing_tags) if decision.missing_tags else 'None'}
+- **Missing Tags**: {", ".join(decision.missing_tags) if decision.missing_tags else "None"}
 - **Reason**: {decision.reason}
 - **Suggested Issue**: {decision.issue_title} (priority: {decision.priority})
 

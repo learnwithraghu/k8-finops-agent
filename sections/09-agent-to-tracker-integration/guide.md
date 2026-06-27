@@ -70,19 +70,21 @@ ISSUE_TRACKER_MCP_URL=http://localhost:8086/mcp
 cat sections/09-agent-to-tracker-integration/agent/tracker.py
 ```
 What to look for:
-- `IssueTrackerClient` connects to the MCP server via SSE transport
-- `create_issue` calls the `create_issue` MCP tool with the arguments
-- `create_issues` iterates over actionable findings and calls the tool for each
-- no HTTP session, no manual payload mapping — the MCP tool handles the schema
-- compare this to the old REST version: ~70 lines vs 104 lines, and much simpler
+- `load_tracker_tools` auto-discovers MCP tools via `langchain-mcp-tools`
+- no manual `sse_client` / `ClientSession` management
+- no argument mapping, no loop, no sync wrapper — 15 lines total
+- the `create_issue` tool is bound to the LLM in `analyzer.py` so the prompt drives the action
+- compare this to the old REST version: ~15 lines vs 104 lines
 
 ## Step 3: Read the orchestrator (transitional)
 ```bash
 cat sections/09-agent-to-tracker-integration/agent/main.py
 ```
 What to look for in the transitional flow:
-- scan + LLM flow, filtering decisions where `should_create_issue=True`
-- calls the MCP `create_issue` tool via `IssueTrackerClient`
+- `load_tracker_tools()` discovers MCP tools in one line
+- `analyze_resource` gets `mcp_tools` and binds `create_issue` to the LLM
+- the prompt tells the LLM: "if not compliant, call create_issue" — no manual loop
+- the LLM files issues DURING analysis, not in a separate step
 What the rewritten flow will look like instead:
 - read Section 07's `TicketBatch` JSON (via `--findings /tmp/section07-findings.json`)
 - call `create_issue` MCP tool for each `TrackerTicket`; no LLM call, no scanner
@@ -94,8 +96,8 @@ PYTHONPATH=sections/09-agent-to-tracker-integration python3 -m agent.main
 ```
 Expected:
 - the agent scans Kubernetes resources in all namespaces
-- the LLM produces decisions
-- actionable decisions are sent to the tracker via MCP `create_issue` tool
+- the LLM analyzes each resource and calls `create_issue` directly for violations
+- no separate issue-creation loop — the prompt drives the action
 - new tickets appear in the Section 08 board
 
 After the rewrite the run command becomes approximately:
@@ -116,7 +118,7 @@ What to look for:
 
 ## Discussion
 - Section 07 decides *what* to do; Section 09 turns those decisions into tracker tickets via MCP.
-- Compare the old REST client (104 lines with HTTP session, payload mapping, error handling) to the new MCP client (~70 lines, just call the tool).
+- Compare the old REST client (104 lines) to the MCP client using `langchain-mcp-tools` (15 lines). The MCP + LangChain approach eliminates session management, argument mapping, and manual loops entirely.
 - Why idempotency matters: re-running the agent must not spam duplicate tickets. A stable correlation key (namespace + resource_name + rule) is the de-dup key in the tracker.
 - After the rewrite, the agent in this section will be small (no scanner, no analyzer) — the LLM and tagging rules stay in Section 07, collection stays in Section 06.
 

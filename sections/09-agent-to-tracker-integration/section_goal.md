@@ -18,7 +18,7 @@ Consume the Section 07 structured findings (`TicketBatch`) and post each actiona
 - De-duplication / persistent state across runs (handled in a future hardening section)
 
 ## Notes on the current code
-`agent/scanner.py`, `agent/analyzer.py`, `agent/main.py`, and `agent/config/tagging-rules.yaml` are **transitional**: they reproduce the legacy LangChain scanner pipeline and produce `ResourceDecision` objects that the current `tracker.py` knows how to POST. In the follow-up "work on 1st agent" session, this section's agent is being rewritten to consume Section 07's `TicketBatch` directly, dropping the scanner + analyzer + `ResourceDecision` and shrinking `tracker.py`'s role to a thin MCP tool call layer.
+`agent/scanner.py`, `agent/analyzer.py`, `agent/main.py`, and `agent/config/tagging-rules.yaml` are **transitional**: they reproduce the legacy LangChain scanner pipeline and produce `ResourceDecision` objects. `tracker.py` is already streamlined to ~15 lines using `langchain-mcp-tools` for auto-discovery — the LLM calls `create_issue` directly via tool binding. In the follow-up "work on 1st agent" session, this section's agent is being rewritten to consume Section 07's `TicketBatch` directly, dropping the scanner + analyzer + `ResourceDecision`.
 
 Until that rewrite lands, the integration still works end to end (scan → LLM decision → tracker ticket) but bypasses Section 07.
 

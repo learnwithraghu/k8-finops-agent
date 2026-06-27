@@ -2,7 +2,7 @@
 
 from agent.analyzer import ResourceDecision, analyze_resource, generate_summary_report
 from agent.scanner import K8sResource, K8sScanner
-from agent.tracker import IssueTrackerClient
+from agent.tracker import load_tracker_tools
 
 __all__ = [
     "K8sScanner",
@@ -10,5 +10,5 @@ __all__ = [
     "analyze_resource",
     "generate_summary_report",
     "ResourceDecision",
-    "IssueTrackerClient",
+    "load_tracker_tools",
 ]

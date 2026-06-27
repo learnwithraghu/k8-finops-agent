@@ -1,7 +1,7 @@
 """Entry point for the agent-to-tracker integration.
 
 Pipeline: scan Kubernetes metadata -> send each resource + the FinOps tagging
-config to the LLM -> create tracker tickets for actionable findings.
+config to the LLM -> LLM creates tracker tickets directly via MCP tools.
 """
 
 import argparse
@@ -16,9 +16,8 @@ from dotenv import load_dotenv
 
 from agent.analyzer import analyze_resource, generate_summary_report
 from agent.scanner import K8sScanner
-from agent.tracker import IssueTrackerClient
+from agent.tracker import load_tracker_tools
 
-# Path to tagging rules is fixed — always lives in config/ next to the agent
 TAGGING_RULES_PATH = Path(__file__).parent.parent / "config" / "tagging-rules.yaml"
 
 
@@ -59,6 +58,15 @@ def main():
     logger.info(f"Using OpenAI compatible model: {model_id}")
     logger.info(f"Using issue tracker MCP: {mcp_url}")
 
+    # 0. Connect to tracker MCP and discover tools
+    try:
+        mcp_tools = asyncio.run(load_tracker_tools(mcp_url))
+        logger.info(f"Connected to tracker MCP, tool: {list(mcp_tools.keys())}")
+    except Exception as exc:
+        logger.error(f"Failed to connect to issue tracker MCP: {exc}")
+        logger.error("Start the Section 08 tracker first.")
+        sys.exit(1)
+
     tagging_rules = yaml.safe_load(TAGGING_RULES_PATH.read_text()) or {}
     excluded_namespaces = tagging_rules.get("excluded_namespaces", []) or []
 
@@ -75,7 +83,8 @@ def main():
     resources = scanner.scan_all()
     logger.info(f"Found {len(resources)} resources")
 
-    # 2. Send each resource + the FinOps tagging policy to the LLM
+    # 2. Send each resource + tagging policy to the LLM.
+    #    The LLM calls create_issue automatically for non-compliant resources.
     logger.info(f"Sending {len(resources)} resources to the LLM for decisions")
     results = []
     for resource in resources:
@@ -88,6 +97,7 @@ def main():
                 max_tokens,
                 temperature,
                 tagging_rules,
+                mcp_tools=mcp_tools,
             )
             results.append((resource, decision))
         except Exception as e:
@@ -104,25 +114,7 @@ def main():
 
     logger.info(f"Total resources analyzed: {len(results)}")
     logger.info(f"Violations: {violation_count}")
-    logger.info(f"Actionable issues: {len(actionable)}")
-
-    # 4. Send actionable findings to the tracker
-    if actionable:
-        tracker = IssueTrackerClient(mcp_url)
-        if not asyncio.run(tracker.connect()):
-            logger.error(
-                "Issue tracker MCP server is not running. Start it with Section 08."
-            )
-            sys.exit(1)
-
-        tracker_results = tracker.create_issues_sync(actionable)
-        created_count = len(tracker_results["created"])
-        failed_count = len(tracker_results["failed"])
-
-        logger.info(f"Issues created: {created_count}")
-
-        if failed_count:
-            logger.error(f"Failed to create {failed_count} issue(s)")
+    logger.info(f"Actionable issues (filed by LLM): {len(actionable)}")
 
     logger.info("FinOps scan completed successfully")
 
