@@ -1,7 +1,5 @@
 import streamlit as st
-import random
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def init_game_state():
