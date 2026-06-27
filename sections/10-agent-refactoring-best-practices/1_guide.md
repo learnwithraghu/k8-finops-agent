@@ -47,4 +47,18 @@ async def main():
 ```
 
 ### 4) Discussion
-> *Talking point: We won't force you to write this out right now, but recognize that separation of concerns is critical for Production-grade AI Engineering. In the next section, we will focus on taking our agent and deploying it natively inside Kubernetes as a CronJob.*
+> *Talking point: We've gone ahead and structured this for you! Take a look at the files in `sections/10-agent-refactoring-best-practices`. Let's test it out to prove it works identically to Section 09 but with a cleaner architecture.*
+
+### 5) Run the Refactored Agent
+Make sure your Supergateway (Section 05) and Issue Tracker (Section 08) are still running in the background.
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r sections/10-agent-refactoring-best-practices/requirements.txt
+
+# Run the refactored main agent
+python3 sections/10-agent-refactoring-best-practices/main.py
+```
+
+> *Expected: You should see the exact same output as Section 09, but the underlying code is now scalable and maintainable!*
