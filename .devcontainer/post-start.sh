@@ -19,3 +19,4 @@ docker --version
 kind --version
 kubectl version --client=true
 helm version --short
+opencode --version
