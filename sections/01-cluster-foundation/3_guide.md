@@ -26,3 +26,7 @@ kubectl auth can-i get pods -A
 kubectl get pods -A
 ```
 > *Expected: No app deployments returned, cluster is clean.*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to assemble the cluster foundation flow interactively — drag Docker, Kind, kubectl, finops-cluster, and all five namespaces into the correct slots, then press **Run Flow** to validate.

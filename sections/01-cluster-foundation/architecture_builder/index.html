@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Section 01: Cluster Foundation Builder</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b1329;
+      --surface: #111b36;
+      --surface-hover: #162040;
+      --border: #2a3a60;
+      --border-glow: #38bdf8;
+      --teal: #028090;
+      --teal-bright: #02c39a;
+      --cyan: #38bdf8;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --wire: #1e4d6b;
+      --wire-active: #38bdf8;
+      --error: #ef5350;
+      --warning: #ffb84d;
+      --success: #02c39a;
+      --toolbar-h: 56px;
+      --palette-w: 210px;
+      --slot-w: 150px;
+      --slot-h: 76px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    #toolbar {
+      height: var(--toolbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: linear-gradient(180deg, #0e1830 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    #toolbar h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--cyan), var(--teal-bright));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .toolbar-left { display: flex; align-items: baseline; gap: 10px; }
+    .subtitle { font-size: 0.72rem; color: var(--text-muted); }
+    .toolbar-actions { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { background: var(--surface-hover); border-color: var(--border-glow); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--teal), #036666);
+      border-color: var(--teal-bright);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary.running {
+      animation: pulse-btn 1s ease infinite;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    @keyframes pulse-btn {
+      0%, 100% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+      50% { box-shadow: 0 0 28px rgba(56, 189, 248, 0.6); }
+    }
+
+    #app {
+      display: flex;
+      height: calc(100vh - var(--toolbar-h));
+    }
+
+    #palette {
+      width: var(--palette-w);
+      flex-shrink: 0;
+      background: #0c152b;
+      border-right: 1px solid var(--border);
+      padding: 14px 10px;
+      overflow-y: auto;
+    }
+
+    #palette h2 {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .palette-section { margin-bottom: 14px; }
+
+    .palette-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: var(--surface);
+      cursor: grab;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .palette-item.distractor { opacity: 0.88; }
+
+    .palette-item:hover {
+      border-color: var(--border-glow);
+      background: var(--surface-hover);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.12);
+    }
+
+    .palette-item:active { cursor: grabbing; }
+
+    .palette-item .icon-wrap {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .palette-item .icon-wrap svg { width: 18px; height: 18px; }
+
+    .palette-item span {
+      font-size: 0.74rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .palette-hint {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(2, 128, 144, 0.1);
+      border: 1px solid rgba(2, 128, 144, 0.22);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    #canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+    }
+
+    #canvas {
+      min-width: 1200px;
+      min-height: 520px;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .row-label {
+      position: absolute;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    #wire-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .wire-visible {
+      fill: none;
+      stroke: var(--wire);
+      stroke-width: 2;
+      transition: stroke 0.2s;
+    }
+
+    .wire-visible.active {
+      stroke: var(--wire-active);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));
+    }
+
+    .wire-pulse {
+      fill: none;
+      stroke: var(--cyan);
+      stroke-width: 4;
+      stroke-linecap: round;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .wire-pulse.animating {
+      opacity: 1;
+      stroke-dasharray: 12 200;
+      animation: wire-travel 0.85s linear forwards;
+    }
+
+    @keyframes wire-travel {
+      from { stroke-dashoffset: 212; }
+      to { stroke-dashoffset: -212; }
+    }
+
+    .wire-particle {
+      fill: var(--cyan);
+      opacity: 0;
+      filter: drop-shadow(0 0 6px var(--cyan));
+    }
+
+    .wire-particle.animating { opacity: 1; }
+
+    #slots-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .slot {
+      position: absolute;
+      width: var(--slot-w);
+      height: var(--slot-h);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .slot.empty {
+      border: 2px dashed rgba(56, 189, 248, 0.35);
+      background: rgba(17, 27, 54, 0.55);
+      animation: slot-pulse 2.5s ease infinite;
+    }
+
+    @keyframes slot-pulse {
+      0%, 100% { border-color: rgba(56, 189, 248, 0.25); }
+      50% { border-color: rgba(56, 189, 248, 0.55); }
+    }
+
+    .slot.filled {
+      border: 1.5px solid var(--border);
+      background: linear-gradient(145deg, #131f3d 0%, var(--surface) 100%);
+      cursor: default;
+    }
+
+    .slot.drop-target {
+      border-color: var(--cyan) !important;
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.35);
+      transform: scale(1.04);
+    }
+
+    .slot.error {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 20px rgba(239, 83, 80, 0.45);
+      animation: shake 0.45s ease;
+    }
+
+    .slot.warning {
+      border-color: var(--warning) !important;
+      box-shadow: 0 0 18px rgba(255, 184, 77, 0.35);
+    }
+
+    .slot.success-flash {
+      border-color: var(--success) !important;
+      box-shadow: 0 0 22px rgba(2, 195, 154, 0.45);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    .slot-hint {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      padding: 0 8px;
+      line-height: 1.3;
+    }
+
+    .slot-step {
+      font-size: 0.58rem;
+      color: var(--cyan);
+      opacity: 0.7;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .slot-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      width: 100%;
+    }
+
+    .slot-icon {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 7px;
+      color: var(--cyan);
+    }
+
+    .slot-icon svg { width: 18px; height: 18px; }
+
+    .slot-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-align: left;
+      line-height: 1.2;
+    }
+
+    .slot-clear {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #1a2744;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      z-index: 5;
+    }
+
+    .slot-clear:hover {
+      background: var(--error);
+      border-color: var(--error);
+      color: #fff;
+    }
+
+    #status {
+      position: fixed;
+      bottom: 14px;
+      left: calc(var(--palette-w) + 50%);
+      transform: translateX(-50%);
+      max-width: 620px;
+      padding: 8px 18px;
+      border-radius: 20px;
+      background: rgba(17, 27, 54, 0.94);
+      border: 1px solid var(--border);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      z-index: 10;
+      pointer-events: none;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    #status.active { color: var(--cyan); }
+    #status.error { color: var(--error); border-color: rgba(239, 83, 80, 0.4); }
+    #status.success { color: var(--success); border-color: rgba(2, 195, 154, 0.4); }
+
+    #icon-sprites { display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="toolbar">
+    <div class="toolbar-left">
+      <h1>Section 01: Cluster Foundation Builder</h1>
+      <span class="subtitle">Drag components into placeholders · Run to validate</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn" id="btn-reset">Reset</button>
+      <button class="btn btn-primary" id="btn-run">▶ Run Flow</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <aside id="palette">
+      <div class="palette-section">
+        <h2>Foundation</h2>
+        <div id="palette-foundation"></div>
+      </div>
+      <div class="palette-section">
+        <h2>Namespaces</h2>
+        <div id="palette-namespaces"></div>
+      </div>
+      <div class="palette-section">
+        <h2>Distractors</h2>
+        <div id="palette-distractors"></div>
+      </div>
+      <div class="palette-hint">
+        Drag a component into a placeholder slot. Click <strong>×</strong> to remove. Drop a new one to replace.<br /><br />
+        Press <strong>Run Flow</strong> to validate your cluster foundation step by step.
+      </div>
+    </aside>
+
+    <div id="canvas-wrap">
+      <div id="canvas">
+        <span class="row-label" style="left: 24px; top: 52px;">Foundation chain</span>
+        <span class="row-label" style="left: 24px; top: 268px;">Airline namespaces</span>
+        <svg id="wire-layer"></svg>
+        <div id="slots-layer"></div>
+      </div>
+      <div id="status">Drag components from the palette into the placeholder slots</div>
+    </div>
+  </div>
+
+  <svg id="icon-sprites" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-docker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>
+      <path d="M6 12h.01"/><path d="M10 12h.01"/><path d="M14 12h.01"/>
+    </symbol>
+    <symbol id="icon-ship" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.24"/><path d="M12 10V2l5 4-5 4"/>
+    </symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>
+    </symbol>
+    <symbol id="icon-hexagon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    </symbol>
+    <symbol id="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+    </symbol>
+    <symbol id="icon-helm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/>
+    </symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+    </symbol>
+    <symbol id="icon-plug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z"/>
+    </symbol>
+    <symbol id="icon-bot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+    </symbol>
+    <symbol id="icon-kanban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 5v11"/><path d="M12 5v6"/><path d="M18 5v14"/><rect width="18" height="18" x="3" y="3" rx="2"/>
+    </symbol>
+    <symbol id="icon-credit-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+    </symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+    </symbol>
+  </svg>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const SLOT_W = 150;
+    const SLOT_H = 76;
+
+    const COMPONENTS = {
+      docker:           { label: 'Docker',              icon: 'icon-docker',      group: 'foundation' },
+      kind:             { label: 'Kind',                icon: 'icon-ship',        group: 'foundation' },
+      kubectl:          { label: 'kubectl',             icon: 'icon-terminal',    group: 'foundation' },
+      'finops-cluster': { label: 'finops-cluster',      icon: 'icon-hexagon',     group: 'foundation' },
+      'booking-api':    { label: 'booking-api',         icon: 'icon-folder',      group: 'namespace' },
+      'flight-search':  { label: 'flight-search',       icon: 'icon-folder',      group: 'namespace' },
+      inventory:        { label: 'inventory',           icon: 'icon-folder',      group: 'namespace' },
+      payment:          { label: 'payment',             icon: 'icon-folder',      group: 'namespace' },
+      airline:          { label: 'airline',             icon: 'icon-folder',      group: 'namespace' },
+      helm:             { label: 'Helm',                icon: 'icon-helm',        group: 'distractor' },
+      llm:              { label: 'LLM',                 icon: 'icon-sparkles',    group: 'distractor' },
+      mcpServer:        { label: 'MCP Server',          icon: 'icon-plug',        group: 'distractor' },
+      finopsAgent:      { label: 'FinOps Agent',        icon: 'icon-bot',         group: 'distractor' },
+      issueTracker:     { label: 'Issue Tracker',       icon: 'icon-kanban',      group: 'distractor' },
+      paymentGateway:   { label: 'Payment Gateway UI',  icon: 'icon-credit-card', group: 'distractor' },
+      pythonAgent:      { label: 'Python Agent',        icon: 'icon-code',        group: 'distractor' },
+    };
+
+    const SLOT_DEFS = [
+      { id: 's1', step: 1, expected: 'docker',           hint: 'Container runtime',       x: 40,  y: 80  },
+      { id: 's2', step: 2, expected: 'kind',             hint: 'Cluster provisioner',     x: 230, y: 80  },
+      { id: 's3', step: 3, expected: 'kubectl',          hint: 'Cluster CLI',             x: 420, y: 80  },
+      { id: 's4', step: 4, expected: 'finops-cluster', hint: 'Local cluster',           x: 610, y: 80  },
+      { id: 's5', step: 5, expected: 'booking-api',    hint: 'Namespace',               x: 340, y: 300 },
+      { id: 's6', step: 6, expected: 'flight-search',  hint: 'Namespace',               x: 510, y: 300 },
+      { id: 's7', step: 7, expected: 'inventory',        hint: 'Namespace',               x: 680, y: 300 },
+      { id: 's8', step: 8, expected: 'payment',          hint: 'Namespace',               x: 850, y: 300 },
+      { id: 's9', step: 9, expected: 'airline',          hint: 'Namespace',               x: 1020, y: 300 },
+    ];
+
+    const WIRE_DEFS = [
+      { id: 'w1', from: 's1', to: 's2' },
+      { id: 'w2', from: 's2', to: 's3' },
+      { id: 'w3', from: 's3', to: 's4' },
+      { id: 'w4', from: 's4', to: 's5' },
+      { id: 'w5', from: 's4', to: 's6' },
+      { id: 'w6', from: 's4', to: 's7' },
+      { id: 'w7', from: 's4', to: 's8' },
+      { id: 'w8', from: 's4', to: 's9' },
+    ];
+
+    const SLOT_WIRE_IN = {
+      s1: null,
+      s2: 'w1', s3: 'w2', s4: 'w3',
+      s5: 'w4', s6: 'w5', s7: 'w6', s8: 'w7', s9: 'w8',
+    };
+
+    const VALIDATION_MESSAGES = {
+      s1: {
+        default: 'Slot 1 needs Docker — the container runtime that runs Kind locally.',
+        kind: 'Kind creates clusters, but Docker must run first as the container runtime.',
+        kubectl: 'kubectl talks to the cluster — Docker is the runtime layer underneath.',
+        'finops-cluster': 'The cluster comes later. Start with Docker as the container runtime.',
+        helm: 'Helm is verified in Demo 1, but Docker is the foundation runtime here.',
+        llm: 'An LLM has no role in cluster setup. You need Docker here.',
+        mcpServer: 'MCP Server belongs in later sections. Slot 1 needs Docker.',
+        finopsAgent: 'The FinOps Agent comes much later. Start with Docker.',
+        issueTracker: 'Issue Tracker is Section 08. Slot 1 needs Docker.',
+        paymentGateway: 'Payment Gateway is an app component — not a runtime.',
+        pythonAgent: 'Python Agent is Section 04. Slot 1 needs Docker.',
+        'booking-api': 'booking-api is a namespace — Docker is the container runtime.',
+        'flight-search': 'flight-search is a namespace — Docker is the container runtime.',
+        inventory: 'inventory is a namespace — Docker is the container runtime.',
+        payment: 'payment is a namespace — Docker is the container runtime.',
+        airline: 'airline is a namespace — Docker is the container runtime.',
+      },
+      s2: {
+        default: 'Slot 2 needs Kind — it creates your local Kubernetes cluster.',
+        docker: 'Docker runs containers, but Kind creates the K8 cluster on top of it.',
+        kubectl: 'kubectl accesses the cluster — Kind is what creates it.',
+        'finops-cluster': 'finops-cluster is the result of Kind — put Kind here first.',
+        helm: 'Helm packages apps — Kind provisions the cluster itself.',
+        llm: 'Kind creates clusters, not LLMs. Put Kind in this slot.',
+        mcpServer: 'MCP Server connects agents to K8 — Kind creates the cluster first.',
+        finopsAgent: 'FinOps Agent scans the cluster — Kind must create it first.',
+        issueTracker: 'Issue Tracker is a service — Kind creates the cluster.',
+        paymentGateway: 'Payment Gateway is deployed later — Kind creates the cluster.',
+        pythonAgent: 'Python Agent runs against a cluster — Kind creates it.',
+        'booking-api': 'Namespaces come after the cluster. Kind creates the cluster here.',
+        'flight-search': 'Namespaces come after the cluster. Kind creates the cluster here.',
+        inventory: 'Namespaces come after the cluster. Kind creates the cluster here.',
+        payment: 'Namespaces come after the cluster. Kind creates the cluster here.',
+        airline: 'Namespaces come after the cluster. Kind creates the cluster here.',
+      },
+      s3: {
+        default: 'Slot 3 needs kubectl — the CLI that talks to your cluster.',
+        docker: 'Docker is the runtime — kubectl is the cluster CLI.',
+        kind: 'Kind creates the cluster — kubectl is how you talk to it.',
+        'finops-cluster': 'finops-cluster is the cluster itself — kubectl is the CLI tool.',
+        helm: 'Helm deploys charts — kubectl is the core cluster CLI.',
+        llm: 'kubectl is a CLI tool, not an AI model.',
+        mcpServer: 'MCP Server is for agents — kubectl is the human CLI.',
+        finopsAgent: 'FinOps Agent uses kubectl internally — this slot is for kubectl itself.',
+        issueTracker: 'Issue Tracker is a web service — kubectl is the CLI.',
+        paymentGateway: 'Payment Gateway is an app — kubectl is the CLI tool.',
+        pythonAgent: 'Python Agent is code — kubectl is the CLI you use manually.',
+        'booking-api': 'booking-api is a namespace — kubectl is the CLI tool.',
+        'flight-search': 'flight-search is a namespace — kubectl is the CLI tool.',
+        inventory: 'inventory is a namespace — kubectl is the CLI tool.',
+        payment: 'payment is a namespace — kubectl is the CLI tool.',
+        airline: 'airline is a namespace — kubectl is the CLI tool.',
+      },
+      s4: {
+        default: 'Slot 4 needs finops-cluster — your local Kind cluster name.',
+        docker: 'kubectl talks to the cluster — it does not create one. You need finops-cluster here.',
+        kind: 'Kind is the tool — finops-cluster is the cluster it creates.',
+        kubectl: 'kubectl talks to the cluster — it does not create one. You need finops-cluster here.',
+        helm: 'Helm deploys into a cluster — the cluster itself is finops-cluster.',
+        llm: 'finops-cluster is your K8 cluster — not an LLM.',
+        mcpServer: 'MCP Server connects to a cluster — finops-cluster is that cluster.',
+        finopsAgent: 'FinOps Agent runs against finops-cluster — put the cluster here.',
+        issueTracker: 'Issue Tracker is a separate service — finops-cluster is the K8 cluster.',
+        paymentGateway: 'Payment Gateway runs inside the cluster — finops-cluster is the cluster itself.',
+        pythonAgent: 'Python Agent scans finops-cluster — put the cluster name here.',
+        'booking-api': 'booking-api is a namespace inside the cluster — finops-cluster is the cluster.',
+        'flight-search': 'flight-search is a namespace — finops-cluster is the cluster.',
+        inventory: 'inventory is a namespace — finops-cluster is the cluster.',
+        payment: 'payment is a namespace — finops-cluster is the cluster.',
+        airline: 'airline is a namespace — finops-cluster is the cluster.',
+      },
+      s5: {
+        default: 'Slot 5 needs booking-api — one of the baseline airline namespaces.',
+        docker: 'booking-api is a Kubernetes namespace, not a container runtime.',
+        kind: 'booking-api is a namespace — create it after the cluster is ready.',
+        kubectl: 'kubectl creates namespaces — booking-api is the namespace itself.',
+        'finops-cluster': 'finops-cluster is the cluster — booking-api is a namespace inside it.',
+        helm: 'Helm can deploy into namespaces — booking-api is the namespace name.',
+        llm: 'booking-api is a Kubernetes namespace, not an AI model.',
+        mcpServer: 'MCP Server is an agent tool — booking-api is a namespace.',
+        finopsAgent: 'FinOps Agent scans namespaces — booking-api is the namespace itself.',
+        issueTracker: 'Issue Tracker is a service — booking-api is a K8 namespace.',
+        paymentGateway: 'Payment Gateway is an app — booking-api is a namespace.',
+        pythonAgent: 'Python Agent is code — booking-api is a namespace.',
+        'flight-search': 'Wrong namespace — this slot needs booking-api specifically.',
+        inventory: 'Wrong namespace — this slot needs booking-api specifically.',
+        payment: 'Wrong namespace — this slot needs booking-api specifically.',
+        airline: 'Wrong namespace — this slot needs booking-api specifically.',
+      },
+      s6: {
+        default: 'Slot 6 needs flight-search — the flight search service namespace.',
+        'booking-api': 'Wrong namespace — this slot needs flight-search.',
+        inventory: 'Wrong namespace — this slot needs flight-search.',
+        payment: 'Wrong namespace — this slot needs flight-search.',
+        airline: 'Wrong namespace — this slot needs flight-search.',
+        docker: 'flight-search is a namespace, not Docker.',
+        kind: 'flight-search is a namespace — create it after the cluster is ready.',
+        kubectl: 'kubectl is the CLI — flight-search is the namespace name.',
+        'finops-cluster': 'finops-cluster is the cluster — flight-search is a namespace.',
+        helm: 'Helm deploys charts — flight-search is a namespace.',
+        llm: 'flight-search is a Kubernetes namespace, not an LLM.',
+        mcpServer: 'MCP Server is for agents — flight-search is a namespace.',
+        finopsAgent: 'FinOps Agent scans namespaces — flight-search is the namespace itself.',
+        issueTracker: 'Issue Tracker is a service — flight-search is a K8 namespace.',
+        paymentGateway: 'Payment Gateway is an app — flight-search is a namespace.',
+        pythonAgent: 'Python Agent is code — flight-search is a namespace.',
+      },
+      s7: {
+        default: 'Slot 7 needs inventory — the inventory service namespace.',
+        'booking-api': 'Wrong namespace — this slot needs inventory.',
+        'flight-search': 'Wrong namespace — this slot needs inventory.',
+        payment: 'Wrong namespace — this slot needs inventory.',
+        airline: 'Wrong namespace — this slot needs inventory.',
+        docker: 'inventory is a namespace, not Docker.',
+        kind: 'inventory is a namespace — create it after the cluster is ready.',
+        kubectl: 'kubectl is the CLI — inventory is the namespace name.',
+        'finops-cluster': 'finops-cluster is the cluster — inventory is a namespace.',
+        helm: 'Helm deploys charts — inventory is a namespace.',
+        llm: 'inventory is a Kubernetes namespace, not an LLM.',
+        mcpServer: 'MCP Server is for agents — inventory is a namespace.',
+        finopsAgent: 'FinOps Agent scans namespaces — inventory is the namespace itself.',
+        issueTracker: 'Issue Tracker is a service — inventory is a K8 namespace.',
+        paymentGateway: 'Payment Gateway is an app — inventory is a namespace.',
+        pythonAgent: 'Python Agent is code — inventory is a namespace.',
+      },
+      s8: {
+        default: 'Slot 8 needs payment — the payment service namespace.',
+        'booking-api': 'Wrong namespace — this slot needs payment.',
+        'flight-search': 'Wrong namespace — this slot needs payment.',
+        inventory: 'Wrong namespace — this slot needs payment.',
+        airline: 'Wrong namespace — this slot needs payment.',
+        docker: 'payment is a namespace, not Docker.',
+        kind: 'payment is a namespace — create it after the cluster is ready.',
+        kubectl: 'kubectl is the CLI — payment is the namespace name.',
+        'finops-cluster': 'finops-cluster is the cluster — payment is a namespace.',
+        helm: 'Helm deploys charts — payment is a namespace.',
+        llm: 'payment is a Kubernetes namespace, not an LLM.',
+        mcpServer: 'MCP Server is for agents — payment is a namespace.',
+        finopsAgent: 'FinOps Agent scans namespaces — payment is the namespace itself.',
+        issueTracker: 'Issue Tracker is a service — payment is a K8 namespace.',
+        paymentGateway: 'Payment Gateway UI is an app — payment is the K8 namespace.',
+        pythonAgent: 'Python Agent is code — payment is a namespace.',
+      },
+      s9: {
+        default: 'Slot 9 needs airline — the main airline namespace.',
+        'booking-api': 'Wrong namespace — this slot needs airline.',
+        'flight-search': 'Wrong namespace — this slot needs airline.',
+        inventory: 'Wrong namespace — this slot needs airline.',
+        payment: 'Wrong namespace — this slot needs airline.',
+        docker: 'airline is a namespace, not Docker.',
+        kind: 'airline is a namespace — create it after the cluster is ready.',
+        kubectl: 'kubectl is the CLI — airline is the namespace name.',
+        'finops-cluster': 'finops-cluster is the cluster — airline is a namespace.',
+        helm: 'Helm deploys charts — airline is a namespace.',
+        llm: 'airline is a Kubernetes namespace, not an LLM.',
+        mcpServer: 'MCP Server is for agents — airline is a namespace.',
+        finopsAgent: 'FinOps Agent scans namespaces — airline is the namespace itself.',
+        issueTracker: 'Issue Tracker is a service — airline is a K8 namespace.',
+        paymentGateway: 'Payment Gateway is an app — airline is a namespace.',
+        pythonAgent: 'Python Agent is code — airline is a namespace.',
+      },
+    };
+
+    let slots = SLOT_DEFS.map(s => ({ ...s, filled: null }));
+    let isRunning = false;
+
+    const wireLayer = document.getElementById('wire-layer');
+    const slotsLayer = document.getElementById('slots-layer');
+    const statusEl = document.getElementById('status');
+    const btnRun = document.getElementById('btn-run');
+    const btnReset = document.getElementById('btn-reset');
+
+    function getSlot(id) {
+      return slots.find(s => s.id === id);
+    }
+
+    function slotCenter(slot, side) {
+      const cx = slot.x + SLOT_W / 2;
+      const cy = slot.y + SLOT_H / 2;
+      if (side === 'out') return { x: slot.x + SLOT_W, y: cy };
+      if (side === 'in') return { x: slot.x, y: cy };
+      if (side === 'bottom') return { x: cx, y: slot.y + SLOT_H };
+      if (side === 'top') return { x: cx, y: slot.y };
+      return { x: cx, y: cy };
+    }
+
+    function bezierPath(x1, y1, x2, y2) {
+      const dx = Math.abs(x2 - x1) * 0.55;
+      const cx1 = x1 + (x2 >= x1 ? dx : -dx);
+      const cx2 = x2 - (x2 >= x1 ? dx : -dx);
+      return `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`;
+    }
+
+    function wirePath(fromId, toId) {
+      const from = getSlot(fromId);
+      const to = getSlot(toId);
+      if (!from || !to) return '';
+
+      const isFanOut = fromId === 's4';
+      const p1 = isFanOut ? slotCenter(from, 'bottom') : slotCenter(from, 'out');
+      const p2 = isFanOut ? slotCenter(to, 'top') : slotCenter(to, 'in');
+      return bezierPath(p1.x, p1.y, p2.x, p2.y);
+    }
+
+    function setStatus(msg, type) {
+      statusEl.textContent = msg;
+      statusEl.className = type || '';
+      if (type === 'active') statusEl.classList.add('active');
+      else if (type === 'error') statusEl.classList.add('error');
+      else if (type === 'success') statusEl.classList.add('success');
+    }
+
+    function renderPalette() {
+      const groups = {
+        foundation: document.getElementById('palette-foundation'),
+        namespace: document.getElementById('palette-namespaces'),
+        distractor: document.getElementById('palette-distractors'),
+      };
+
+      Object.entries(COMPONENTS).forEach(([type, meta]) => {
+        const item = document.createElement('div');
+        item.className = 'palette-item' + (meta.group === 'distractor' ? ' distractor' : '');
+        item.dataset.type = type;
+        item.draggable = true;
+        item.innerHTML = `
+          <div class="icon-wrap"><svg><use href="#${meta.icon}"/></svg></div>
+          <span>${meta.label}</span>`;
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', type);
+          e.dataTransfer.effectAllowed = 'copy';
+        });
+        groups[meta.group].appendChild(item);
+      });
+    }
+
+    function renderWires(activeWireIds) {
+      const activeSet = new Set(activeWireIds || []);
+      wireLayer.querySelectorAll('.wire-group').forEach(el => el.remove());
+
+      WIRE_DEFS.forEach(wire => {
+        const d = wirePath(wire.from, wire.to);
+        if (!d) return;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.classList.add('wire-group');
+        g.dataset.wireId = wire.id;
+
+        const visible = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        visible.setAttribute('d', d);
+        visible.classList.add('wire-visible');
+        visible.dataset.wireId = wire.id;
+        if (activeSet.has(wire.id)) visible.classList.add('active');
+
+        const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        pulse.setAttribute('d', d);
+        pulse.classList.add('wire-pulse');
+        pulse.dataset.wireId = wire.id;
+
+        const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        particle.setAttribute('r', '5');
+        particle.classList.add('wire-particle');
+        particle.dataset.wireId = wire.id;
+
+        g.appendChild(visible);
+        g.appendChild(pulse);
+        g.appendChild(particle);
+        wireLayer.appendChild(g);
+      });
+    }
+
+    function renderSlots() {
+      slotsLayer.innerHTML = '';
+      slots.forEach(slot => {
+        const el = document.createElement('div');
+        el.className = 'slot ' + (slot.filled ? 'filled' : 'empty');
+        el.dataset.slotId = slot.id;
+        el.style.left = slot.x + 'px';
+        el.style.top = slot.y + 'px';
+
+        if (slot.filled) {
+          const meta = COMPONENTS[slot.filled];
+          el.innerHTML = `
+            <button class="slot-clear" title="Remove" aria-label="Remove">×</button>
+            <div class="slot-content">
+              <div class="slot-icon"><svg><use href="#${meta.icon}"/></svg></div>
+              <div class="slot-label">${meta.label}</div>
+            </div>`;
+          el.querySelector('.slot-clear').addEventListener('click', e => {
+            e.stopPropagation();
+            if (isRunning) return;
+            slot.filled = null;
+            renderAll();
+            setStatus('Component removed — drag a new one into the slot');
+          });
+        } else {
+          el.innerHTML = `
+            <div class="slot-step">Step ${slot.step}</div>
+            <div class="slot-hint">${slot.hint}</div>`;
+        }
+
+        el.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+          el.classList.add('drop-target');
+        });
+
+        el.addEventListener('dragleave', () => {
+          el.classList.remove('drop-target');
+        });
+
+        el.addEventListener('drop', e => {
+          e.preventDefault();
+          el.classList.remove('drop-target');
+          if (isRunning) return;
+          const type = e.dataTransfer.getData('text/plain');
+          if (!type || !COMPONENTS[type]) return;
+          slot.filled = type;
+          clearSlotHighlights();
+          renderAll();
+          setStatus(`Placed ${COMPONENTS[type].label} in step ${slot.step}`, 'active');
+        });
+
+        slotsLayer.appendChild(el);
+      });
+    }
+
+    function renderAll(activeWireIds) {
+      renderSlots();
+      renderWires(activeWireIds);
+    }
+
+    function clearSlotHighlights() {
+      document.querySelectorAll('.slot').forEach(el => {
+        el.classList.remove('error', 'warning', 'success-flash');
+      });
+    }
+
+    function getValidationMessage(slot, wrongType) {
+      const msgs = VALIDATION_MESSAGES[slot.id];
+      if (!msgs) return `Wrong component for step ${slot.step}.`;
+      return msgs[wrongType] || msgs.default;
+    }
+
+    function animateParticleAlongPath(wireId) {
+      return new Promise(resolve => {
+        const visible = wireLayer.querySelector(`.wire-visible[data-wire-id="${wireId}"]`);
+        const pulse = wireLayer.querySelector(`.wire-pulse[data-wire-id="${wireId}"]`);
+        const particle = wireLayer.querySelector(`.wire-particle[data-wire-id="${wireId}"]`);
+        if (!visible || !pulse || !particle) {
+          resolve();
+          return;
+        }
+
+        pulse.classList.add('animating');
+        const len = visible.getTotalLength();
+        const start = performance.now();
+        const duration = 750;
+
+        particle.classList.add('animating');
+
+        function tick(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const pt = visible.getPointAtLength(t * len);
+          particle.setAttribute('cx', pt.x);
+          particle.setAttribute('cy', pt.y);
+          if (t < 1) requestAnimationFrame(tick);
+          else {
+            pulse.classList.remove('animating');
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function runValidation() {
+      if (isRunning) return;
+      isRunning = true;
+      btnRun.classList.add('running');
+      btnRun.textContent = '● Running…';
+      clearSlotHighlights();
+
+      for (const slot of slots) {
+        const el = document.querySelector(`.slot[data-slot-id="${slot.id}"]`);
+        const wireId = SLOT_WIRE_IN[slot.id];
+
+        if (!slot.filled) {
+          el.classList.add('warning');
+          setStatus(`Step ${slot.step} is empty — fill "${slot.hint}" before continuing`, 'error');
+          isRunning = false;
+          btnRun.classList.remove('running');
+          btnRun.textContent = '▶ Run Flow';
+          return;
+        }
+
+        if (slot.filled !== slot.expected) {
+          el.classList.add('error');
+          setStatus(getValidationMessage(slot, slot.filled), 'error');
+          isRunning = false;
+          btnRun.classList.remove('running');
+          btnRun.textContent = '▶ Run Flow';
+          return;
+        }
+
+        const label = COMPONENTS[slot.filled].label;
+        setStatus(`Step ${slot.step}: ${label} ✓`, 'active');
+
+        if (wireId) {
+          renderWires([wireId]);
+          await animateParticleAlongPath(wireId);
+        }
+
+        el.classList.add('success-flash');
+        await sleep(350);
+        el.classList.remove('success-flash');
+      }
+
+      renderWires(WIRE_DEFS.map(w => w.id));
+      setStatus('Cluster foundation complete! You\'re ready for Section 02 — Airline App Deployment.', 'success');
+      await sleep(2000);
+
+      isRunning = false;
+      btnRun.classList.remove('running');
+      btnRun.textContent = '▶ Run Flow';
+    }
+
+    function sleep(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    function resetAll() {
+      if (isRunning) return;
+      slots = SLOT_DEFS.map(s => ({ ...s, filled: null }));
+      clearSlotHighlights();
+      renderAll();
+      setStatus('All slots cleared — drag components from the palette');
+    }
+
+    btnRun.addEventListener('click', runValidation);
+    btnReset.addEventListener('click', resetAll);
+
+    renderPalette();
+    renderAll();
+  })();
+  </script>
+</body>
+</html>
