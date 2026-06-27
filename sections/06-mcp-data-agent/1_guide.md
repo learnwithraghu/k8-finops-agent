@@ -15,4 +15,4 @@ python3 -m pip install -r sections/06-mcp-data-agent/requirements.txt
 ```bash
 cat sections/06-mcp-data-agent/agent.py
 ```
-> *Talking point: This is our base agent. It connects to the Kubernetes MCP via standard IO, calls the tool to list resources, and prints the raw JSON.*
+> *Talking point: This is our base agent. It connects to the Kubernetes MCP via SSE to our supergateway, calls the tool to list resources, and prints the raw JSON.*
