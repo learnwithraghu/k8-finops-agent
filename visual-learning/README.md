@@ -22,6 +22,23 @@ uv run streamlit run app.py
 
 **See:** `visuals/k8s_finops_mystery/README.md` for detailed instructions.
 
+### RAG Architecture Builder
+**Location:** `visuals/rag_architecture_builder/`
+
+A single-file, browser-based drag-and-drop canvas for exploring RAG (Retrieval-Augmented Generation) pipeline architecture. Students rearrange pre-wired components, add new ones from the palette, reconnect wires, and watch animated data-flow pulses travel through the pipeline.
+
+**Learn:**
+- How documents, embeddings, vector stores, and LLMs connect in a RAG system
+- The order of data flow from user query to final answer
+- How adding components (e.g. Reranker, Guardrails) changes the architecture
+
+**Run (no install required):**
+```bash
+open visual-learning/visuals/rag_architecture_builder/index.html
+```
+
+Or host the file on any static server / GitHub Pages — it has zero dependencies.
+
 ## 🚀 Quick Start
 
 1. **Navigate to the game:**
@@ -72,18 +89,20 @@ visual-learning/
 ├── README.md                   # This file
 └── visuals/
     ├── __init__.py
-    └── k8s_finops_mystery/
-        ├── app.py              # Main application
-        ├── components/         # Game components
-        │   ├── __init__.py
-        │   ├── state_manager.py
-        │   ├── act1_incident.py
-        │   ├── act2_investigation.py
-        │   ├── act3_revelation.py
-        │   └── act4_solution.py
-        ├── assets/             # Icons, images
-        ├── README.md           # Game instructions
-        └── GAME_DESIGN.md      # Game design document
+    ├── k8s_finops_mystery/
+    │   ├── app.py              # Main application
+    │   ├── components/         # Game components
+    │   │   ├── __init__.py
+    │   │   ├── state_manager.py
+    │   │   ├── act1_incident.py
+    │   │   ├── act2_investigation.py
+    │   │   ├── act3_revelation.py
+    │   │   └── act4_solution.py
+    │   ├── assets/             # Icons, images
+    │   ├── README.md           # Game instructions
+    │   └── GAME_DESIGN.md      # Game design document
+    └── rag_architecture_builder/
+        └── index.html          # Single-file RAG pipeline builder (no deps)
 ```
 
 ## 🎯 Key Features
