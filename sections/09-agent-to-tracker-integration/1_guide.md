@@ -1,22 +1,20 @@
-# Demo 1: Testing Integration and Idempotency
+# Demo 1: The Full End-to-End Agent
 
 **Time Budget:** 3-4 mins
 
 ### 1) Ensure the tracker is running
-```bash
-docker run --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
-```
 *(If it is already running from Section 08, skip this)*
-
-### 2) Check environment configuration
 ```bash
-grep -nE '^(OPENAI_BASE_URL|OPENAI_API_KEY|OPENAI_MODEL_ID|ISSUE_TRACKER_MCP_URL)=' .env
+docker run -d --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
 ```
-> *Expected: Ensure `ISSUE_TRACKER_MCP_URL` points to `http://localhost:8086/mcp`.*
 
-### 3) Inspect MCP tracker client and main logic
+### 2) Inspect the new script
 ```bash
-cat sections/09-agent-to-tracker-integration/agent/tracker.py
-cat sections/09-agent-to-tracker-integration/agent/main.py
+cat sections/09-agent-to-tracker-integration/agent.py
 ```
-> *Talking point: Compare 15 lines of MCP client code to the legacy 104-line REST client.*
+> *Talking point: We've now added MCP SSE client logic to our agent to POST the structured output directly into the Issue Tracker, using `call_tool("create_issue")`.*
+
+### 3) Run the full agent
+```bash
+python3 sections/09-agent-to-tracker-integration/agent.py
+```

@@ -9,18 +9,13 @@ source venv/bin/activate
 python3 -m pip install -r sections/07-llm-structured-agent/requirements.txt
 ```
 
-### 2) Inspect the rules and skeleton code
+### 2) Inspect the code
 ```bash
-cat sections/07-llm-structured-agent/config/tagging-rules.yaml
-cat sections/07-llm-structured-agent/agent/analyser.py
-cat sections/07-llm-structured-agent/agent/models.py
-cat sections/07-llm-structured-agent/agent/main.py
+cat sections/07-llm-structured-agent/agent.py
 ```
-> *Talking point: We feed the unstructured snapshot + tagging rules to the LLM to get structured findings based on models.py schemas.*
+> *Talking point: We took the data collection logic from Section 06 and added LangChain/OpenAI analysis on top to get structured findings.*
 
 ### 3) Run the structured agent
-*(Using the snapshot generated in Section 04)*
 ```bash
-PYTHONPATH=sections/07-llm-structured-agent \
-  python3 -m agent.main --snapshot k8s_metadata.json
+python3 sections/07-llm-structured-agent/agent.py
 ```

@@ -1,16 +1,12 @@
-# Demo 2: Auto-creating and Updating Tickets
+# Demo 2: Verifying the Automation
 
 **Time Budget:** 4-5 mins
 
-### 1) Run the agent to create tickets
-```bash
-PYTHONPATH=sections/09-agent-to-tracker-integration python3 -m agent.main
-```
-> *Talking point: Currently running the transitional flow which scans and calls the LLM. Soon this will just read the TicketBatch from Section 07 directly.*
-
-### 2) Verify tickets in the UI
+### 1) Verify tickets in the UI
 - Open: `http://localhost:8085`
-> *Talking point: Look for the 'mcp-llm-agent' source field. Emphasize idempotency (re-running the agent doesn't spam duplicate tickets).*
+> *Talking point: Our end-to-end flow is complete! We pulled raw cluster data via an MCP standard IO client, passed it to a structured LLM, and posted the resulting tickets back to our Tracker using an MCP SSE client.*
 
-### 3) Cleanup
-*(Switch to the tracker terminal and press `Ctrl-C` to stop it)*
+### 2) Cleanup
+```bash
+docker stop finops-issue-tracker
+```
