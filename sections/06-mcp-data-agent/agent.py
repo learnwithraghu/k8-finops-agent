@@ -12,7 +12,7 @@ try:
     from mcp import ClientSession
 except ImportError:
     from mcp.client.session import ClientSession
-from mcp.client.stdio import StdioServerParameters, stdio_client
+from mcp.client.sse import sse_client
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,22 +32,10 @@ def _decode(response: Any) -> Dict[str, Any]:
     return {"items": []}
 
 async def main() -> None:
-    kubeconfig = os.getenv("KUBECONFIG_FILE") or os.getenv("KUBECONFIG") or str(Path.home() / ".kube" / "config")
-    
-    server_params = StdioServerParameters(
-        command="docker",
-        args=[
-            "run", "--rm", "-i", "--network", "host", "--user", "0:0",
-            "-v", f"{kubeconfig}:/kubeconfig:ro",
-            "-e", "KUBECONFIG=/kubeconfig",
-            "mcp/kubernetes:latest"
-        ],
-        env=os.environ.copy()
-    )
-
+    mcp_url = os.getenv("K8S_MCP_URL", "http://localhost:8000/sse")
     async with AsyncExitStack() as stack:
-        logger.info("Connecting to Kubernetes MCP server...")
-        read_stream, write_stream = await stack.enter_async_context(stdio_client(server_params))
+        logger.info(f"Connecting to Kubernetes MCP server at {mcp_url}...")
+        read_stream, write_stream = await stack.enter_async_context(sse_client(mcp_url))
         session = await stack.enter_async_context(ClientSession(read_stream, write_stream))
         await session.initialize()
         

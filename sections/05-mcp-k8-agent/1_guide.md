@@ -27,8 +27,7 @@ npx -y supergateway \
   --stdio "docker run --rm -i --network host --user 0:0 \
     -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig \
     mcp/kubernetes:latest" \
-  --outputTransport streamableHttp \
-  --streamableHttpPath /mcp \
+  --outputTransport sse \
   --port 8000 \
   --healthEndpoint /healthz
 ```

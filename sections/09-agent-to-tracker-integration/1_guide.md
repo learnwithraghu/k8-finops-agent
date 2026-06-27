@@ -2,6 +2,8 @@
 
 **Time Budget:** 3-4 mins
 
+> *Note: Ensure your `supergateway` from Section 05 is still running in the background!*
+
 ### 1) Ensure the tracker is running
 *(If it is already running from Section 08, skip this)*
 ```bash
