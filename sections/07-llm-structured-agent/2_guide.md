@@ -24,3 +24,7 @@
 
 ### 2) Discussion
 > *Talking point: This structured output is what Section 09 will POST to our Issue Tracker. We separated collection (06) from analysis (07) to keep the pipeline deterministic and testable.*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to wire the **before/after analysis** pipeline — messy snapshot and policy in, structured ticket fields out. Use **Need a hint?** if stuck, then press **Run Analysis** to validate.

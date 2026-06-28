@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Section 01: Cluster Foundation Builder</title>
+  <title>Section 06: MCP Data Collector Builder</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -331,8 +331,8 @@
     #canvas-viewport.panning { cursor: grabbing; }
 
     #canvas {
-      width: 1240px;
-      height: 460px;
+      width: 1280px;
+      height: 480px;
       position: relative;
       background-color: var(--canvas-bg);
       background-image: radial-gradient(circle, #E8ECED 1px, transparent 1px);
@@ -345,8 +345,8 @@
       position: absolute;
       left: 16px;
       top: 64px;
-      width: 1188px;
-      height: 330px;
+      width: 1248px;
+      height: 400px;
       border-radius: 16px;
       border: 1px solid rgba(255, 153, 0, 0.25);
       background: #FAFAFA;
@@ -434,6 +434,64 @@
       inset: 0;
       z-index: 2;
     }
+    #zones-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .zone-frame {
+      position: absolute;
+      border-radius: 14px;
+      border: 2px dashed rgba(255, 153, 0, 0.35);
+      background: rgba(255, 251, 242, 0.45);
+    }
+
+    .zone-frame.tint-green {
+      border-color: rgba(52, 168, 83, 0.45);
+      background: rgba(245, 255, 248, 0.55);
+    }
+
+    .zone-frame.tint-red {
+      border-color: rgba(239, 83, 80, 0.4);
+      background: rgba(255, 248, 248, 0.55);
+    }
+
+    .zone-frame.tint-blue {
+      border-color: rgba(66, 133, 244, 0.35);
+      background: rgba(240, 247, 255, 0.5);
+    }
+
+    .zone-frame.tint-amber {
+      border-color: rgba(255, 153, 0, 0.4);
+      background: rgba(255, 251, 242, 0.65);
+    }
+
+    .zone-label {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .slot.hub {
+      width: 170px;
+      height: 92px;
+    }
+
+    .slot.wide {
+      width: 220px;
+    }
+
+    .wire-visible.dashed {
+      stroke-dasharray: 6 6;
+    }
+
 
     .slot {
       position: absolute;
@@ -599,14 +657,14 @@
 
   <div id="toolbar">
     <div class="toolbar-left">
-      <h1>Section 01: Cluster Foundation Builder</h1>
-      <span class="subtitle">Recall the foundation chain from the demos — then Run Flow</span>
+      <h1>Section 06: MCP Data Collector Builder</h1>
+      <span class="subtitle">Build the prompt → MCP → raw snapshot loop (no LLM yet)</span>
     </div>
     <div class="toolbar-actions">
       <button class="btn btn-hint" id="btn-hint">Need a hint?</button>
       <button class="btn btn-solve" id="btn-auto-solve">Auto Solve</button>
       <button class="btn" id="btn-reset">Reset</button>
-      <button class="btn btn-primary" id="btn-run">▶ Run Flow</button>
+      <button class="btn btn-primary" id="btn-run">▶ Collect Snapshot</button>
     </div>
   </div>
 
@@ -628,9 +686,10 @@
     <div id="canvas-wrap">
       <div id="canvas-viewport">
         <div id="canvas">
-          <div id="canvas-frame"></div>
-          <span class="row-label" style="left: 24px; top: 52px;">Foundation chain</span>
-          <span class="row-label" style="left: 24px; top: 268px;">Airline namespaces</span>
+                    <div id="canvas-frame"></div>
+          <span class="row-label" style="left: 24px; top: 52px;">MCP hub</span>
+          <span class="row-label" style="left: 420px; top: 300px;">JSON sink</span>
+          <div id="zones-layer"></div>
           <svg id="wire-layer"></svg>
           <div id="slots-layer"></div>
         </div>
@@ -645,7 +704,7 @@
         <div class="hint-title">Hint</div>
         <div class="hint-text" id="hint-text"></div>
       </div>
-      <div id="status">Drag components onto the slots — order matters</div>
+      <div id="status">Route MCP tool spokes into the JSON sink</div>
     </div>
   </div>
 
@@ -687,234 +746,238 @@
     const SLOT_W = 150;
     const SLOT_H = 84;
 
+    const LAYOUT = {
+      runLabel: '▶ Collect Snapshot',
+      successMsg: 'MCP data collection complete! Unstructured snapshot ready for Section 07 analysis.',
+      canvasW: 1280,
+      canvasH: 480,
+      hubId: 's2',
+      sinkId: 's8',
+    };
+
+    const ZONE_DEFS = [
+      { id: 'spokes', label: 'MCP spokes', x: 20, y: 60, w: 1240, h: 300, tint: 'blue' },
+      { id: 'sink', label: 'JSON sink', x: 340, y: 290, w: 600, h: 150, tint: 'green' },
+    ];
+
+    const VALIDATION_GROUPS = [
+      { id: 'endpoint', label: 'MCP endpoint', slots: ['s1'] },
+      { id: 'hub', label: 'Agent hub', slots: ['s2'] },
+      { id: 'tools', label: 'Tool spokes', slots: ['s3', 's4', 's5', 's6', 's7'] },
+      { id: 'sink', label: 'JSON sink', slots: ['s8'] },
+    ];
+
     const COMPONENTS = {
-      docker:           { label: 'Docker',         icon: 'icon-docker' },
-      kind:             { label: 'Kind',           icon: 'icon-ship' },
-      kubectl:          { label: 'kubectl',        icon: 'icon-terminal' },
-      'finops-cluster': { label: 'finops-cluster', icon: 'icon-hexagon' },
-      'booking-api':    { label: 'booking-api',    icon: 'icon-folder' },
-      'flight-search':  { label: 'flight-search',  icon: 'icon-folder' },
-      inventory:        { label: 'inventory',      icon: 'icon-folder' },
-      payment:          { label: 'payment',        icon: 'icon-folder' },
-      airline:          { label: 'airline',        icon: 'icon-folder' },
-      helm:             { label: 'Helm',           icon: 'icon-helm' },
-      llm:              { label: 'LLM',            icon: 'icon-sparkles' },
-      mcpServer:        { label: 'MCP Server',     icon: 'icon-plug' },
-      finopsAgent:      { label: 'FinOps Agent',   icon: 'icon-bot' },
+      'mcp-endpoint': { label: 'MCP endpoint', icon: 'icon-plug' },
+      'agent-py': { label: 'agent.py', icon: 'icon-code' },
+      'kubectl-get-ns': { label: 'kubectl_get namespaces', icon: 'icon-list' },
+      'kubectl-get-deploy': { label: 'kubectl_get deployments', icon: 'icon-box' },
+      'kubectl-get-pods': { label: 'kubectl_get pods', icon: 'icon-hexagon' },
+      'kubectl-get-svc': { label: 'kubectl_get services', icon: 'icon-globe' },
+      'kubectl-get-pvc-cm': { label: 'kubectl_get PVCs + CMs', icon: 'icon-database' },
+      'k8s-metadata-json': { label: 'k8s_metadata.json', icon: 'icon-file-json' },
+      llm: { label: 'LLM', icon: 'icon-sparkles' },
+      'tagging-rules': { label: 'tagging-rules.yaml', icon: 'icon-file-json' },
+      'issue-tracker': { label: 'Issue Tracker', icon: 'icon-ticket' },
+      'curl-only': { label: 'curl only', icon: 'icon-terminal' },
+      bedrock: { label: 'Bedrock', icon: 'icon-sparkles' },
     };
 
     const SLOT_DEFS = [
-      { id: 's1', step: 1, expected: 'docker',           storyHint: 'Runs containers on your laptop',        x: 40,  y: 80  },
-      { id: 's2', step: 2, expected: 'kind',             storyHint: 'Spins up a local Kubernetes cluster',   x: 230, y: 80  },
-      { id: 's3', step: 3, expected: 'kubectl',          storyHint: 'Command-line access to the cluster',    x: 420, y: 80  },
-      { id: 's4', step: 4, expected: 'finops-cluster', storyHint: 'Name of your training cluster',         x: 610, y: 80  },
-      { id: 's5', step: 5, expected: 'booking-api',    storyHint: 'Handles ticket reservations',           x: 340, y: 300 },
-      { id: 's6', step: 6, expected: 'flight-search',  storyHint: 'Searches available flights',            x: 510, y: 300 },
-      { id: 's7', step: 7, expected: 'inventory',        storyHint: 'Tracks seats and routes',               x: 680, y: 300 },
-      { id: 's8', step: 8, expected: 'payment',          storyHint: 'Collecting money service',              x: 850, y: 300 },
-      { id: 's9', step: 9, expected: 'airline',          storyHint: 'Parent namespace for airline apps',     x: 1020, y: 300 },
+      { id: 's1', step: 1, expected: 'mcp-endpoint', storyHint: 'Section 05 HTTP gateway still running', x: 500, y: 80, zoneTag: 'spokes', hub: true },
+      { id: 's2', step: 2, expected: 'agent-py', storyHint: 'Python script driving the collector', x: 500, y: 200, zoneTag: 'hub', hub: true },
+      { id: 's3', step: 3, expected: 'kubectl-get-ns', storyHint: 'First MCP tool call — list namespaces', x: 80, y: 120, zoneTag: 'spokes' },
+      { id: 's4', step: 4, expected: 'kubectl-get-deploy', storyHint: 'Pulls deployment objects', x: 80, y: 240, zoneTag: 'spokes' },
+      { id: 's5', step: 5, expected: 'kubectl-get-pods', storyHint: 'Pulls pod objects', x: 200, y: 340, zoneTag: 'spokes' },
+      { id: 's6', step: 6, expected: 'kubectl-get-svc', storyHint: 'Pulls service objects', x: 800, y: 240, zoneTag: 'spokes' },
+      { id: 's7', step: 7, expected: 'kubectl-get-pvc-cm', storyHint: 'Remaining resource types in one sweep', x: 920, y: 120, zoneTag: 'spokes' },
+      { id: 's8', step: 8, expected: 'k8s-metadata-json', storyHint: 'Unstructured snapshot printed to stdout', x: 460, y: 330, zoneTag: 'sink', wide: true },
     ];
 
     const WIRE_DEFS = [
       { id: 'w1', from: 's1', to: 's2' },
       { id: 'w2', from: 's2', to: 's3' },
-      { id: 'w3', from: 's3', to: 's4' },
-      { id: 'w4', from: 's4', to: 's5' },
-      { id: 'w5', from: 's4', to: 's6' },
-      { id: 'w6', from: 's4', to: 's7' },
-      { id: 'w7', from: 's4', to: 's8' },
-      { id: 'w8', from: 's4', to: 's9' },
+      { id: 'w3', from: 's2', to: 's4' },
+      { id: 'w4', from: 's2', to: 's5' },
+      { id: 'w5', from: 's2', to: 's6' },
+      { id: 'w6', from: 's2', to: 's7' },
+      { id: 'w7', from: 's2', to: 's8' },
     ];
 
     const SLOT_WIRE_IN = {
       s1: null,
-      s2: 'w1', s3: 'w2', s4: 'w3',
-      s5: 'w4', s6: 'w5', s7: 'w6', s8: 'w7', s9: 'w8',
+      s2: 'w1',
+      s3: 'w2',
+      s4: 'w3',
+      s5: 'w4',
+      s6: 'w5',
+      s7: 'w6',
+      s8: 'w7'
     };
 
     const VALIDATION_MESSAGES = {
       s1: {
-        default: 'Slot 1 needs Docker — the container runtime that runs Kind locally.',
-        kind: 'Kind creates clusters, but Docker must run first as the container runtime.',
-        kubectl: 'kubectl talks to the cluster — Docker is the runtime layer underneath.',
-        'finops-cluster': 'The cluster comes later. Start with Docker as the container runtime.',
-        helm: 'Helm is verified in Demo 1, but Docker is the foundation runtime here.',
-        llm: 'An LLM has no role in cluster setup. You need Docker here.',
-        mcpServer: 'MCP Server belongs in later sections. Slot 1 needs Docker.',
-        finopsAgent: 'The FinOps Agent comes much later. Start with Docker.',
-        'booking-api': 'booking-api is a namespace — Docker is the container runtime.',
-        'flight-search': 'flight-search is a namespace — Docker is the container runtime.',
-        inventory: 'inventory is a namespace — Docker is the container runtime.',
-        payment: 'payment is a namespace — Docker is the container runtime.',
-        airline: 'airline is a namespace — Docker is the container runtime.',
+        default: 'This slot needs the component for "Section 05 HTTP gateway still running".',
+        'agent-py': 'agent.py belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'llm': 'LLM belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'curl-only': 'curl only belongs elsewhere — try "Section 05 HTTP gateway still running".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Section 05 HTTP gateway still running".',
       },
       s2: {
-        default: 'Slot 2 needs Kind — it creates your local Kubernetes cluster.',
-        docker: 'Docker runs containers, but Kind creates the K8 cluster on top of it.',
-        kubectl: 'kubectl accesses the cluster — Kind is what creates it.',
-        'finops-cluster': 'finops-cluster is the result of Kind — put Kind here first.',
-        helm: 'Helm packages apps — Kind provisions the cluster itself.',
-        llm: 'Kind creates clusters, not LLMs. Put Kind in this slot.',
-        mcpServer: 'MCP Server connects agents to K8 — Kind creates the cluster first.',
-        finopsAgent: 'FinOps Agent scans the cluster — Kind must create it first.',
-        'booking-api': 'Namespaces come after the cluster. Kind creates the cluster here.',
-        'flight-search': 'Namespaces come after the cluster. Kind creates the cluster here.',
-        inventory: 'Namespaces come after the cluster. Kind creates the cluster here.',
-        payment: 'Namespaces come after the cluster. Kind creates the cluster here.',
-        airline: 'Namespaces come after the cluster. Kind creates the cluster here.',
+        default: 'This slot needs the component for "Python script driving the collector".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Python script driving the collector".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Python script driving the collector".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Python script driving the collector".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Python script driving the collector".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Python script driving the collector".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Python script driving the collector".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Python script driving the collector".',
+        'llm': 'LLM belongs elsewhere — try "Python script driving the collector".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Python script driving the collector".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Python script driving the collector".',
+        'curl-only': 'curl only belongs elsewhere — try "Python script driving the collector".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Python script driving the collector".',
       },
       s3: {
-        default: 'Slot 3 needs kubectl — the CLI that talks to your cluster.',
-        docker: 'Docker is the runtime — kubectl is the cluster CLI.',
-        kind: 'Kind creates the cluster — kubectl is how you talk to it.',
-        'finops-cluster': 'finops-cluster is the cluster itself — kubectl is the CLI tool.',
-        helm: 'Helm deploys charts — kubectl is the core cluster CLI.',
-        llm: 'kubectl is a CLI tool, not an AI model.',
-        mcpServer: 'MCP Server is for agents — kubectl is the human CLI.',
-        finopsAgent: 'FinOps Agent uses kubectl internally — this slot is for kubectl itself.',
-        'booking-api': 'booking-api is a namespace — kubectl is the CLI tool.',
-        'flight-search': 'flight-search is a namespace — kubectl is the CLI tool.',
-        inventory: 'inventory is a namespace — kubectl is the CLI tool.',
-        payment: 'payment is a namespace — kubectl is the CLI tool.',
-        airline: 'airline is a namespace — kubectl is the CLI tool.',
+        default: 'This slot needs the component for "First MCP tool call — list namespaces".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'agent-py': 'agent.py belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'llm': 'LLM belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'curl-only': 'curl only belongs elsewhere — try "First MCP tool call — list namespaces".',
+        'bedrock': 'Bedrock belongs elsewhere — try "First MCP tool call — list namespaces".',
       },
       s4: {
-        default: 'Slot 4 needs finops-cluster — your local Kind cluster name.',
-        docker: 'Docker is the runtime — finops-cluster is the cluster name.',
-        kind: 'Kind is the tool — finops-cluster is the cluster it creates.',
-        kubectl: 'kubectl talks to the cluster — it does not create one. You need finops-cluster here.',
-        helm: 'Helm deploys into a cluster — the cluster itself is finops-cluster.',
-        llm: 'finops-cluster is your K8 cluster — not an LLM.',
-        mcpServer: 'MCP Server connects to a cluster — finops-cluster is that cluster.',
-        finopsAgent: 'FinOps Agent runs against finops-cluster — put the cluster here.',
-        'booking-api': 'booking-api is a namespace inside the cluster — finops-cluster is the cluster.',
-        'flight-search': 'flight-search is a namespace — finops-cluster is the cluster.',
-        inventory: 'inventory is a namespace — finops-cluster is the cluster.',
-        payment: 'payment is a namespace — finops-cluster is the cluster.',
-        airline: 'airline is a namespace — finops-cluster is the cluster.',
+        default: 'This slot needs the component for "Pulls deployment objects".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Pulls deployment objects".',
+        'agent-py': 'agent.py belongs elsewhere — try "Pulls deployment objects".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Pulls deployment objects".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Pulls deployment objects".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Pulls deployment objects".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Pulls deployment objects".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Pulls deployment objects".',
+        'llm': 'LLM belongs elsewhere — try "Pulls deployment objects".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Pulls deployment objects".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Pulls deployment objects".',
+        'curl-only': 'curl only belongs elsewhere — try "Pulls deployment objects".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Pulls deployment objects".',
       },
       s5: {
-        default: 'Slot 5 needs booking-api — one of the baseline airline namespaces.',
-        docker: 'booking-api is a Kubernetes namespace, not a container runtime.',
-        kind: 'booking-api is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl creates namespaces — booking-api is the namespace itself.',
-        'finops-cluster': 'finops-cluster is the cluster — booking-api is a namespace inside it.',
-        helm: 'Helm can deploy into namespaces — booking-api is the namespace name.',
-        llm: 'booking-api is a Kubernetes namespace, not an AI model.',
-        mcpServer: 'MCP Server is an agent tool — booking-api is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — booking-api is the namespace itself.',
-        'flight-search': 'Wrong namespace — this slot needs booking-api specifically.',
-        inventory: 'Wrong namespace — this slot needs booking-api specifically.',
-        payment: 'Wrong namespace — this slot needs booking-api specifically.',
-        airline: 'Wrong namespace — this slot needs booking-api specifically.',
+        default: 'This slot needs the component for "Pulls pod objects".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Pulls pod objects".',
+        'agent-py': 'agent.py belongs elsewhere — try "Pulls pod objects".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Pulls pod objects".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Pulls pod objects".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Pulls pod objects".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Pulls pod objects".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Pulls pod objects".',
+        'llm': 'LLM belongs elsewhere — try "Pulls pod objects".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Pulls pod objects".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Pulls pod objects".',
+        'curl-only': 'curl only belongs elsewhere — try "Pulls pod objects".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Pulls pod objects".',
       },
       s6: {
-        default: 'Slot 6 needs flight-search — the flight search service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs flight-search.',
-        inventory: 'Wrong namespace — this slot needs flight-search.',
-        payment: 'Wrong namespace — this slot needs flight-search.',
-        airline: 'Wrong namespace — this slot needs flight-search.',
-        docker: 'flight-search is a namespace, not Docker.',
-        kind: 'flight-search is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — flight-search is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — flight-search is a namespace.',
-        helm: 'Helm deploys charts — flight-search is a namespace.',
-        llm: 'flight-search is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — flight-search is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — flight-search is the namespace itself.',
+        default: 'This slot needs the component for "Pulls service objects".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Pulls service objects".',
+        'agent-py': 'agent.py belongs elsewhere — try "Pulls service objects".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Pulls service objects".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Pulls service objects".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Pulls service objects".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Pulls service objects".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Pulls service objects".',
+        'llm': 'LLM belongs elsewhere — try "Pulls service objects".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Pulls service objects".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Pulls service objects".',
+        'curl-only': 'curl only belongs elsewhere — try "Pulls service objects".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Pulls service objects".',
       },
       s7: {
-        default: 'Slot 7 needs inventory — the inventory service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs inventory.',
-        'flight-search': 'Wrong namespace — this slot needs inventory.',
-        payment: 'Wrong namespace — this slot needs inventory.',
-        airline: 'Wrong namespace — this slot needs inventory.',
-        docker: 'inventory is a namespace, not Docker.',
-        kind: 'inventory is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — inventory is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — inventory is a namespace.',
-        helm: 'Helm deploys charts — inventory is a namespace.',
-        llm: 'inventory is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — inventory is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — inventory is the namespace itself.',
+        default: 'This slot needs the component for "Remaining resource types in one sweep".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Remaining resource types in one sweep".',
+        'agent-py': 'agent.py belongs elsewhere — try "Remaining resource types in one sweep".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Remaining resource types in one sweep".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Remaining resource types in one sweep".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Remaining resource types in one sweep".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Remaining resource types in one sweep".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Remaining resource types in one sweep".',
+        'llm': 'LLM belongs elsewhere — try "Remaining resource types in one sweep".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Remaining resource types in one sweep".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Remaining resource types in one sweep".',
+        'curl-only': 'curl only belongs elsewhere — try "Remaining resource types in one sweep".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Remaining resource types in one sweep".',
       },
       s8: {
-        default: 'Slot 8 needs payment — the payment service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs payment.',
-        'flight-search': 'Wrong namespace — this slot needs payment.',
-        inventory: 'Wrong namespace — this slot needs payment.',
-        airline: 'Wrong namespace — this slot needs payment.',
-        docker: 'payment is a namespace, not Docker.',
-        kind: 'payment is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — payment is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — payment is a namespace.',
-        helm: 'Helm deploys charts — payment is a namespace.',
-        llm: 'payment is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — payment is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — payment is the namespace itself.',
-      },
-      s9: {
-        default: 'Slot 9 needs airline — the main airline namespace.',
-        'booking-api': 'Wrong namespace — this slot needs airline.',
-        'flight-search': 'Wrong namespace — this slot needs airline.',
-        inventory: 'Wrong namespace — this slot needs airline.',
-        payment: 'Wrong namespace — this slot needs airline.',
-        docker: 'airline is a namespace, not Docker.',
-        kind: 'airline is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — airline is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — airline is a namespace.',
-        helm: 'Helm deploys charts — airline is a namespace.',
-        llm: 'airline is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — airline is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — airline is the namespace itself.',
+        default: 'This slot needs the component for "Unstructured snapshot printed to stdout".',
+        'mcp-endpoint': 'MCP endpoint belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'agent-py': 'agent.py belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'kubectl-get-ns': 'kubectl_get namespaces belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'kubectl-get-deploy': 'kubectl_get deployments belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'kubectl-get-pods': 'kubectl_get pods belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'kubectl-get-svc': 'kubectl_get services belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'kubectl-get-pvc-cm': 'kubectl_get PVCs + CMs belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'llm': 'LLM belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'issue-tracker': 'Issue Tracker belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'curl-only': 'curl only belongs elsewhere — try "Unstructured snapshot printed to stdout".',
+        'bedrock': 'Bedrock belongs elsewhere — try "Unstructured snapshot printed to stdout".',
       },
     };
 
     const HINT_TIERS = {
       s1: [
-        'This is the first link in the foundation chain — everything runs on top of it.',
-        'Think container runtime on your laptop — what runs Docker containers locally?',
-        'The tool that must be running before Kind can create node containers.',
+        'The collector connects to Section 05 gateway.',
+        'Think Supergateway SSE URL on localhost:8000.',
+        'MCP HTTP endpoint from Section 05.',
       ],
       s2: [
-        'After the runtime is ready, you need a local Kubernetes cluster.',
-        'Think "Kubernetes in Docker" — a tool whose name sounds like "kind".',
-        'The CLI that creates your local K8s cluster using Docker.',
+        'Which Python script drives MCP tool calls?',
+        'Think sections/06-mcp-data-agent/agent.py.',
+        'agent.py — the data collector script.',
       ],
       s3: [
-        'Once the cluster exists, you need a way to talk to it.',
-        'Think command-line tool — the one you use for get, apply, and describe.',
-        'The standard CLI for interacting with any Kubernetes cluster.',
+        'First tool call lists all namespaces.',
+        'Think session.call_tool kubectl_get namespaces.',
+        'kubectl_get for namespaces.',
       ],
       s4: [
-        'Your training cluster has a specific name used throughout the course.',
-        'Think cluster identity — not a namespace, but the cluster itself.',
-        'The Kind cluster name referenced in demos and agent config.',
+        'Next, scan deployments per namespace.',
+        'Think resourceType deployments.',
+        'kubectl_get deployments.',
       ],
       s5: [
-        'Below the cluster, you create airline namespaces — start with reservations.',
-        'Think namespace for ticket booking — handles reservations.',
-        'The namespace for the booking API service.',
+        'Pods show what is actually running.',
+        'Think resourceType pods.',
+        'kubectl_get pods.',
       ],
       s6: [
-        'Each airline service gets its own namespace — this one searches flights.',
-        'Think namespace for finding available flights.',
-        'The namespace housing the flight-search service.',
+        'Services expose network endpoints.',
+        'Think resourceType services.',
+        'kubectl_get services.',
       ],
       s7: [
-        'Another airline namespace — this one tracks seats and routes.',
-        'Think inventory management namespace.',
-        'The namespace for the inventory service.',
+        'Do not forget storage and config.',
+        'Think pvc and configmaps resource types.',
+        'kubectl_get for PVCs and ConfigMaps.',
       ],
       s8: [
-        'The namespace where payment processing lives.',
-        'Think billing and payment collection namespace.',
-        'The payment service namespace.',
-      ],
-      s9: [
-        'The last baseline namespace — a parent airline namespace.',
-        'Think top-level airline namespace name.',
-        'The airline namespace created alongside the other service namespaces.',
+        'All results assemble into one file.',
+        'Think unstructured JSON printed to stdout.',
+        'k8s_metadata.json snapshot output.',
       ],
     };
 
@@ -1119,12 +1182,41 @@
     function wirePath(fromId, toId) {
       const from = getSlot(fromId);
       const to = getSlot(toId);
-      if (!from || !to) return '';
-
-      const isFanOut = fromId === 's4';
-      const p1 = isFanOut ? slotCenter(from, 'bottom') : slotCenter(from, 'out');
-      const p2 = isFanOut ? slotCenter(to, 'top') : slotCenter(to, 'in');
+      if (!from || !to) return "";
+      const hub = LAYOUT.hubId || "s2";
+      const sink = LAYOUT.sinkId || "s8";
+      let p1, p2;
+      if (toId === hub) {
+        p1 = slotCenter(from, "out");
+        p2 = slotCenter(to, "in");
+      } else if (fromId === hub && toId === sink) {
+        p1 = slotCenter(from, "bottom");
+        p2 = slotCenter(to, "top");
+      } else if (fromId === hub) {
+        p1 = slotCenter(from, "right");
+        p2 = slotCenter(to, "left");
+      } else {
+        p1 = slotCenter(from, "out");
+        p2 = slotCenter(to, "in");
+      }
       return bezierPath(p1.x, p1.y, p2.x, p2.y);
+    }
+
+
+    function renderZones() {
+      const layer = document.getElementById('zones-layer');
+      if (!layer) return;
+      layer.innerHTML = '';
+      (ZONE_DEFS || []).forEach(zone => {
+        const el = document.createElement('div');
+        el.className = 'zone-frame' + (zone.tint ? ' tint-' + zone.tint : '');
+        el.style.left = zone.x + 'px';
+        el.style.top = zone.y + 'px';
+        el.style.width = zone.w + 'px';
+        el.style.height = zone.h + 'px';
+        el.innerHTML = '<span class="zone-label">' + zone.label + '</span>';
+        layer.appendChild(el);
+      });
     }
 
     function setStatus(msg, type) {
@@ -1236,6 +1328,7 @@
         visible.classList.add('wire-visible');
         visible.dataset.wireId = wire.id;
         if (activeSet.has(wire.id)) visible.classList.add('active');
+        if (wire.dashed) visible.classList.add('dashed');
 
         const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         pulse.setAttribute('d', d);
@@ -1254,12 +1347,16 @@
       });
     }
 
-    function renderSlots() {
+function renderSlots() {
       slotsLayer.innerHTML = '';
       slots.forEach(slot => {
+        let cls = 'slot ' + (slot.filled ? 'filled' : 'empty');
+        if (slot.hub) cls += ' hub';
+        if (slot.wide) cls += ' wide';
         const el = document.createElement('div');
-        el.className = 'slot ' + (slot.filled ? 'filled' : 'empty');
+        el.className = cls;
         el.dataset.slotId = slot.id;
+        if (slot.zoneTag) el.dataset.zoneTag = slot.zoneTag;
         el.style.left = slot.x + 'px';
         el.style.top = slot.y + 'px';
 
@@ -1318,6 +1415,7 @@
     }
 
     function renderAll(activeWireIds) {
+      renderZones();
       renderSlots();
       renderWires(activeWireIds);
       renderPalette();
@@ -1334,6 +1432,7 @@
       if (!msgs) return `Wrong component for step ${slot.step}.`;
       return msgs[wrongType] || msgs.default;
     }
+
 
     function getSlotsInValidationOrder() {
       if (typeof VALIDATION_GROUPS !== 'undefined') {
@@ -1513,7 +1612,7 @@
       }
       const empty = sorted.find(s => !s.filled);
       if (!empty) {
-        return { slotId: null, text: 'All slots are filled! Press Run Flow to validate your architecture.' };
+        return { slotId: null, text: 'All slots are filled! Press ' + LAYOUT.runLabel.replace('▶ ', '') + ' to validate.' };
       }
       if (lastHintSlotId !== empty.id) {
         hintTiersUsed[empty.id] = 0;
@@ -1574,6 +1673,7 @@
       });
     }
 
+
     async function runValidation() {
       if (isRunning) return;
       isRunning = true;
@@ -1581,48 +1681,54 @@
       btnRun.textContent = '● Running…';
       clearSlotHighlights();
 
-      for (const slot of slots) {
-        const el = document.querySelector(`.slot[data-slot-id="${slot.id}"]`);
-        const wireId = SLOT_WIRE_IN[slot.id];
+      for (const group of VALIDATION_GROUPS) {
+        setStatus('Checking ' + group.label + '…', 'active');
+        await sleep(200);
 
-        if (!slot.filled) {
-          el.classList.add('warning');
-          setStatus(`Step ${slot.step} is empty — "${slot.storyHint}" still needs a component`, 'error');
-          isRunning = false;
-          btnRun.classList.remove('running');
-          btnRun.textContent = '▶ Run Flow';
-          return;
+        for (const slotId of group.slots) {
+          const slot = getSlot(slotId);
+          if (!slot) continue;
+          const el = document.querySelector('.slot[data-slot-id="' + slot.id + '"]');
+          const wireId = SLOT_WIRE_IN[slot.id];
+
+          if (!slot.filled) {
+            el.classList.add('warning');
+            setStatus(group.label + ': "' + slot.storyHint + '" still needs a component', 'error');
+            finishRun();
+            return;
+          }
+
+          if (slot.filled !== slot.expected) {
+            el.classList.add('error');
+            setStatus(getValidationMessage(slot, slot.filled), 'error');
+            finishRun();
+            return;
+          }
+
+          const label = COMPONENTS[slot.filled].label;
+          setStatus(group.label + ': ' + label + ' ✓', 'active');
+
+          if (wireId) {
+            renderWires([wireId]);
+            await animateParticleAlongPath(wireId);
+          }
+
+          el.classList.add('success-flash');
+          await sleep(300);
+          el.classList.remove('success-flash');
         }
-
-        if (slot.filled !== slot.expected) {
-          el.classList.add('error');
-          setStatus(getValidationMessage(slot, slot.filled), 'error');
-          isRunning = false;
-          btnRun.classList.remove('running');
-          btnRun.textContent = '▶ Run Flow';
-          return;
-        }
-
-        const label = COMPONENTS[slot.filled].label;
-        setStatus(`Step ${slot.step}: ${label} ✓`, 'active');
-
-        if (wireId) {
-          renderWires([wireId]);
-          await animateParticleAlongPath(wireId);
-        }
-
-        el.classList.add('success-flash');
-        await sleep(350);
-        el.classList.remove('success-flash');
       }
 
       renderWires(WIRE_DEFS.map(w => w.id));
-      setStatus('Cluster foundation complete! You\'re ready for Section 02 — Airline App Deployment.', 'success');
+      setStatus(LAYOUT.successMsg, 'success');
       await sleep(2000);
+      finishRun();
+    }
 
+    function finishRun() {
       isRunning = false;
       btnRun.classList.remove('running');
-      btnRun.textContent = '▶ Run Flow';
+      btnRun.textContent = LAYOUT.runLabel;
     }
 
     function sleep(ms) {

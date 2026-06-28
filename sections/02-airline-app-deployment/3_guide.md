@@ -23,3 +23,7 @@ kubectl logs -n flight-search deploy/flight-search-service
 kubectl exec -it -n flight-search deploy/flight-search-service -- sh
 ```
 > *Expected: Shell access to the running container. Type `exit` to leave.*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **namespace stack** — deploy gate first, then resources inside the booking-api box. Use **Need a hint?** if stuck, then press **Deploy & Inspect** to validate.

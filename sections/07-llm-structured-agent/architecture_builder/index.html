@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Section 01: Cluster Foundation Builder</title>
+  <title>Section 07: LLM Structured Findings Builder</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -345,8 +345,8 @@
       position: absolute;
       left: 16px;
       top: 64px;
-      width: 1188px;
-      height: 330px;
+      width: 1208px;
+      height: 380px;
       border-radius: 16px;
       border: 1px solid rgba(255, 153, 0, 0.25);
       background: #FAFAFA;
@@ -434,6 +434,64 @@
       inset: 0;
       z-index: 2;
     }
+    #zones-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .zone-frame {
+      position: absolute;
+      border-radius: 14px;
+      border: 2px dashed rgba(255, 153, 0, 0.35);
+      background: rgba(255, 251, 242, 0.45);
+    }
+
+    .zone-frame.tint-green {
+      border-color: rgba(52, 168, 83, 0.45);
+      background: rgba(245, 255, 248, 0.55);
+    }
+
+    .zone-frame.tint-red {
+      border-color: rgba(239, 83, 80, 0.4);
+      background: rgba(255, 248, 248, 0.55);
+    }
+
+    .zone-frame.tint-blue {
+      border-color: rgba(66, 133, 244, 0.35);
+      background: rgba(240, 247, 255, 0.5);
+    }
+
+    .zone-frame.tint-amber {
+      border-color: rgba(255, 153, 0, 0.4);
+      background: rgba(255, 251, 242, 0.65);
+    }
+
+    .zone-label {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .slot.hub {
+      width: 170px;
+      height: 92px;
+    }
+
+    .slot.wide {
+      width: 220px;
+    }
+
+    .wire-visible.dashed {
+      stroke-dasharray: 6 6;
+    }
+
 
     .slot {
       position: absolute;
@@ -599,14 +657,14 @@
 
   <div id="toolbar">
     <div class="toolbar-left">
-      <h1>Section 01: Cluster Foundation Builder</h1>
-      <span class="subtitle">Recall the foundation chain from the demos — then Run Flow</span>
+      <h1>Section 07: LLM Structured Findings Builder</h1>
+      <span class="subtitle">Turn raw snapshot + policy into structured FinOps tickets</span>
     </div>
     <div class="toolbar-actions">
       <button class="btn btn-hint" id="btn-hint">Need a hint?</button>
       <button class="btn btn-solve" id="btn-auto-solve">Auto Solve</button>
       <button class="btn" id="btn-reset">Reset</button>
-      <button class="btn btn-primary" id="btn-run">▶ Run Flow</button>
+      <button class="btn btn-primary" id="btn-run">▶ Run Analysis</button>
     </div>
   </div>
 
@@ -628,9 +686,11 @@
     <div id="canvas-wrap">
       <div id="canvas-viewport">
         <div id="canvas">
-          <div id="canvas-frame"></div>
-          <span class="row-label" style="left: 24px; top: 52px;">Foundation chain</span>
-          <span class="row-label" style="left: 24px; top: 268px;">Airline namespaces</span>
+                    <div id="canvas-frame"></div>
+          <span class="row-label" style="left: 24px; top: 52px;">Messy input</span>
+          <span class="row-label" style="left: 360px; top: 52px;">Engine</span>
+          <span class="row-label" style="left: 780px; top: 52px;">Structured output</span>
+          <div id="zones-layer"></div>
           <svg id="wire-layer"></svg>
           <div id="slots-layer"></div>
         </div>
@@ -645,7 +705,7 @@
         <div class="hint-title">Hint</div>
         <div class="hint-text" id="hint-text"></div>
       </div>
-      <div id="status">Drag components onto the slots — order matters</div>
+      <div id="status">Messy inputs → engine → structured ticket fields</div>
     </div>
   </div>
 
@@ -687,234 +747,228 @@
     const SLOT_W = 150;
     const SLOT_H = 84;
 
+    const LAYOUT = {
+      runLabel: '▶ Run Analysis',
+      successMsg: 'LLM structured analysis complete! Findings are ready for the issue tracker in Section 09.',
+      canvasW: 1240,
+      canvasH: 460,
+      hubId: 's3',
+    };
+
+    const ZONE_DEFS = [
+      { id: 'messy', label: 'Messy input', x: 20, y: 72, w: 300, h: 340, tint: 'amber' },
+      { id: 'engine', label: 'Engine', x: 330, y: 72, w: 410, h: 340, tint: 'blue' },
+      { id: 'structured', label: 'Structured output', x: 750, y: 72, w: 470, h: 340, tint: 'green' },
+    ];
+
+    const VALIDATION_GROUPS = [
+      { id: 'input', label: 'Messy input', slots: ['s1', 's2'] },
+      { id: 'engine', label: 'Engine', slots: ['s3', 's4'] },
+      { id: 'output', label: 'Structured output', slots: ['s5', 's6', 's7', 's8'] },
+    ];
+
     const COMPONENTS = {
-      docker:           { label: 'Docker',         icon: 'icon-docker' },
-      kind:             { label: 'Kind',           icon: 'icon-ship' },
-      kubectl:          { label: 'kubectl',        icon: 'icon-terminal' },
-      'finops-cluster': { label: 'finops-cluster', icon: 'icon-hexagon' },
-      'booking-api':    { label: 'booking-api',    icon: 'icon-folder' },
-      'flight-search':  { label: 'flight-search',  icon: 'icon-folder' },
-      inventory:        { label: 'inventory',      icon: 'icon-folder' },
-      payment:          { label: 'payment',        icon: 'icon-folder' },
-      airline:          { label: 'airline',        icon: 'icon-folder' },
-      helm:             { label: 'Helm',           icon: 'icon-helm' },
-      llm:              { label: 'LLM',            icon: 'icon-sparkles' },
-      mcpServer:        { label: 'MCP Server',     icon: 'icon-plug' },
-      finopsAgent:      { label: 'FinOps Agent',   icon: 'icon-bot' },
+      'k8s-metadata-json': { label: 'k8s_metadata.json', icon: 'icon-file-json' },
+      'tagging-rules': { label: 'tagging-rules.yaml', icon: 'icon-file-json' },
+      'agent-py': { label: 'agent.py', icon: 'icon-code' },
+      llm: { label: 'LLM', icon: 'icon-sparkles' },
+      'ticket-batch': { label: 'TicketBatch schema', icon: 'icon-list' },
+      'missing-owner': { label: 'missing-owner', icon: 'icon-alert' },
+      'priority-field': { label: 'priority field', icon: 'icon-zap' },
+      'reasoning-field': { label: 'reasoning field', icon: 'icon-code' },
+      supergateway: { label: 'Supergateway setup', icon: 'icon-plug' },
+      'curl-healthz': { label: 'curl /healthz', icon: 'icon-terminal' },
+      'raw-kubectl': { label: 'raw kubectl only', icon: 'icon-terminal' },
+      'issue-tracker-post': { label: 'Issue Tracker POST', icon: 'icon-ticket' },
     };
 
     const SLOT_DEFS = [
-      { id: 's1', step: 1, expected: 'docker',           storyHint: 'Runs containers on your laptop',        x: 40,  y: 80  },
-      { id: 's2', step: 2, expected: 'kind',             storyHint: 'Spins up a local Kubernetes cluster',   x: 230, y: 80  },
-      { id: 's3', step: 3, expected: 'kubectl',          storyHint: 'Command-line access to the cluster',    x: 420, y: 80  },
-      { id: 's4', step: 4, expected: 'finops-cluster', storyHint: 'Name of your training cluster',         x: 610, y: 80  },
-      { id: 's5', step: 5, expected: 'booking-api',    storyHint: 'Handles ticket reservations',           x: 340, y: 300 },
-      { id: 's6', step: 6, expected: 'flight-search',  storyHint: 'Searches available flights',            x: 510, y: 300 },
-      { id: 's7', step: 7, expected: 'inventory',        storyHint: 'Tracks seats and routes',               x: 680, y: 300 },
-      { id: 's8', step: 8, expected: 'payment',          storyHint: 'Collecting money service',              x: 850, y: 300 },
-      { id: 's9', step: 9, expected: 'airline',          storyHint: 'Parent namespace for airline apps',     x: 1020, y: 300 },
+      { id: 's1', step: 1, expected: 'k8s-metadata-json', storyHint: 'Unstructured snapshot from Section 06', x: 50, y: 120, zoneTag: 'messy' },
+      { id: 's2', step: 2, expected: 'tagging-rules', storyHint: 'Policy injected into the LLM prompt', x: 50, y: 250, zoneTag: 'messy' },
+      { id: 's3', step: 3, expected: 'agent-py', storyHint: 'Orchestrates collection + analysis', x: 400, y: 190, zoneTag: 'engine', hub: true },
+      { id: 's4', step: 4, expected: 'llm', storyHint: 'Applies policy to raw data', x: 560, y: 190, zoneTag: 'engine' },
+      { id: 's5', step: 5, expected: 'ticket-batch', storyHint: 'Pydantic schema for findings', x: 800, y: 100, zoneTag: 'structured', wide: true },
+      { id: 's6', step: 6, expected: 'missing-owner', storyHint: 'Example violation category', x: 790, y: 220, zoneTag: 'structured' },
+      { id: 's7', step: 7, expected: 'priority-field', storyHint: 'Severity on each finding', x: 790, y: 310, zoneTag: 'structured' },
+      { id: 's8', step: 8, expected: 'reasoning-field', storyHint: 'Explainable audit trail per ticket', x: 960, y: 265, zoneTag: 'structured' },
     ];
 
     const WIRE_DEFS = [
-      { id: 'w1', from: 's1', to: 's2' },
+      { id: 'w1', from: 's1', to: 's3', dashed: true },
       { id: 'w2', from: 's2', to: 's3' },
       { id: 'w3', from: 's3', to: 's4' },
       { id: 'w4', from: 's4', to: 's5' },
-      { id: 'w5', from: 's4', to: 's6' },
-      { id: 'w6', from: 's4', to: 's7' },
-      { id: 'w7', from: 's4', to: 's8' },
-      { id: 'w8', from: 's4', to: 's9' },
+      { id: 'w5', from: 's5', to: 's6' },
+      { id: 'w6', from: 's5', to: 's7' },
+      { id: 'w7', from: 's5', to: 's8' },
     ];
 
     const SLOT_WIRE_IN = {
       s1: null,
-      s2: 'w1', s3: 'w2', s4: 'w3',
-      s5: 'w4', s6: 'w5', s7: 'w6', s8: 'w7', s9: 'w8',
+      s2: null,
+      s3: 'w2',
+      s4: 'w3',
+      s5: 'w4',
+      s6: 'w5',
+      s7: 'w6',
+      s8: 'w7'
     };
 
     const VALIDATION_MESSAGES = {
       s1: {
-        default: 'Slot 1 needs Docker — the container runtime that runs Kind locally.',
-        kind: 'Kind creates clusters, but Docker must run first as the container runtime.',
-        kubectl: 'kubectl talks to the cluster — Docker is the runtime layer underneath.',
-        'finops-cluster': 'The cluster comes later. Start with Docker as the container runtime.',
-        helm: 'Helm is verified in Demo 1, but Docker is the foundation runtime here.',
-        llm: 'An LLM has no role in cluster setup. You need Docker here.',
-        mcpServer: 'MCP Server belongs in later sections. Slot 1 needs Docker.',
-        finopsAgent: 'The FinOps Agent comes much later. Start with Docker.',
-        'booking-api': 'booking-api is a namespace — Docker is the container runtime.',
-        'flight-search': 'flight-search is a namespace — Docker is the container runtime.',
-        inventory: 'inventory is a namespace — Docker is the container runtime.',
-        payment: 'payment is a namespace — Docker is the container runtime.',
-        airline: 'airline is a namespace — Docker is the container runtime.',
+        default: 'This slot needs the component for "Unstructured snapshot from Section 06".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'agent-py': 'agent.py belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'llm': 'LLM belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'priority-field': 'priority field belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Unstructured snapshot from Section 06".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Unstructured snapshot from Section 06".',
       },
       s2: {
-        default: 'Slot 2 needs Kind — it creates your local Kubernetes cluster.',
-        docker: 'Docker runs containers, but Kind creates the K8 cluster on top of it.',
-        kubectl: 'kubectl accesses the cluster — Kind is what creates it.',
-        'finops-cluster': 'finops-cluster is the result of Kind — put Kind here first.',
-        helm: 'Helm packages apps — Kind provisions the cluster itself.',
-        llm: 'Kind creates clusters, not LLMs. Put Kind in this slot.',
-        mcpServer: 'MCP Server connects agents to K8 — Kind creates the cluster first.',
-        finopsAgent: 'FinOps Agent scans the cluster — Kind must create it first.',
-        'booking-api': 'Namespaces come after the cluster. Kind creates the cluster here.',
-        'flight-search': 'Namespaces come after the cluster. Kind creates the cluster here.',
-        inventory: 'Namespaces come after the cluster. Kind creates the cluster here.',
-        payment: 'Namespaces come after the cluster. Kind creates the cluster here.',
-        airline: 'Namespaces come after the cluster. Kind creates the cluster here.',
+        default: 'This slot needs the component for "Policy injected into the LLM prompt".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'agent-py': 'agent.py belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'llm': 'LLM belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'priority-field': 'priority field belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Policy injected into the LLM prompt".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Policy injected into the LLM prompt".',
       },
       s3: {
-        default: 'Slot 3 needs kubectl — the CLI that talks to your cluster.',
-        docker: 'Docker is the runtime — kubectl is the cluster CLI.',
-        kind: 'Kind creates the cluster — kubectl is how you talk to it.',
-        'finops-cluster': 'finops-cluster is the cluster itself — kubectl is the CLI tool.',
-        helm: 'Helm deploys charts — kubectl is the core cluster CLI.',
-        llm: 'kubectl is a CLI tool, not an AI model.',
-        mcpServer: 'MCP Server is for agents — kubectl is the human CLI.',
-        finopsAgent: 'FinOps Agent uses kubectl internally — this slot is for kubectl itself.',
-        'booking-api': 'booking-api is a namespace — kubectl is the CLI tool.',
-        'flight-search': 'flight-search is a namespace — kubectl is the CLI tool.',
-        inventory: 'inventory is a namespace — kubectl is the CLI tool.',
-        payment: 'payment is a namespace — kubectl is the CLI tool.',
-        airline: 'airline is a namespace — kubectl is the CLI tool.',
+        default: 'This slot needs the component for "Orchestrates collection + analysis".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Orchestrates collection + analysis".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Orchestrates collection + analysis".',
+        'llm': 'LLM belongs elsewhere — try "Orchestrates collection + analysis".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Orchestrates collection + analysis".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Orchestrates collection + analysis".',
+        'priority-field': 'priority field belongs elsewhere — try "Orchestrates collection + analysis".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Orchestrates collection + analysis".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Orchestrates collection + analysis".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Orchestrates collection + analysis".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Orchestrates collection + analysis".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Orchestrates collection + analysis".',
       },
       s4: {
-        default: 'Slot 4 needs finops-cluster — your local Kind cluster name.',
-        docker: 'Docker is the runtime — finops-cluster is the cluster name.',
-        kind: 'Kind is the tool — finops-cluster is the cluster it creates.',
-        kubectl: 'kubectl talks to the cluster — it does not create one. You need finops-cluster here.',
-        helm: 'Helm deploys into a cluster — the cluster itself is finops-cluster.',
-        llm: 'finops-cluster is your K8 cluster — not an LLM.',
-        mcpServer: 'MCP Server connects to a cluster — finops-cluster is that cluster.',
-        finopsAgent: 'FinOps Agent runs against finops-cluster — put the cluster here.',
-        'booking-api': 'booking-api is a namespace inside the cluster — finops-cluster is the cluster.',
-        'flight-search': 'flight-search is a namespace — finops-cluster is the cluster.',
-        inventory: 'inventory is a namespace — finops-cluster is the cluster.',
-        payment: 'payment is a namespace — finops-cluster is the cluster.',
-        airline: 'airline is a namespace — finops-cluster is the cluster.',
+        default: 'This slot needs the component for "Applies policy to raw data".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Applies policy to raw data".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Applies policy to raw data".',
+        'agent-py': 'agent.py belongs elsewhere — try "Applies policy to raw data".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Applies policy to raw data".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Applies policy to raw data".',
+        'priority-field': 'priority field belongs elsewhere — try "Applies policy to raw data".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Applies policy to raw data".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Applies policy to raw data".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Applies policy to raw data".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Applies policy to raw data".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Applies policy to raw data".',
       },
       s5: {
-        default: 'Slot 5 needs booking-api — one of the baseline airline namespaces.',
-        docker: 'booking-api is a Kubernetes namespace, not a container runtime.',
-        kind: 'booking-api is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl creates namespaces — booking-api is the namespace itself.',
-        'finops-cluster': 'finops-cluster is the cluster — booking-api is a namespace inside it.',
-        helm: 'Helm can deploy into namespaces — booking-api is the namespace name.',
-        llm: 'booking-api is a Kubernetes namespace, not an AI model.',
-        mcpServer: 'MCP Server is an agent tool — booking-api is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — booking-api is the namespace itself.',
-        'flight-search': 'Wrong namespace — this slot needs booking-api specifically.',
-        inventory: 'Wrong namespace — this slot needs booking-api specifically.',
-        payment: 'Wrong namespace — this slot needs booking-api specifically.',
-        airline: 'Wrong namespace — this slot needs booking-api specifically.',
+        default: 'This slot needs the component for "Pydantic schema for findings".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Pydantic schema for findings".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Pydantic schema for findings".',
+        'agent-py': 'agent.py belongs elsewhere — try "Pydantic schema for findings".',
+        'llm': 'LLM belongs elsewhere — try "Pydantic schema for findings".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Pydantic schema for findings".',
+        'priority-field': 'priority field belongs elsewhere — try "Pydantic schema for findings".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Pydantic schema for findings".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Pydantic schema for findings".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Pydantic schema for findings".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Pydantic schema for findings".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Pydantic schema for findings".',
       },
       s6: {
-        default: 'Slot 6 needs flight-search — the flight search service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs flight-search.',
-        inventory: 'Wrong namespace — this slot needs flight-search.',
-        payment: 'Wrong namespace — this slot needs flight-search.',
-        airline: 'Wrong namespace — this slot needs flight-search.',
-        docker: 'flight-search is a namespace, not Docker.',
-        kind: 'flight-search is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — flight-search is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — flight-search is a namespace.',
-        helm: 'Helm deploys charts — flight-search is a namespace.',
-        llm: 'flight-search is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — flight-search is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — flight-search is the namespace itself.',
+        default: 'This slot needs the component for "Example violation category".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Example violation category".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Example violation category".',
+        'agent-py': 'agent.py belongs elsewhere — try "Example violation category".',
+        'llm': 'LLM belongs elsewhere — try "Example violation category".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Example violation category".',
+        'priority-field': 'priority field belongs elsewhere — try "Example violation category".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Example violation category".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Example violation category".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Example violation category".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Example violation category".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Example violation category".',
       },
       s7: {
-        default: 'Slot 7 needs inventory — the inventory service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs inventory.',
-        'flight-search': 'Wrong namespace — this slot needs inventory.',
-        payment: 'Wrong namespace — this slot needs inventory.',
-        airline: 'Wrong namespace — this slot needs inventory.',
-        docker: 'inventory is a namespace, not Docker.',
-        kind: 'inventory is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — inventory is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — inventory is a namespace.',
-        helm: 'Helm deploys charts — inventory is a namespace.',
-        llm: 'inventory is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — inventory is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — inventory is the namespace itself.',
+        default: 'This slot needs the component for "Severity on each finding".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Severity on each finding".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Severity on each finding".',
+        'agent-py': 'agent.py belongs elsewhere — try "Severity on each finding".',
+        'llm': 'LLM belongs elsewhere — try "Severity on each finding".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Severity on each finding".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Severity on each finding".',
+        'reasoning-field': 'reasoning field belongs elsewhere — try "Severity on each finding".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Severity on each finding".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Severity on each finding".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Severity on each finding".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Severity on each finding".',
       },
       s8: {
-        default: 'Slot 8 needs payment — the payment service namespace.',
-        'booking-api': 'Wrong namespace — this slot needs payment.',
-        'flight-search': 'Wrong namespace — this slot needs payment.',
-        inventory: 'Wrong namespace — this slot needs payment.',
-        airline: 'Wrong namespace — this slot needs payment.',
-        docker: 'payment is a namespace, not Docker.',
-        kind: 'payment is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — payment is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — payment is a namespace.',
-        helm: 'Helm deploys charts — payment is a namespace.',
-        llm: 'payment is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — payment is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — payment is the namespace itself.',
-      },
-      s9: {
-        default: 'Slot 9 needs airline — the main airline namespace.',
-        'booking-api': 'Wrong namespace — this slot needs airline.',
-        'flight-search': 'Wrong namespace — this slot needs airline.',
-        inventory: 'Wrong namespace — this slot needs airline.',
-        payment: 'Wrong namespace — this slot needs airline.',
-        docker: 'airline is a namespace, not Docker.',
-        kind: 'airline is a namespace — create it after the cluster is ready.',
-        kubectl: 'kubectl is the CLI — airline is the namespace name.',
-        'finops-cluster': 'finops-cluster is the cluster — airline is a namespace.',
-        helm: 'Helm deploys charts — airline is a namespace.',
-        llm: 'airline is a Kubernetes namespace, not an LLM.',
-        mcpServer: 'MCP Server is for agents — airline is a namespace.',
-        finopsAgent: 'FinOps Agent scans namespaces — airline is the namespace itself.',
+        default: 'This slot needs the component for "Explainable audit trail per ticket".',
+        'k8s-metadata-json': 'k8s_metadata.json belongs elsewhere — try "Explainable audit trail per ticket".',
+        'tagging-rules': 'tagging-rules.yaml belongs elsewhere — try "Explainable audit trail per ticket".',
+        'agent-py': 'agent.py belongs elsewhere — try "Explainable audit trail per ticket".',
+        'llm': 'LLM belongs elsewhere — try "Explainable audit trail per ticket".',
+        'ticket-batch': 'TicketBatch schema belongs elsewhere — try "Explainable audit trail per ticket".',
+        'missing-owner': 'missing-owner belongs elsewhere — try "Explainable audit trail per ticket".',
+        'priority-field': 'priority field belongs elsewhere — try "Explainable audit trail per ticket".',
+        'supergateway': 'Supergateway setup belongs elsewhere — try "Explainable audit trail per ticket".',
+        'curl-healthz': 'curl /healthz belongs elsewhere — try "Explainable audit trail per ticket".',
+        'raw-kubectl': 'raw kubectl only belongs elsewhere — try "Explainable audit trail per ticket".',
+        'issue-tracker-post': 'Issue Tracker POST belongs elsewhere — try "Explainable audit trail per ticket".',
       },
     };
 
     const HINT_TIERS = {
       s1: [
-        'This is the first link in the foundation chain — everything runs on top of it.',
-        'Think container runtime on your laptop — what runs Docker containers locally?',
-        'The tool that must be running before Kind can create node containers.',
+        'Analysis starts with Section 06 output.',
+        'Think unstructured cluster snapshot JSON.',
+        'k8s_metadata.json from the MCP collector.',
       ],
       s2: [
-        'After the runtime is ready, you need a local Kubernetes cluster.',
-        'Think "Kubernetes in Docker" — a tool whose name sounds like "kind".',
-        'The CLI that creates your local K8s cluster using Docker.',
+        'The LLM needs policy context.',
+        'Think config/tagging-rules.yaml.',
+        'tagging-rules.yaml injected into the prompt.',
       ],
       s3: [
-        'Once the cluster exists, you need a way to talk to it.',
-        'Think command-line tool — the one you use for get, apply, and describe.',
-        'The standard CLI for interacting with any Kubernetes cluster.',
+        'Which script orchestrates collection and analysis?',
+        'Think sections/07-llm-structured-agent/agent.py.',
+        'agent.py — runs MCP collect then LLM analysis.',
       ],
       s4: [
-        'Your training cluster has a specific name used throughout the course.',
-        'Think cluster identity — not a namespace, but the cluster itself.',
-        'The Kind cluster name referenced in demos and agent config.',
+        'Who turns policy + data into verdicts?',
+        'Think LangChain/OpenAI Chat model.',
+        'LLM — applies tagging rules to snapshot.',
       ],
       s5: [
-        'Below the cluster, you create airline namespaces — start with reservations.',
-        'Think namespace for ticket booking — handles reservations.',
-        'The namespace for the booking API service.',
+        'Output must match a typed schema.',
+        'Think Pydantic TicketBatch model.',
+        'TicketBatch schema — structured findings container.',
       ],
       s6: [
-        'Each airline service gets its own namespace — this one searches flights.',
-        'Think namespace for finding available flights.',
-        'The namespace housing the flight-search service.',
+        'Findings include violation categories.',
+        'Think category: missing-owner.',
+        'missing-owner — example finding category.',
       ],
       s7: [
-        'Another airline namespace — this one tracks seats and routes.',
-        'Think inventory management namespace.',
-        'The namespace for the inventory service.',
+        'Each ticket gets a severity level.',
+        'Think priority: high/medium/low.',
+        'priority field on each finding.',
       ],
       s8: [
-        'The namespace where payment processing lives.',
-        'Think billing and payment collection namespace.',
-        'The payment service namespace.',
-      ],
-      s9: [
-        'The last baseline namespace — a parent airline namespace.',
-        'Think top-level airline namespace name.',
-        'The airline namespace created alongside the other service namespaces.',
+        'Auditors need explainability.',
+        'Think reasoning field per ticket.',
+        'reasoning — why the LLM flagged the resource.',
       ],
     };
 
@@ -1119,12 +1173,40 @@
     function wirePath(fromId, toId) {
       const from = getSlot(fromId);
       const to = getSlot(toId);
-      if (!from || !to) return '';
-
-      const isFanOut = fromId === 's4';
-      const p1 = isFanOut ? slotCenter(from, 'bottom') : slotCenter(from, 'out');
-      const p2 = isFanOut ? slotCenter(to, 'top') : slotCenter(to, 'in');
+      if (!from || !to) return "";
+      const wire = WIRE_DEFS.find(w => w.from === fromId && w.to === toId);
+      let p1, p2;
+      if (wire && wire.dashed) {
+        p1 = slotCenter(from, "right");
+        p2 = slotCenter(to, "left");
+      } else if (fromId === "s4" && toId === "s5") {
+        p1 = slotCenter(from, "right");
+        p2 = slotCenter(to, "left");
+      } else if (fromId === "s5" && ["s6","s7","s8"].includes(toId)) {
+        p1 = slotCenter(from, "bottom");
+        p2 = slotCenter(to, "top");
+      } else {
+        p1 = slotCenter(from, "out");
+        p2 = slotCenter(to, "in");
+      }
       return bezierPath(p1.x, p1.y, p2.x, p2.y);
+    }
+
+
+    function renderZones() {
+      const layer = document.getElementById('zones-layer');
+      if (!layer) return;
+      layer.innerHTML = '';
+      (ZONE_DEFS || []).forEach(zone => {
+        const el = document.createElement('div');
+        el.className = 'zone-frame' + (zone.tint ? ' tint-' + zone.tint : '');
+        el.style.left = zone.x + 'px';
+        el.style.top = zone.y + 'px';
+        el.style.width = zone.w + 'px';
+        el.style.height = zone.h + 'px';
+        el.innerHTML = '<span class="zone-label">' + zone.label + '</span>';
+        layer.appendChild(el);
+      });
     }
 
     function setStatus(msg, type) {
@@ -1236,6 +1318,7 @@
         visible.classList.add('wire-visible');
         visible.dataset.wireId = wire.id;
         if (activeSet.has(wire.id)) visible.classList.add('active');
+        if (wire.dashed) visible.classList.add('dashed');
 
         const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         pulse.setAttribute('d', d);
@@ -1257,9 +1340,13 @@
     function renderSlots() {
       slotsLayer.innerHTML = '';
       slots.forEach(slot => {
+        let cls = 'slot ' + (slot.filled ? 'filled' : 'empty');
+        if (slot.hub) cls += ' hub';
+        if (slot.wide) cls += ' wide';
         const el = document.createElement('div');
-        el.className = 'slot ' + (slot.filled ? 'filled' : 'empty');
+        el.className = cls;
         el.dataset.slotId = slot.id;
+        if (slot.zoneTag) el.dataset.zoneTag = slot.zoneTag;
         el.style.left = slot.x + 'px';
         el.style.top = slot.y + 'px';
 
@@ -1318,6 +1405,7 @@
     }
 
     function renderAll(activeWireIds) {
+      renderZones();
       renderSlots();
       renderWires(activeWireIds);
       renderPalette();
@@ -1334,6 +1422,7 @@
       if (!msgs) return `Wrong component for step ${slot.step}.`;
       return msgs[wrongType] || msgs.default;
     }
+
 
     function getSlotsInValidationOrder() {
       if (typeof VALIDATION_GROUPS !== 'undefined') {
@@ -1513,7 +1602,7 @@
       }
       const empty = sorted.find(s => !s.filled);
       if (!empty) {
-        return { slotId: null, text: 'All slots are filled! Press Run Flow to validate your architecture.' };
+        return { slotId: null, text: 'All slots are filled! Press ' + LAYOUT.runLabel.replace('▶ ', '') + ' to validate.' };
       }
       if (lastHintSlotId !== empty.id) {
         hintTiersUsed[empty.id] = 0;
@@ -1574,6 +1663,7 @@
       });
     }
 
+
     async function runValidation() {
       if (isRunning) return;
       isRunning = true;
@@ -1581,48 +1671,54 @@
       btnRun.textContent = '● Running…';
       clearSlotHighlights();
 
-      for (const slot of slots) {
-        const el = document.querySelector(`.slot[data-slot-id="${slot.id}"]`);
-        const wireId = SLOT_WIRE_IN[slot.id];
+      for (const group of VALIDATION_GROUPS) {
+        setStatus('Checking ' + group.label + '…', 'active');
+        await sleep(200);
 
-        if (!slot.filled) {
-          el.classList.add('warning');
-          setStatus(`Step ${slot.step} is empty — "${slot.storyHint}" still needs a component`, 'error');
-          isRunning = false;
-          btnRun.classList.remove('running');
-          btnRun.textContent = '▶ Run Flow';
-          return;
+        for (const slotId of group.slots) {
+          const slot = getSlot(slotId);
+          if (!slot) continue;
+          const el = document.querySelector('.slot[data-slot-id="' + slot.id + '"]');
+          const wireId = SLOT_WIRE_IN[slot.id];
+
+          if (!slot.filled) {
+            el.classList.add('warning');
+            setStatus(group.label + ': "' + slot.storyHint + '" still needs a component', 'error');
+            finishRun();
+            return;
+          }
+
+          if (slot.filled !== slot.expected) {
+            el.classList.add('error');
+            setStatus(getValidationMessage(slot, slot.filled), 'error');
+            finishRun();
+            return;
+          }
+
+          const label = COMPONENTS[slot.filled].label;
+          setStatus(group.label + ': ' + label + ' ✓', 'active');
+
+          if (wireId) {
+            renderWires([wireId]);
+            await animateParticleAlongPath(wireId);
+          }
+
+          el.classList.add('success-flash');
+          await sleep(300);
+          el.classList.remove('success-flash');
         }
-
-        if (slot.filled !== slot.expected) {
-          el.classList.add('error');
-          setStatus(getValidationMessage(slot, slot.filled), 'error');
-          isRunning = false;
-          btnRun.classList.remove('running');
-          btnRun.textContent = '▶ Run Flow';
-          return;
-        }
-
-        const label = COMPONENTS[slot.filled].label;
-        setStatus(`Step ${slot.step}: ${label} ✓`, 'active');
-
-        if (wireId) {
-          renderWires([wireId]);
-          await animateParticleAlongPath(wireId);
-        }
-
-        el.classList.add('success-flash');
-        await sleep(350);
-        el.classList.remove('success-flash');
       }
 
       renderWires(WIRE_DEFS.map(w => w.id));
-      setStatus('Cluster foundation complete! You\'re ready for Section 02 — Airline App Deployment.', 'success');
+      setStatus(LAYOUT.successMsg, 'success');
       await sleep(2000);
+      finishRun();
+    }
 
+    function finishRun() {
       isRunning = false;
       btnRun.classList.remove('running');
-      btnRun.textContent = '▶ Run Flow';
+      btnRun.textContent = LAYOUT.runLabel;
     }
 
     function sleep(ms) {

@@ -1,124 +1,135 @@
 # Style DNA — Architecture Builder UIs
 
-## One line
+## One line (default — section builders)
 
-A dark interactive pipeline game on a dot-grid canvas — glass cards, cyan wire glow, light traveling along connections.
+A light interactive pipeline on a white dot-grid canvas — warm amber accents, charcoal text, story hints on empty slots.
 
-Think: engineer wiring up a system on a glowing bench, not a whiteboard slide or SaaS marketing hero.
+Think: AWS console workbook for wiring up a cluster foundation, not a dark neon game or a pencil-sketch slide.
 
-## Mood
+## Theme selection
 
-- **Game-like but educational** — pulsing wires, particle travel, glow on hover
-- **Dark cyber canvas** — deep navy background, teal/cyan accents
-- **Restrained neon** — glow on active wires and hover states only, not full-screen effects
-- **Teaching clarity** — status bar explains what to do; validation messages teach when wrong
+| Theme | When | Reference |
+|-------|------|-----------|
+| **AWS light** (default) | All new `sections/*/architecture_builder/` | Section 01 builder |
+| **Dark cyber** (legacy) | Existing RAG visual-learning builder only | `rag_architecture_builder/index.html` |
 
-## Color tokens
+---
+
+## AWS light — default for section builders
+
+### Mood
+
+- **Clean and teaching-first** — white canvas, readable contrast, warm amber highlights
+- **Recall challenge** — shuffled palette, story hints describe *what* not *which tool*
+- **Restrained accent** — amber on Run button, active wires, hover; no full-screen glow
+- **Teaching clarity** — status bar guides; `VALIDATION_MESSAGES` teach on wrong picks
+
+### Color tokens (required)
 
 | Token | Hex | Use |
 |-------|-----|-----|
-| `--bg` | `#0b1329` | Page + canvas background |
-| `--surface` | `#111b36` | Cards, buttons, palette items |
-| `--surface-hover` | `#162040` | Hover states |
-| Palette bg | `#0c152b` | Left sidebar |
-| Toolbar gradient top | `#0e1830` | Toolbar fade into `--bg` |
-| Node gradient start | `#131f3d` | Card gradient top-left |
-| `--border` | `#2a3a60` | Default borders |
-| `--border-glow` | `#38bdf8` | Hover border accent |
-| `--teal` | `#028090` | Primary button gradient start, ports |
-| Teal dark | `#036666` | Primary button gradient end |
-| `--teal-bright` | `#02c39a` | Success, primary border, title gradient end |
-| `--cyan` | `#38bdf8` | Icons, active wires, title gradient start |
-| `--text` | `#e2e8f0` | Primary text |
-| `--text-muted` | `#94a3b8` | Subtitles, hints, labels |
-| `--wire` | `#1e4d6b` | Default wire stroke |
-| `--wire-active` | `#38bdf8` | Active / animated wire |
-| `--port` | `#028090` | Connection port fill |
-| `--port-hover` | `#02c39a` | Port hover |
-| `--error` | `#ef5350` | Wrong component, validation fail |
-| `--warning` | `#ffb84d` | Empty slot on Run |
-| `--success` | `#02c39a` | Step passed, completion message |
-| Dot grid | `#1e293b` at 1px, 24px spacing | Canvas background pattern |
+| `--bg` | `#F4F6F8` | Page chrome |
+| `--canvas-bg` | `#FFFFFF` | Canvas base |
+| Canvas-wrap surround | `#EEF1F3` | Area around viewport |
+| `--surface` | `#F8F9FA` | Cards, buttons, palette items |
+| `--surface-hover` | `#FFF8F0` | Warm hover |
+| `--border` | `#D5DBDB` | Default borders |
+| `--accent` / `--border-glow` / `--wire-active` | `#FF9900` | AWS orange — CTA, wires, icons, hover |
+| `--accent-dark` | `#EC7211` | Run button gradient end |
+| `--text` | `#232F3E` | Charcoal body (AWS) |
+| `--text-muted` | `#607D8B` | Subtitles, story hints |
+| `--wire` | `#AAB7B8` | Default wire stroke |
+| `--error` | `#EF5350` | Wrong component |
+| `--warning` | `#FF9900` | Empty slot on Run |
+| `--success` | `#34A853` | Step passed (GCP green, legacy pairing) |
+| Empty slot fill | `#FFFBF2` | Warm policy tint |
+| Diagram frame fill | `#FAFAFA` | `#canvas-frame` background |
+| Dot grid | `#E8ECED` at 1px, 24px spacing | Canvas pattern |
+| Palette sidebar | `#FFFFFF` | Left panel |
+| Toolbar | `#FFFFFF` | Top bar |
+| Palette item accent | `border-left: 3px solid rgba(255,153,0,0.65)` | Amber stripe |
+| Icon wrapper tint | `rgba(255,153,0,0.1)` background, `color: var(--accent)` | Palette + slot icons |
+| Palette hint box | `#FFFBF2` fill, `rgba(255,153,0,0.25)` border | Bottom of palette |
 
-Glow rgba values used in box-shadows:
-- Cyan hover: `rgba(56, 189, 248, 0.12–0.35)`
-- Teal hint box: `rgba(2, 128, 144, 0.10–0.25)`
-- Error: `rgba(239, 83, 80, 0.35–0.45)`
-- Success: `rgba(2, 195, 154, 0.30–0.45)`
+Shadow rgba (light bg — keep subtle):
+- Amber hover: `rgba(255, 153, 0, 0.12–0.35)`
+- Error: `rgba(239, 83, 80, 0.35)`
+- Success: `rgba(52, 168, 83, 0.35)`
 
-## Typography
+### Typography
 
 - **Font stack**: `'Segoe UI', system-ui, -apple-system, sans-serif`
-- **Title (toolbar h1)**: ~1.05–1.1rem, weight 700, letter-spacing -0.02em, **gradient text** cyan → teal-bright
-- **Subtitle**: 0.72–0.75rem, `--text-muted`
-- **Palette section headers**: 0.68–0.7rem, uppercase, letter-spacing 0.08em, muted
-- **Node/slot labels**: 0.72–0.78rem, weight 600
-- **Category/type sublabels**: 0.62rem, muted
-- **Palette hints / status**: 0.68–0.76rem, muted; status turns cyan/error/success when active
+- **Title (toolbar h1)**: ~1.05rem, weight 700, **charcoal** `--text` (no gradient)
+- **Subtitle**: 0.72rem, `--text-muted`
+- **Palette header**: 0.68rem, uppercase, muted
+- **Slot story hint**: 0.64rem, italic, `--text-muted`
+- **Slot step label**: 0.58rem, uppercase, `--accent`
+- **Node/slot labels (filled)**: 0.72rem, weight 600
+- **Status**: 0.76rem; `.active` → amber, `.error` → red, `.success` → green
 
-## Layout dimensions
+### Layout dimensions
 
 | Token | Value | Use |
 |-------|-------|-----|
 | `--toolbar-h` | `56px` | Top bar |
-| `--palette-w` | `200–210px` | Left sidebar |
-| `--node-w` / `--slot-w` | `150–160px` | Card width |
-| `--node-h` / `--slot-h` | `72–76px` | Card height |
-| Icon wrap (palette) | 26–28px box, 18–20px SVG | Palette items |
-| Icon wrap (node/slot) | 30–32px box, 18–20px SVG | Canvas cards |
-| Border radius | 8–14px cards, 8–10px buttons | Rounded glass panels |
+| `--palette-w` | `210px` | Left sidebar |
+| `--slot-w` | `150px` | Slot width |
+| `--slot-h` | `84px` | Slot height (room for step + story hint) |
+| `--node-w` / `--node-h` | `160px` / `72px` | Template mode nodes |
+| Border radius | 8–16px cards, 8px buttons | Rounded panels |
 
-## Visual components
+### Visual components (AWS light)
 
-### Toolbar
-- Gradient `#0e1830 → --bg`, bottom border `--border`
-- Left: gradient title + muted subtitle ("Drag · Connect · Run" or similar)
-- Right: `Reset` (secondary `.btn`) + `▶ Run Flow` (`.btn-primary`)
+**Toolbar** — white bg, charcoal title, amber `▶ Run Flow` gradient button.
 
-### Canvas
-- Dot-grid background on `--bg`
-- `#wire-layer` SVG behind nodes/slots (z-index 1)
-- `#nodes-layer` or `#slots-layer` on top (z-index 2)
+**Canvas** — white dot grid; `#canvas-frame` rounded rect behind diagram rows (warm border + `#FAFAFA` fill); `#canvas-viewport` with pan/zoom transform on `#canvas`.
 
-### Cards (nodes / filled slots)
-- `linear-gradient(145deg, #131f3d, --surface)`
-- Border 1.5px `--border`, radius 12–14px
-- Hover: cyan border tint + soft glow
-- Icon in tinted cyan box: `rgba(56, 189, 248, 0.1)` background
+**Empty slots** — dashed amber border, `#FFFBF2` fill, pulse animation; show **Step N** + **storyHint** only.
 
-### Empty slots (placeholder mode)
-- Dashed border `rgba(56, 189, 248, 0.35)`, subtle pulse animation
-- Step number + hint text centered
-- `.drop-target`: cyan border + scale 1.04 + glow
+**Filled slots** — white/`#F8F9FA` gradient card, charcoal border, soft amber shadow.
 
-### Wires
-- Cubic bezier, default `--wire` 2px
-- Active: `--wire-active` 3px + `drop-shadow` glow
-- Pulse overlay: `--cyan` 4px, `stroke-dasharray: 12 200`, `@keyframes wire-travel`
-- Particle: 5px circle, cyan fill + drop-shadow, animated along path via `getPointAtLength`
+**Wires** — gray default; amber when active; particle uses `--accent`; lighter drop-shadow than dark theme.
 
-### Status bar
-- Fixed/floating bottom center, pill shape
-- Background `rgba(17, 27, 54, 0.92–0.94)`, border `--border`
-- States: default (muted), `.active` (cyan), `.error` (red), `.success` (green)
+**Status bar** — white pill, light border, subtle shadow; amber active state.
+
+**Zoom controls** — floating bottom-right: −, +, Fit, Center.
+
+---
+
+## Dark cyber — legacy (RAG builder only)
+
+Use only when extending `visual-learning/visuals/rag_architecture_builder/`. Do **not** use for new section builders.
+
+| Token | Hex | Use |
+|-------|-----|-----|
+| `--bg` | `#0b1329` | Page + canvas |
+| `--surface` | `#111b36` | Cards |
+| `--cyan` | `#38bdf8` | Icons, active wires |
+| `--teal` / `--teal-bright` | `#028090` / `#02c39a` | Buttons, success |
+
+See RAG builder file for full dark CSS. Mood: game-like glowing bench, cyan wire travel.
+
+---
 
 ## Icons
 
 - **Source**: Lucide-inspired inline SVG `<symbol>` defs (MIT style)
-- **Pattern**: hidden `#icon-sprites` at end of body; reference with `<use href="#icon-id"/>`
+- **Pattern**: hidden `#icon-sprites`; reference with `<use href="#icon-id"/>`
 - **Stroke**: `currentColor`, width 2, round caps/joins
-- **Color**: inherit `--cyan` on icon wrappers
+- **Color**: inherit `--accent` (AWS light) or `--cyan` (dark legacy)
 
 ## Absolutely avoid
 
-- White slide backgrounds (that's finops-slide-visuals)
+- Inventing a third color system per builder
+- Grouping palette into "correct" vs "distractor" sections (shuffle instead)
+- Answer-revealing slot hints (`Container runtime`, `Docker`, etc.) — use `storyHint` domain lines
 - External CDN fonts or icon libraries
 - React/Vue/build steps for v1
-- Heavy full-screen neon orbs, robot mascots, stock AI brain art
-- More than one visual system per file (don't mix slide sketch + dark canvas)
+- Mixing pencil-sketch slide rules with builder UI
+- Applying dark cyber theme to new section builders unless user explicitly requests it
 
 ## Aesthetic direction
 
-**Yes**: dark dot grid, glass cards, traveling light on wires, palette sidebar, teaching status messages
+**Yes (section builders)**: white canvas, amber accents, story hints, shuffled palette, pan/zoom, teaching status messages
 
-**No**: corporate light infographic, PPT-exported slides, generic n8n clone with rounded pastels
+**No**: random pastels, corporate card grids, dark neon orbs, answer keys in slot labels

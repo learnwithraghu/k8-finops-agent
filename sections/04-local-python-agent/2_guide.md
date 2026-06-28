@@ -29,3 +29,7 @@ kubectl get services -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.m
 kubectl get pvc -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATUS:.status.phase'
 ```
 > *Talking point: Raw data is disconnected from policy. This is why we need the LLM in Section 07.*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to wire the **laptop ↔ cluster bridge** — local collect.py reads the Kind API and writes JSON on your machine. Use **Need a hint?** if stuck, then press **Run Scan** to validate.
