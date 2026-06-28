@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 # --- Models ---
 class TrackerTicket(BaseModel):
-    title: str
+    title: str = ""
     summary: str = ""
     body: str = ""
     namespace: str = ""

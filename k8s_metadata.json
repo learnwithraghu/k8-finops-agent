@@ -1,0 +1,256 @@
+{
+  "scanned_at": "2026-06-28T03:05:51.940499+00:00",
+  "cluster": "kind",
+  "namespaces": [
+    "airline",
+    "booking-api",
+    "default",
+    "flight-search",
+    "inventory",
+    "kube-node-lease",
+    "kube-public",
+    "kube-system",
+    "local-path-storage",
+    "payment"
+  ],
+  "resources": [
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "airline",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "orphaned-data-pvc",
+      "namespace": "airline",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "booking-api-config",
+      "namespace": "booking-api",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "booking-api",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "booking-api",
+      "namespace": "booking-api",
+      "kind": "Deployment",
+      "status": "1/1 ready",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "booking-api-data",
+      "namespace": "booking-api",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "booking-api-6f4bd5948-lh7ql",
+      "namespace": "booking-api",
+      "kind": "Pod",
+      "status": "Running",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "booking-api",
+      "namespace": "booking-api",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "analytics-config",
+      "namespace": "default",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "default",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "untracked-config",
+      "namespace": "default",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "analytics-collector",
+      "namespace": "default",
+      "kind": "Deployment",
+      "status": "1/1 ready",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "analytics-data",
+      "namespace": "default",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "analytics-collector-6f7d85c8fd-qcgbl",
+      "namespace": "default",
+      "kind": "Pod",
+      "status": "Running",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "analytics-collector",
+      "namespace": "default",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kubernetes",
+      "namespace": "default",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:42:43Z"
+    },
+    {
+      "name": "flight-search-config",
+      "namespace": "flight-search",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "flight-search",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "flight-search-service",
+      "namespace": "flight-search",
+      "kind": "Deployment",
+      "status": "1/1 ready",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "flight-search-data",
+      "namespace": "flight-search",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "flight-search-service-5678746b86-7nx27",
+      "namespace": "flight-search",
+      "kind": "Pod",
+      "status": "Running",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "flight-search-service",
+      "namespace": "flight-search",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "inventory-config",
+      "namespace": "inventory",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "inventory",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "inventory-service",
+      "namespace": "inventory",
+      "kind": "Deployment",
+      "status": "1/1 ready",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "inventory-data",
+      "namespace": "inventory",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "inventory-service-69cc899bd8-4p4lm",
+      "namespace": "inventory",
+      "kind": "Pod",
+      "status": "Running",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "inventory-service",
+      "namespace": "inventory",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "kube-root-ca.crt",
+      "namespace": "payment",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:42:58Z"
+    },
+    {
+      "name": "payment-config",
+      "namespace": "payment",
+      "kind": "ConfigMap",
+      "status": "Active",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "payment-processor",
+      "namespace": "payment",
+      "kind": "Deployment",
+      "status": "1/1 ready",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "payment-logs",
+      "namespace": "payment",
+      "kind": "PersistentVolumeClaim",
+      "status": "Pending",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "payment-processor-789f68f867-jt888",
+      "namespace": "payment",
+      "kind": "Pod",
+      "status": "Running",
+      "createdAt": "2026-06-28T02:43:44Z"
+    },
+    {
+      "name": "payment-processor",
+      "namespace": "payment",
+      "kind": "Service",
+      "status": "ClusterIP",
+      "createdAt": "2026-06-28T02:43:44Z"
+    }
+  ]
+}
