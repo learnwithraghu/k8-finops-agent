@@ -17,6 +17,22 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It deploys the gateway, starts port-forward, and smoke-checks the broken state. Do not show that setup during the live demo.
 
+## Story viewer (concept intro — open locally)
+
+Before the live demo, walk through the incident story with the animated whiteboard viewer:
+
+```bash
+open sections/02a-payment-gateway-down/story_viewer/index.html
+```
+
+Three full-screen scenes with draw-on animation. Click **→** (or press `ArrowRight`) to advance — the next scene only plays when you click. Press `F` for fullscreen.
+
+| Scene | Focus |
+|-------|-------|
+| **1** | Symptom — UI loads, payment fails (503) |
+| **2** | Root cause — UI pod up, API at 0/0, empty endpoints |
+| **3** | Ownership wall — no labels, scale fix, manual labels are a bad fix |
+
 ## Demo structure (3 parts)
 | Demo | Focus | Time |
 |------|-------|------|

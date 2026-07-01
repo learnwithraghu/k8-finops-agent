@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Section 02a — Payment Gateway Down</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFFFF;
+      --charcoal: #232F3E;
+      --muted: #607D8B;
+      --teal: #028090;
+      --mint: #02C39A;
+      --warm: #FFB84D;
+      --red: #EF5350;
+      --card: #FAFAFA;
+      --tint-ok: #F5FFFC;
+      --tint-warn: #FFF8F8;
+      --tint-policy: #FFFBF2;
+      --nav-h: 88px;
+      --header-h: 52px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--charcoal);
+    }
+
+    #header {
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid #E8ECF0;
+      background: #fff;
+    }
+
+    #header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    #header .scene-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    #dots {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #D5DBDB;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .dot.active {
+      background: var(--teal);
+      transform: scale(1.25);
+    }
+
+    .dot.done {
+      background: var(--mint);
+    }
+
+    #stage-wrap {
+      height: calc(100vh - var(--header-h) - var(--nav-h));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #stage {
+      width: 100%;
+      height: 100%;
+      max-width: 1920px;
+      position: relative;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .scene svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Draw-on animation */
+    .draw {
+      stroke-dasharray: var(--len, 1000);
+      stroke-dashoffset: var(--len, 1000);
+    }
+
+    .draw.animate {
+      animation: drawStroke var(--dur, 0.6s) ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes drawStroke {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .fade-in {
+      opacity: 0;
+    }
+
+    .fade-in.animate {
+      animation: fadeIn var(--dur, 0.5s) ease forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .scale-in {
+      opacity: 0;
+      transform-origin: center;
+      transform: scale(0.6);
+    }
+
+    .scale-in.animate {
+      animation: scaleIn var(--dur, 0.45s) cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes scaleIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .pulse-after.animate {
+      animation: subtlePulse 2s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes subtlePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    .shake.animate {
+      animation: shake 0.5s ease;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    #nav {
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      border-top: 1px solid #E8ECF0;
+      background: #fff;
+    }
+
+    .nav-btn {
+      width: 64px;
+      height: 64px;
+      border: 2.5px solid var(--charcoal);
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      color: var(--charcoal);
+    }
+
+    .nav-btn svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--tint-ok);
+      border-color: var(--teal);
+      color: var(--teal);
+      transform: scale(1.05);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      border-color: #CBD5E1;
+    }
+
+    .nav-btn.hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #nav-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      flex: 1;
+      padding: 0 20px;
+    }
+
+    #nav-hint strong {
+      color: var(--teal);
+    }
+  </style>
+</head>
+<body>
+
+  <header id="header">
+    <h1>Section 02a — Payment Gateway Down</h1>
+    <span class="scene-label" id="scene-label">Scene 1 of 3</span>
+    <div id="dots">
+      <div class="dot active" data-i="0"></div>
+      <div class="dot" data-i="1"></div>
+      <div class="dot" data-i="2"></div>
+    </div>
+  </header>
+
+  <div id="stage-wrap">
+    <div id="stage">
+
+      <!-- SCENE 1: Symptom -->
+      <div class="scene active" id="scene-0" data-title="Symptom, not catastrophe">
+        <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1920" height="1080" fill="#FFFFFF"/>
+
+          <!-- Title -->
+          <g class="anim" data-delay="0">
+            <text x="120" y="100" font-size="44" font-weight="700" fill="#232F3E" class="fade-in">Payments are broken</text>
+            <path d="M 118 112 L 520 108 L 524 116 L 120 120 Z" fill="none" stroke="#028090" stroke-width="3" stroke-linecap="round" class="draw"/>
+          </g>
+
+          <!-- On-call alert -->
+          <g class="anim" data-delay="400">
+            <circle cx="280" cy="220" r="48" fill="#FFF8F8" stroke="#EF5350" stroke-width="2.5" class="draw scale-in"/>
+            <path d="M 268 200 L 280 188 L 292 200" fill="none" stroke="#EF5350" stroke-width="2.5" stroke-linecap="round" class="draw"/>
+            <text x="280" y="232" font-size="28" text-anchor="middle" class="fade-in">!</text>
+            <text x="360" y="218" font-size="22" fill="#607D8B" class="fade-in">On call — alert arrives</text>
+          </g>
+
+          <!-- Browser window -->
+          <g class="anim" data-delay="900">
+            <path d="M 200 300 L 720 296 L 724 620 L 198 624 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2.5" stroke-linecap="round" class="draw"/>
+            <circle cx="230" cy="330" r="8" fill="#EF5350" class="fade-in"/>
+            <circle cx="254" cy="330" r="8" fill="#FFB84D" class="fade-in"/>
+            <circle cx="278" cy="330" r="8" fill="#02C39A" class="fade-in"/>
+            <text x="460" y="338" font-size="16" fill="#607D8B" text-anchor="middle" class="fade-in">localhost:8089 — AirPay</text>
+            <rect x="240" y="370" width="440" height="200" rx="4" fill="#F5FFFC" stroke="#02C39A" stroke-width="2" class="draw"/>
+            <text x="460" y="430" font-size="20" fill="#232F3E" text-anchor="middle" font-weight="600" class="fade-in">Payment Form</text>
+            <rect x="300" y="450" width="320" height="28" rx="4" fill="#fff" stroke="#CBD5E1" stroke-width="1.5" class="fade-in"/>
+            <rect x="300" y="490" width="320" height="28" rx="4" fill="#fff" stroke="#CBD5E1" stroke-width="1.5" class="fade-in"/>
+            <rect x="380" y="530" width="160" height="36" rx="6" fill="#028090" class="fade-in"/>
+            <text x="460" y="554" font-size="15" fill="#fff" text-anchor="middle" font-weight="600" class="fade-in">Submit Payment</text>
+            <!-- UI OK check -->
+            <circle cx="680" cy="400" r="28" fill="#02C39A" class="scale-in"/>
+            <path d="M 668 400 L 676 410 L 694 388" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" class="draw"/>
+            <text x="680" y="450" font-size="16" fill="#02C39A" text-anchor="middle" font-weight="700" class="fade-in">UI loads</text>
+          </g>
+
+          <!-- Submit arrow + 503 -->
+          <g class="anim" data-delay="1800">
+            <path d="M 460 640 C 460 700 460 740 460 780" fill="none" stroke="#028090" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowTeal)" class="draw"/>
+            <rect x="340" y="800" width="240" height="80" rx="8" fill="#FFF8F8" stroke="#EF5350" stroke-width="2.5" class="draw shake"/>
+            <text x="460" y="838" font-size="22" fill="#EF5350" text-anchor="middle" font-weight="700" class="fade-in">503</text>
+            <text x="460" y="866" font-size="15" fill="#EF5350" text-anchor="middle" class="fade-in">Service Unavailable</text>
+          </g>
+
+          <!-- Split panel -->
+          <g class="anim" data-delay="2600">
+            <path d="M 900 320 L 1180 316 L 1184 480 L 898 484 Z" fill="#F5FFFC" stroke="#02C39A" stroke-width="2.5" class="draw"/>
+            <text x="1040" y="370" font-size="20" fill="#02C39A" text-anchor="middle" font-weight="700" class="fade-in">UI = UP</text>
+            <text x="1040" y="420" font-size="15" fill="#607D8B" text-anchor="middle" class="fade-in">Frontend works</text>
+
+            <path d="M 1280 320 L 1560 316 L 1564 480 L 1278 484 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2.5" stroke-dasharray="8 6" class="draw"/>
+            <text x="1420" y="370" font-size="20" fill="#607D8B" text-anchor="middle" font-weight="700" class="fade-in">API = ???</text>
+            <text x="1420" y="420" font-size="36" fill="#607D8B" text-anchor="middle" class="fade-in">?</text>
+          </g>
+
+          <!-- Terminal -->
+          <g class="anim" data-delay="3400">
+            <path d="M 900 560 L 1560 556 L 1564 720 L 898 724 Z" fill="#232F3E" stroke="#232F3E" stroke-width="2" class="draw"/>
+            <text x="930" y="610" font-family="Courier New, monospace" font-size="18" fill="#02C39A" class="fade-in">$ kubectl get namespaces</text>
+            <text x="930" y="650" font-family="Courier New, monospace" font-size="16" fill="#94A3B8" class="fade-in">booking-api   Active</text>
+            <text x="930" y="680" font-family="Courier New, monospace" font-size="16" fill="#94A3B8" class="fade-in">payment       Active</text>
+            <text x="1230" y="700" font-size="16" fill="#FFB84D" text-anchor="middle" class="fade-in">Start blind — no one tells you the deployment name</text>
+          </g>
+
+          <defs>
+            <marker id="arrowTeal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#028090"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- SCENE 2: Root cause -->
+      <div class="scene" id="scene-1" data-title="Follow the traffic">
+        <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1920" height="1080" fill="#FFFFFF"/>
+
+          <g class="anim" data-delay="0">
+            <text x="120" y="100" font-size="44" font-weight="700" fill="#232F3E" class="fade-in">Follow the traffic</text>
+            <path d="M 118 112 L 480 108 L 484 116 L 120 120 Z" fill="none" stroke="#028090" stroke-width="3" class="draw"/>
+          </g>
+
+          <!-- Namespace box -->
+          <g class="anim" data-delay="400">
+            <path d="M 160 180 L 1760 176 L 1764 920 L 156 924 Z" fill="none" stroke="#028090" stroke-width="3" stroke-dasharray="12 8" class="draw"/>
+            <text x="200" y="230" font-size="24" fill="#028090" font-weight="700" class="fade-in">namespace: payment</text>
+          </g>
+
+          <!-- UI deployment -->
+          <g class="anim" data-delay="1000">
+            <path d="M 220 320 L 620 316 L 624 560 L 218 564 Z" fill="#F5FFFC" stroke="#02C39A" stroke-width="2.5" class="draw"/>
+            <text x="420" y="360" font-size="18" fill="#232F3E" text-anchor="middle" font-weight="700" class="fade-in">payment-gateway</text>
+            <text x="420" y="390" font-size="14" fill="#607D8B" text-anchor="middle" class="fade-in">Deployment (UI)</text>
+            <!-- Pod hexagon -->
+            <polygon points="420,430 450,445 450,475 420,490 390,475 390,445" fill="none" stroke="#02C39A" stroke-width="2.5" class="draw"/>
+            <text x="420" y="465" font-size="13" fill="#02C39A" text-anchor="middle" font-weight="600" class="fade-in">pod</text>
+            <text x="420" y="520" font-size="22" fill="#02C39A" text-anchor="middle" font-weight="700" class="fade-in">1/1 Running</text>
+          </g>
+
+          <!-- API deployment -->
+          <g class="anim" data-delay="1800">
+            <path d="M 720 320 L 1120 316 L 1124 560 L 718 564 Z" fill="#FFF8F8" stroke="#EF5350" stroke-width="2.5" stroke-dasharray="8 5" class="draw"/>
+            <text x="920" y="360" font-size="18" fill="#232F3E" text-anchor="middle" font-weight="700" class="fade-in">payment-gateway-api</text>
+            <text x="920" y="390" font-size="14" fill="#607D8B" text-anchor="middle" class="fade-in">Deployment (API)</text>
+            <rect x="870" y="430" width="100" height="60" rx="6" fill="none" stroke="#EF5350" stroke-width="2" stroke-dasharray="6 4" class="draw"/>
+            <text x="920" y="470" font-size="14" fill="#EF5350" text-anchor="middle" class="fade-in">no pod</text>
+            <text x="920" y="520" font-size="28" fill="#EF5350" text-anchor="middle" font-weight="700" class="fade-in pulse-after">0/0</text>
+          </g>
+
+          <!-- Broken arrow -->
+          <g class="anim" data-delay="2600">
+            <path d="M 620 440 L 720 440" fill="none" stroke="#028090" stroke-width="3" class="draw"/>
+            <circle cx="670" cy="440" r="22" fill="#FFF8F8" stroke="#EF5350" stroke-width="2.5" class="scale-in"/>
+            <text x="670" y="448" font-size="22" fill="#EF5350" text-anchor="middle" font-weight="700" class="fade-in">X</text>
+            <text x="670" y="490" font-size="14" fill="#607D8B" text-anchor="middle" class="fade-in">Service → no backend</text>
+          </g>
+
+          <!-- Endpoints -->
+          <g class="anim" data-delay="3200">
+            <path d="M 220 640 L 1120 636 L 1124 780 L 218 784 Z" fill="#FAFAFA" stroke="#232F3E" stroke-width="2" class="draw"/>
+            <text x="260" y="680" font-family="Courier New, monospace" font-size="17" fill="#232F3E" class="fade-in">$ kubectl get endpoints payment-gateway-api -n payment</text>
+            <text x="260" y="720" font-family="Courier New, monospace" font-size="17" fill="#EF5350" font-weight="700" class="fade-in">ENDPOINTS   &lt;none&gt;</text>
+          </g>
+
+          <!-- Root cause callout -->
+          <g class="anim" data-delay="4000">
+            <path d="M 1200 640 L 1700 636 L 1704 820 L 1198 824 Z" fill="#FFF8F8" stroke="#EF5350" stroke-width="3" class="draw"/>
+            <text x="1450" y="700" font-size="18" fill="#607D8B" text-anchor="middle" class="fade-in">describe deployment:</text>
+            <text x="1450" y="740" font-size="20" fill="#232F3E" text-anchor="middle" font-weight="600" class="fade-in">Replicas: 0 desired</text>
+            <text x="1450" y="790" font-size="26" fill="#EF5350" text-anchor="middle" font-weight="700" class="fade-in scale-in">Root cause: scaled to zero</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- SCENE 3: Ownership wall -->
+      <div class="scene" id="scene-2" data-title="The ownership wall">
+        <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1920" height="1080" fill="#FFFFFF"/>
+
+          <g class="anim" data-delay="0">
+            <text x="120" y="100" font-size="44" font-weight="700" fill="#232F3E" class="fade-in">The ownership wall</text>
+            <path d="M 118 112 L 500 108 L 504 116 L 120 120 Z" fill="none" stroke="#028090" stroke-width="3" class="draw"/>
+          </g>
+
+          <!-- Wall -->
+          <g class="anim" data-delay="500">
+            <path d="M 200 200 L 1720 196 L 1724 340 L 196 344 Z" fill="#FFF8F8" stroke="#EF5350" stroke-width="3" class="draw"/>
+            <text x="200" y="250" font-size="14" fill="#EF5350" class="fade-in">█ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █</text>
+            <text x="960" y="290" font-size="28" fill="#EF5350" text-anchor="middle" font-weight="700" class="fade-in">Who do we page?</text>
+          </g>
+
+          <!-- Labels -->
+          <g class="anim" data-delay="1200">
+            <text x="200" y="400" font-family="Courier New, monospace" font-size="17" fill="#232F3E" class="fade-in">$ kubectl get deployments -n payment --show-labels</text>
+
+            <rect x="200" y="430" width="140" height="44" rx="6" fill="#F5FFFC" stroke="#02C39A" stroke-width="2" class="draw"/>
+            <text x="270" y="458" font-size="14" fill="#02C39A" text-anchor="middle" class="fade-in">app ✓</text>
+
+            <rect x="360" y="430" width="140" height="44" rx="6" fill="#F5FFFC" stroke="#02C39A" stroke-width="2" class="draw"/>
+            <text x="430" y="458" font-size="14" fill="#02C39A" text-anchor="middle" class="fade-in">tier ✓</text>
+
+            <rect x="520" y="430" width="180" height="44" rx="6" fill="#FAFAFA" stroke="#EF5350" stroke-width="2" stroke-dasharray="6 4" class="draw"/>
+            <text x="610" y="458" font-size="14" fill="#EF5350" text-anchor="middle" class="fade-in">owner ✗</text>
+
+            <rect x="720" y="430" width="200" height="44" rx="6" fill="#FAFAFA" stroke="#EF5350" stroke-width="2" stroke-dasharray="6 4" class="draw"/>
+            <text x="820" y="458" font-size="14" fill="#EF5350" text-anchor="middle" class="fade-in">cost-center ✗</text>
+          </g>
+
+          <!-- Questions -->
+          <g class="anim" data-delay="2200">
+            <text x="200" y="540" font-size="20" fill="#607D8B" class="fade-in">?</text>
+            <text x="230" y="540" font-size="18" fill="#232F3E" class="fade-in">Who owns this service?</text>
+            <text x="200" y="580" font-size="20" fill="#607D8B" class="fade-in">?</text>
+            <text x="230" y="580" font-size="18" fill="#232F3E" class="fade-in">Which Slack channel?</text>
+            <text x="200" y="620" font-size="20" fill="#607D8B" class="fade-in">?</text>
+            <text x="230" y="620" font-size="18" fill="#232F3E" class="fade-in">Whose budget pays for it?</text>
+          </g>
+
+          <!-- Scale fix -->
+          <g class="anim" data-delay="3000">
+            <path d="M 200 700 L 900 696 L 904 820 L 196 824 Z" fill="#F5FFFC" stroke="#02C39A" stroke-width="2.5" class="draw"/>
+            <text x="230" y="745" font-family="Courier New, monospace" font-size="16" fill="#028090" class="fade-in">kubectl scale deployment payment-gateway-api --replicas=1</text>
+            <polygon points="550,780 580,795 580,825 550,840 520,825 520,795" fill="none" stroke="#02C39A" stroke-width="2" class="draw scale-in"/>
+            <text x="550" y="810" font-size="12" fill="#02C39A" text-anchor="middle" class="fade-in">pod</text>
+            <circle cx="820" cy="770" r="24" fill="#02C39A" class="scale-in"/>
+            <path d="M 808 770 L 816 780 L 836 758" fill="none" stroke="#fff" stroke-width="2.5" class="draw"/>
+            <text x="550" y="870" font-size="16" fill="#02C39A" text-anchor="middle" font-weight="600" class="fade-in">Payment succeeds — service restored</text>
+          </g>
+
+          <!-- Bad fix warning -->
+          <g class="anim" data-delay="4000">
+            <path d="M 1000 700 L 1720 696 L 1724 860 L 996 864 Z" fill="#FFFBF2" stroke="#FFB84D" stroke-width="2.5" class="draw"/>
+            <text x="1030" y="745" font-family="Courier New, monospace" font-size="15" fill="#232F3E" class="fade-in">kubectl label ... owner=payments-team</text>
+            <rect x="1030" y="770" width="200" height="36" rx="4" fill="#FFB84D" class="fade-in"/>
+            <text x="1130" y="794" font-size="14" fill="#fff" text-anchor="middle" font-weight="700" class="fade-in">NOT IN GIT</text>
+            <text x="1360" y="820" font-size="16" fill="#607D8B" text-anchor="middle" class="fade-in">Manual labels ≠ real governance</text>
+          </g>
+
+          <!-- Section 03 teaser -->
+          <g class="anim" data-delay="4800">
+            <path d="M 200 920 L 1720 916 L 1724 1000 L 196 1004 Z" fill="#FAFAFA" stroke="#028090" stroke-width="2" class="draw"/>
+            <text x="960" y="970" font-size="22" fill="#028090" text-anchor="middle" font-weight="700" class="fade-in">Section 03 → FinOps automation fixes this at scale</text>
+          </g>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <nav id="nav">
+    <button class="nav-btn hidden" id="btn-prev" aria-label="Previous scene" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <p id="nav-hint">Watch the whiteboard draw… then click <strong>→</strong> to continue</p>
+    <button class="nav-btn" id="btn-next" aria-label="Next scene" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const SCENES = [
+      { id: 'scene-0', title: 'Symptom, not catastrophe', duration: 5200 },
+      { id: 'scene-1', title: 'Follow the traffic', duration: 5200 },
+      { id: 'scene-2', title: 'The ownership wall', duration: 5800 },
+    ];
+
+    let current = 0;
+    let animComplete = false;
+    let animTimer = null;
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const sceneLabel = document.getElementById('scene-label');
+    const navHint = document.getElementById('nav-hint');
+    const dots = document.querySelectorAll('.dot');
+
+    function prepDrawPaths(svg) {
+      svg.querySelectorAll('.draw').forEach(el => {
+        if (el.getTotalLength) {
+          const len = el.getTotalLength();
+          el.style.setProperty('--len', len);
+          el.style.strokeDasharray = len;
+          el.style.strokeDashoffset = len;
+        }
+      });
+    }
+
+    function resetScene(sceneEl) {
+      sceneEl.querySelectorAll('.animate').forEach(el => el.classList.remove('animate'));
+      sceneEl.querySelectorAll('.draw').forEach(el => {
+        if (el.getTotalLength) {
+          const len = el.getTotalLength();
+          el.style.strokeDashoffset = len;
+        }
+      });
+      sceneEl.querySelectorAll('.fade-in, .scale-in').forEach(el => {
+        el.style.opacity = '0';
+        if (el.classList.contains('scale-in')) {
+          el.style.transform = 'scale(0.6)';
+        }
+      });
+    }
+
+    function playScene(index) {
+      if (animTimer) clearTimeout(animTimer);
+      animComplete = false;
+      btnNext.disabled = true;
+
+      document.querySelectorAll('.scene').forEach((s, i) => {
+        s.classList.toggle('active', i === index);
+        resetScene(s);
+      });
+
+      const sceneEl = document.getElementById(SCENES[index].id);
+      const svg = sceneEl.querySelector('svg');
+      prepDrawPaths(svg);
+
+      const groups = sceneEl.querySelectorAll('.anim');
+      let maxEnd = 0;
+
+      groups.forEach(group => {
+        const baseDelay = parseInt(group.dataset.delay || '0', 10);
+        const children = group.querySelectorAll('.draw, .fade-in, .scale-in, .shake, .pulse-after');
+
+        children.forEach((child, ci) => {
+          const stagger = ci * 120;
+          const delay = baseDelay + stagger;
+          const dur = child.classList.contains('draw') ? 700 : 500;
+          child.style.setProperty('--delay', `${delay}ms`);
+          child.style.setProperty('--dur', `${dur}ms`);
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => child.classList.add('animate'));
+          });
+
+          maxEnd = Math.max(maxEnd, delay + dur);
+        });
+      });
+
+      const total = Math.max(maxEnd + 400, SCENES[index].duration);
+      animTimer = setTimeout(() => {
+        animComplete = true;
+        if (index < SCENES.length - 1) {
+          btnNext.disabled = false;
+          navHint.innerHTML = 'Click <strong>→</strong> for the next scene';
+        } else {
+          navHint.innerHTML = 'End of story — proceed to the <strong>live demo</strong>';
+        }
+      }, total);
+
+      updateChrome(index);
+    }
+
+    function updateChrome(index) {
+      sceneLabel.textContent = `Scene ${index + 1} of ${SCENES.length} — ${SCENES[index].title}`;
+      btnPrev.classList.toggle('hidden', index === 0);
+      btnPrev.disabled = index === 0;
+
+      dots.forEach((d, i) => {
+        d.classList.remove('active', 'done');
+        if (i === index) d.classList.add('active');
+        else if (i < index) d.classList.add('done');
+      });
+
+      if (index === 0) {
+        navHint.innerHTML = 'Watch the whiteboard draw… then click <strong>→</strong> to continue';
+      }
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= SCENES.length) return;
+      current = index;
+      playScene(current);
+    }
+
+    btnNext.addEventListener('click', () => {
+      if (!animComplete || current >= SCENES.length - 1) return;
+      goTo(current + 1);
+    });
+
+    btnPrev.addEventListener('click', () => {
+      if (current <= 0) return;
+      goTo(current - 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' && animComplete && current < SCENES.length - 1) {
+        goTo(current + 1);
+      } else if (e.key === 'ArrowLeft' && current > 0) {
+        goTo(current - 1);
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.();
+        } else {
+          document.exitFullscreen?.();
+        }
+      }
+    });
+
+    // Init
+    document.querySelectorAll('.scene svg').forEach(prepDrawPaths);
+    playScene(0);
+  </script>
+</body>
+</html>
