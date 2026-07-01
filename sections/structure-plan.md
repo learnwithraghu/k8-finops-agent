@@ -33,11 +33,12 @@ sections/
 │   ├── guide.md
 │   ├── manifests/
 │   └── examples/
-├── 04-local-python-agent/
+├── 04-finops-architecture-design/
 │   ├── section_goal.md
-│   ├── guide.md
-│   ├── agent/
-│   └── config/
+│   ├── 1_guide.md (Video 1: The problem)
+│   ├── 2_guide.md (Video 2: Architecture pattern)
+│   ├── 3_guide.md (Video 3: Component design)
+│   └── slides/
 ├── 05-mcp-k8-agent/
 │   ├── section_goal.md
 │   └── guide.md
@@ -107,14 +108,18 @@ sections/
   - orphaned PVCs/configmaps
   - ownership ambiguity
 
-### Section 04: Local Python agent
+### Section 04: FinOps AI Architecture Design (whiteboarding)
 - Keep:
-  - `agent/` (scanner, cost_calculator, untracked_money, main, analyzer, github_client)
-  - `config/pricing.yaml`
-  - `config/tagging-rules.yaml`
+  - `section_goal.md`
+  - `1_guide.md` — Video 1: The problem (recap 02a, define the system question)
+  - `2_guide.md` — Video 2: Architecture pattern (data flow, tool selection, pipeline)
+  - `3_guide.md` — Video 3: Component design (responsibilities, trade-offs)
+  - `slides/` — SVGs for future video production
 - Output should teach:
-  - local scan flow
-  - raw report generation
+  - problem-to-solution thinking
+  - Collect → Analyze → Act pipeline
+  - tool selection trade-offs (MCP vs Python client, LLM vs rule engine)
+  - component responsibilities and boundaries
 
 ### Section 05: Prebuilt MCP setup for local cluster access (curl-validated)
 - Keep:

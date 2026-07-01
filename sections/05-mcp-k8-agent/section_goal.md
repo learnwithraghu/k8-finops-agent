@@ -4,12 +4,12 @@
 Run a prebuilt Kubernetes MCP server against the local Kind cluster, expose it as a plain HTTP endpoint with Supergateway, and validate the whole chain with curl — no client SDK required. This is the seam that Sections 06+ plug into.
 
 ## Prerequisites
-Sections 01 and 02 complete.
+Sections 01, 02, 02a, and 04 complete.
 
 You should already have:
 - a working Kind cluster (`finops-cluster`)
 - kubectl access confirmed
-- Docker running
+- the FinOps architecture design understood (Collect → Analyze → Act pipeline)
 
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It pulls the MCP image, confirms kubeconfig, and validates cluster access. Do not walk students through Docker image pulls during the live demo.

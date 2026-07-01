@@ -11,7 +11,7 @@ This directory is the curriculum skeleton for the repo.
 ## Current repo mapping
 - `sections/01-cluster-foundation/commands/setup.sh` → Section 01
 - `sections/02-airline-app-deployment/manifests/airline-k8-deployment/` → Sections 02, 03
-- `sections/04-local-python-agent/agent/` and `config/` → Section 04
+- `sections/04-finops-architecture-design/` → Section 04 (architecture whiteboarding)
 - `sections/05-mcp-k8-agent/` → Section 05 (prebuilt MCP setup and curl validation)
 - `sections/06-mcp-data-agent/agent/` → Section 06 (prompt → MCP → unstructured data)
 - `sections/07-llm-structured-agent/agent/` and `config/` → Section 07 (snapshot + tagging rules → structured findings)
@@ -24,7 +24,7 @@ This directory is the curriculum skeleton for the repo.
 2. Deploy airline services and kubectl basics
 2a. Payment gateway down — incident triage
 3. FinOps problems: tagging, orphaned resources, ownership gaps
-4. Local Python agent: scan + report
+4. FinOps AI architecture design (whiteboarding)
 5. Prebuilt MCP setup and curl validation
 6. First MCP data agent: prompt → MCP → unstructured data
 7. LLM structured agent: snapshot + tagging rules → structured findings

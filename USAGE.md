@@ -64,8 +64,7 @@ nano .env
 ```bash
 AWS_REGION=us-east-1
 KUBECONFIG_PATH=~/.kube/config
-PRICING_CONFIG=sections/04-local-python-agent/config/pricing.yaml
-TAGGING_RULES=sections/04-local-python-agent/config/tagging-rules.yaml
+TAGGING_RULES=sections/07-llm-structured-agent/config/tagging-rules.yaml
 BEDROCK_MODEL_ID=anthropic.claude-3-5-haiku-20241022-v1:0
 BEDROCK_MAX_TOKENS=1024
 BEDROCK_TEMPERATURE=0.3
@@ -308,10 +307,12 @@ sections/
 │   ├── idea.md
 │   └── manifests/
 │       └── orphaned-resources/
-├── 04-local-python-agent/
-│   ├── agent/
-│   ├── config/
-│   └── guide.md
+├── 04-finops-architecture-design/
+│   ├── section_goal.md
+│   ├── 1_guide.md (Video 1: The problem)
+│   ├── 2_guide.md (Video 2: Architecture pattern)
+│   ├── 3_guide.md (Video 3: Component design)
+│   └── slides/
 ├── 05-llm-agent-langchain/
 ├── 06-issue-tracker-service/
 ├── 07-agent-to-tracker-integration/
@@ -329,5 +330,5 @@ sections/
 
 For issues or questions:
 - Check logs with `--log-level DEBUG`
-- Review agent code in `sections/04-local-python-agent/agent/`
-- Check configuration in `sections/04-local-python-agent/config/`
+- Review agent code in `sections/06-mcp-data-agent/agent.py`
+- Check configuration in `sections/07-llm-structured-agent/config/`
