@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0EA5E9"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F97316"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 2: The Architecture Pattern</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 04 — FinOps AI Architecture Design</text>
+
+  <!-- Title -->
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">The Pipeline: Cluster → Findings → Tickets</text>
+  <line x1="40" y1="130" x2="420" y2="130" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Pipeline flow -->
+  <!-- Phase labels -->
+  <rect x="40" y="150" width="170" height="30" rx="6" fill="#0EA5E9"/>
+  <text x="125" y="170" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">PHASE 1: COLLECT</text>
+
+  <rect x="430" y="150" width="170" height="30" rx="6" fill="#F97316"/>
+  <text x="515" y="170" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">PHASE 2: ANALYZE</text>
+
+  <rect x="820" y="150" width="170" height="30" rx="6" fill="#10B981"/>
+  <text x="905" y="170" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">PHASE 3: ACT</text>
+
+  <!-- Node 1: Cluster -->
+  <rect x="40" y="210" width="140" height="100" rx="10" fill="#1B2A4A"/>
+  <text x="110" y="245" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Kubernetes</text>
+  <text x="110" y="265" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Cluster</text>
+  <text x="110" y="290" fill="#94A3B8" font-size="11" text-anchor="middle">Namespaces, pods,</text>
+  <text x="110" y="304" fill="#94A3B8" font-size="11" text-anchor="middle">services, deployments</text>
+
+  <!-- Arrow 1 -->
+  <line x1="180" y1="260" x2="230" y2="260" stroke="#0EA5E9" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <!-- Node 2: MCP Server -->
+  <rect x="235" y="200" width="150" height="120" rx="10" fill="#FFFFFF" stroke="#0EA5E9" stroke-width="2"/>
+  <rect x="235" y="200" width="150" height="8" rx="4" fill="#0EA5E9"/>
+  <text x="310" y="235" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">MCP Server</text>
+  <text x="310" y="255" fill="#64748B" font-size="11" text-anchor="middle">mcp/kubernetes</text>
+  <text x="310" y="278" fill="#475569" font-size="11" text-anchor="middle">kubectl_get</text>
+  <text x="310" y="295" fill="#475569" font-size="11" text-anchor="middle">kubectl_describe</text>
+  <text x="310" y="312" fill="#475569" font-size="11" text-anchor="middle">kubectl_logs</text>
+
+  <!-- Arrow 2 -->
+  <line x1="385" y1="260" x2="430" y2="260" stroke="#0EA5E9" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <!-- Node 3: Collector -->
+  <rect x="435" y="200" width="150" height="120" rx="10" fill="#FFFFFF" stroke="#0EA5E9" stroke-width="2"/>
+  <rect x="435" y="200" width="150" height="8" rx="4" fill="#0EA5E9"/>
+  <text x="510" y="235" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">Collector</text>
+  <text x="510" y="255" fill="#64748B" font-size="11" text-anchor="middle">Python MCP client</text>
+  <text x="510" y="278" fill="#475569" font-size="11" text-anchor="middle">List namespaces</text>
+  <text x="510" y="295" fill="#475569" font-size="11" text-anchor="middle">Fetch resources</text>
+  <text x="510" y="312" fill="#475569" font-size="11" text-anchor="middle">Write JSON snapshot</text>
+
+  <!-- Arrow 3 -->
+  <line x1="585" y1="260" x2="630" y2="260" stroke="#F97316" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+  <!-- Node 4: LLM Analyzer -->
+  <rect x="635" y="190" width="160" height="140" rx="10" fill="#FFFFFF" stroke="#F97316" stroke-width="2"/>
+  <rect x="635" y="190" width="160" height="8" rx="4" fill="#F97316"/>
+  <text x="715" y="225" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">LLM Analyzer</text>
+  <text x="715" y="245" fill="#64748B" font-size="11" text-anchor="middle">LangChain + OpenAI</text>
+  <text x="715" y="270" fill="#475569" font-size="11" text-anchor="middle">Input: JSON snapshot</text>
+  <text x="715" y="287" fill="#475569" font-size="11" text-anchor="middle">+ tagging rules</text>
+  <text x="715" y="310" fill="#475569" font-size="11" text-anchor="middle">Output: TicketBatch</text>
+  <text x="715" y="327" fill="#475569" font-size="11" text-anchor="middle">(structured JSON)</text>
+
+  <!-- Arrow 4 -->
+  <line x1="795" y1="260" x2="840" y2="260" stroke="#10B981" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <!-- Node 5: Tracker -->
+  <rect x="845" y="210" width="150" height="100" rx="10" fill="#FFFFFF" stroke="#10B981" stroke-width="2"/>
+  <rect x="845" y="210" width="150" height="8" rx="4" fill="#10B981"/>
+  <text x="920" y="245" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">Tracker</text>
+  <text x="920" y="265" fill="#64748B" font-size="11" text-anchor="middle">FastAPI + MCP</text>
+  <text x="920" y="288" fill="#475569" font-size="11" text-anchor="middle">POST /create-issue</text>
+  <text x="920" y="305" fill="#475569" font-size="11" text-anchor="middle">create_issue tool</text>
+
+  <!-- Arrow 5 -->
+  <line x1="995" y1="260" x2="1040" y2="260" stroke="#10B981" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <!-- Node 6: Board -->
+  <rect x="1045" y="210" width="140" height="100" rx="10" fill="#1B2A4A"/>
+  <text x="1115" y="245" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Kanban</text>
+  <text x="1115" y="265" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Board</text>
+  <text x="1115" y="290" fill="#94A3B8" font-size="11" text-anchor="middle">Open, assign,</text>
+  <text x="1115" y="304" fill="#94A3B8" font-size="11" text-anchor="middle">track findings</text>
+
+  <!-- Data labels on arrows -->
+  <rect x="195" y="270" width="50" height="20" rx="4" fill="#F1F5F9"/>
+  <text x="220" y="284" fill="#0EA5E9" font-size="10" font-weight="600" text-anchor="middle">MCP</text>
+
+  <rect x="395" y="270" width="50" height="20" rx="4" fill="#F1F5F9"/>
+  <text x="420" y="284" fill="#0EA5E9" font-size="10" font-weight="600" text-anchor="middle">MCP</text>
+
+  <rect x="595" y="270" width="65" height="20" rx="4" fill="#FEF3C7"/>
+  <text x="628" y="284" fill="#F97316" font-size="10" font-weight="600" text-anchor="middle">JSON</text>
+
+  <rect x="805" y="270" width="50" height="20" rx="4" fill="#D1FAE5"/>
+  <text x="830" y="284" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">MCP</text>
+
+  <rect x="1005" y="270" width="50" height="20" rx="4" fill="#D1FAE5"/>
+  <text x="1030" y="284" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">REST</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="360" x2="1240" y2="360" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- Section mapping -->
+  <text x="40" y="395" fill="#1B2A4A" font-size="18" font-weight="700">Section Mapping</text>
+  <text x="40" y="415" fill="#64748B" font-size="13">Each box is a section you will build:</text>
+
+  <!-- Section cards -->
+  <rect x="40" y="435" width="180" height="100" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="130" y="460" fill="#0EA5E9" font-size="12" font-weight="700" text-anchor="middle">SECTION 05</text>
+  <text x="130" y="480" fill="#1B2A4A" font-size="14" font-weight="600" text-anchor="middle">MCP Server</text>
+  <text x="130" y="500" fill="#64748B" font-size="11" text-anchor="middle">curl validation</text>
+  <text x="130" y="520" fill="#64748B" font-size="11" text-anchor="middle">3 min demo</text>
+
+  <rect x="240" y="435" width="180" height="100" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="330" y="460" fill="#0EA5E9" font-size="12" font-weight="700" text-anchor="middle">SECTION 06</text>
+  <text x="330" y="480" fill="#1B2A4A" font-size="14" font-weight="600" text-anchor="middle">Collector</text>
+  <text x="330" y="500" fill="#64748B" font-size="11" text-anchor="middle">MCP client → JSON</text>
+  <text x="330" y="520" fill="#64748B" font-size="11" text-anchor="middle">7 min demo</text>
+
+  <rect x="440" y="435" width="180" height="100" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="530" y="460" fill="#F97316" font-size="12" font-weight="700" text-anchor="middle">SECTION 07</text>
+  <text x="530" y="480" fill="#1B2A4A" font-size="14" font-weight="600" text-anchor="middle">LLM Analyzer</text>
+  <text x="530" y="500" fill="#64748B" font-size="11" text-anchor="middle">snapshot → findings</text>
+  <text x="530" y="520" fill="#64748B" font-size="11" text-anchor="middle">7 min demo</text>
+
+  <rect x="640" y="435" width="180" height="100" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="1"/>
+  <text x="730" y="460" fill="#10B981" font-size="12" font-weight="700" text-anchor="middle">SECTION 08</text>
+  <text x="730" y="480" fill="#1B2A4A" font-size="14" font-weight="600" text-anchor="middle">Tracker</text>
+  <text x="730" y="500" fill="#64748B" font-size="11" text-anchor="middle">REST + MCP service</text>
+  <text x="730" y="520" fill="#64748B" font-size="11" text-anchor="middle">7 min demo</text>
+
+  <rect x="840" y="435" width="180" height="100" rx="8" fill="#E0E7FF" stroke="#6366F1" stroke-width="1"/>
+  <text x="930" y="460" fill="#6366F1" font-size="12" font-weight="700" text-anchor="middle">SECTION 09</text>
+  <text x="930" y="480" fill="#1B2A4A" font-size="14" font-weight="600" text-anchor="middle">Integration</text>
+  <text x="930" y="500" fill="#64748B" font-size="11" text-anchor="middle">collect + analyze + act</text>
+  <text x="930" y="520" fill="#64748B" font-size="11" text-anchor="middle">7 min demo</text>
+
+  <!-- Connecting lines between section cards -->
+  <line x1="220" y1="485" x2="240" y2="485" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="420" y1="485" x2="440" y2="485" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="620" y1="485" x2="640" y2="485" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="820" y1="485" x2="840" y2="485" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Bottom insight -->
+  <rect x="40" y="565" width="1200" height="80" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="640" y="595" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">Why MCP everywhere?</text>
+  <text x="640" y="618" fill="#475569" font-size="13" text-anchor="middle">Standard protocol. Same interface for collection (Section 06) and tracker (Section 09).</text>
+  <text x="640" y="635" fill="#475569" font-size="13" text-anchor="middle">Any client — Python, curl, VS Code — can call the same tools. No custom client code.</text>
+</svg>

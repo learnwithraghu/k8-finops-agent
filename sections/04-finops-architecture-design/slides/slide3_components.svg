@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 3: Component Design</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 04 — FinOps AI Architecture Design</text>
+
+  <!-- Title -->
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Each Component — Responsibility, Input, Output</text>
+  <line x1="40" y1="130" x2="440" y2="130" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Component 1: MCP Server -->
+  <rect x="40" y="150" width="370" height="245" rx="10" fill="#FFFFFF" stroke="#0EA5E9" stroke-width="2"/>
+  <rect x="40" y="150" width="370" height="8" rx="4" fill="#0EA5E9"/>
+  <text x="60" y="185" fill="#0EA5E9" font-size="12" font-weight="700">SECTION 05</text>
+  <text x="60" y="210" fill="#1B2A4A" font-size="18" font-weight="700">MCP Server</text>
+  <text x="60" y="230" fill="#64748B" font-size="12">Expose kubectl as standard tools over HTTP</text>
+  <line x1="60" y1="242" x2="380" y2="242" stroke="#E2E8F0" stroke-width="1"/>
+  <!-- Input -->
+  <text x="60" y="262" fill="#94A3B8" font-size="11" font-weight="600">INPUT</text>
+  <rect x="60" y="270" width="150" height="24" rx="4" fill="#F1F5F9"/>
+  <text x="135" y="287" fill="#475569" font-size="11" text-anchor="middle">MCP tool calls</text>
+  <!-- Output -->
+  <text x="230" y="262" fill="#94A3B8" font-size="11" font-weight="600">OUTPUT</text>
+  <rect x="230" y="270" width="160" height="24" rx="4" fill="#D1FAE5"/>
+  <text x="310" y="287" fill="#065F46" font-size="11" text-anchor="middle">Structured JSON</text>
+  <!-- Key detail -->
+  <rect x="60" y="308" width="330" height="30" rx="6" fill="#F0F9FF"/>
+  <text x="225" y="328" fill="#0EA5E9" font-size="11" font-weight="600" text-anchor="middle">Prebuilt image — validate with curl, no custom code</text>
+  <!-- Validation -->
+  <rect x="60" y="348" width="330" height="30" rx="6" fill="#1B2A4A"/>
+  <text x="225" y="368" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">3 curl calls = health, handshake, cluster read</text>
+
+  <!-- Component 2: Collector -->
+  <rect x="435" y="150" width="370" height="245" rx="10" fill="#FFFFFF" stroke="#0EA5E9" stroke-width="2"/>
+  <rect x="435" y="150" width="370" height="8" rx="4" fill="#0EA5E9"/>
+  <text x="455" y="185" fill="#0EA5E9" font-size="12" font-weight="700">SECTION 06</text>
+  <text x="455" y="210" fill="#1B2A4A" font-size="18" font-weight="700">Collector</text>
+  <text x="455" y="230" fill="#64748B" font-size="12">Call MCP tools, assemble JSON snapshot</text>
+  <line x1="455" y1="242" x2="775" y2="242" stroke="#E2E8F0" stroke-width="1"/>
+  <!-- Input -->
+  <text x="455" y="262" fill="#94A3B8" font-size="11" font-weight="600">INPUT</text>
+  <rect x="455" y="270" width="150" height="24" rx="4" fill="#F1F5F9"/>
+  <text x="530" y="287" fill="#475569" font-size="11" text-anchor="middle">MCP endpoint URL</text>
+  <!-- Output -->
+  <text x="625" y="262" fill="#94A3B8" font-size="11" font-weight="600">OUTPUT</text>
+  <rect x="625" y="270" width="160" height="24" rx="4" fill="#D1FAE5"/>
+  <text x="705" y="287" fill="#065F46" font-size="11" text-anchor="middle">JSON snapshot file</text>
+  <!-- Key detail -->
+  <rect x="455" y="308" width="330" height="30" rx="6" fill="#F0F9FF"/>
+  <text x="620" y="328" fill="#0EA5E9" font-size="11" font-weight="600" text-anchor="middle">Deterministic — same cluster state, same output</text>
+  <!-- Why separate -->
+  <rect x="455" y="348" width="330" height="30" rx="6" fill="#1B2A4A"/>
+  <text x="620" y="368" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Separate from analysis = testable independently</text>
+
+  <!-- Component 3: LLM Analyzer -->
+  <rect x="830" y="150" width="410" height="245" rx="10" fill="#FFFFFF" stroke="#F97316" stroke-width="2"/>
+  <rect x="830" y="150" width="410" height="8" rx="4" fill="#F97316"/>
+  <text x="850" y="185" fill="#F97316" font-size="12" font-weight="700">SECTION 07</text>
+  <text x="850" y="210" fill="#1B2A4A" font-size="18" font-weight="700">LLM Analyzer</text>
+  <text x="850" y="230" fill="#64748B" font-size="12">Apply policy, produce structured findings</text>
+  <line x1="850" y1="242" x2="1220" y2="242" stroke="#E2E8F0" stroke-width="1"/>
+  <!-- Input -->
+  <text x="850" y="262" fill="#94A3B8" font-size="11" font-weight="600">INPUT</text>
+  <rect x="850" y="270" width="170" height="24" rx="4" fill="#FEF3C7"/>
+  <text x="935" y="287" fill="#92400E" font-size="11" text-anchor="middle">Snapshot + tagging rules</text>
+  <!-- Output -->
+  <text x="1040" y="262" fill="#94A3B8" font-size="11" font-weight="600">OUTPUT</text>
+  <rect x="1040" y="270" width="180" height="24" rx="4" fill="#D1FAE5"/>
+  <text x="1130" y="287" fill="#065F46" font-size="11" text-anchor="middle">TicketBatch (Pydantic)</text>
+  <!-- Key detail -->
+  <rect x="850" y="308" width="370" height="30" rx="6" fill="#FFF7ED"/>
+  <text x="1035" y="328" fill="#F97316" font-size="11" font-weight="600" text-anchor="middle">LLM reasons about context; schema enforces structure</text>
+  <!-- Why LLM -->
+  <rect x="850" y="348" width="370" height="30" rx="6" fill="#1B2A4A"/>
+  <text x="1035" y="368" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Flexible policy — change prompt, not code</text>
+
+  <!-- Component 4: Tracker -->
+  <rect x="40" y="420" width="370" height="245" rx="10" fill="#FFFFFF" stroke="#10B981" stroke-width="2"/>
+  <rect x="40" y="420" width="370" height="8" rx="4" fill="#10B981"/>
+  <text x="60" y="455" fill="#10B981" font-size="12" font-weight="700">SECTION 08</text>
+  <text x="60" y="480" fill="#1B2A4A" font-size="18" font-weight="700">Issue Tracker</text>
+  <text x="60" y="500" fill="#64748B" font-size="12">Receive findings as tickets, display on board</text>
+  <line x1="60" y1="512" x2="380" y2="512" stroke="#E2E8F0" stroke-width="1"/>
+  <!-- Input -->
+  <text x="60" y="532" fill="#94A3B8" font-size="11" font-weight="600">INPUT</text>
+  <rect x="60" y="540" width="150" height="24" rx="4" fill="#D1FAE5"/>
+  <text x="135" y="557" fill="#065F46" font-size="11" text-anchor="middle">REST POST / MCP</text>
+  <!-- Output -->
+  <text x="230" y="532" fill="#94A3B8" font-size="11" font-weight="600">OUTPUT</text>
+  <rect x="230" y="540" width="160" height="24" rx="4" fill="#F1F5F9"/>
+  <text x="310" y="557" fill="#475569" font-size="11" text-anchor="middle">Tickets on Kanban board</text>
+  <!-- Key detail -->
+  <rect x="60" y="578" width="330" height="30" rx="6" fill="#F0FDF4"/>
+  <text x="225" y="598" fill="#10B981" font-size="11" font-weight="600" text-anchor="middle">Simple tracker — pattern transfers to Jira</text>
+  <!-- Why not Jira -->
+  <rect x="60" y="618" width="330" height="30" rx="6" fill="#1B2A4A"/>
+  <text x="225" y="638" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Local demo, no API keys, full control</text>
+
+  <!-- Component 5: Integration -->
+  <rect x="435" y="420" width="370" height="245" rx="10" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
+  <rect x="435" y="420" width="370" height="8" rx="4" fill="#6366F1"/>
+  <text x="455" y="455" fill="#6366F1" font-size="12" font-weight="700">SECTION 09</text>
+  <text x="455" y="480" fill="#1B2A4A" font-size="18" font-weight="700">Integration</text>
+  <text x="455" y="500" fill="#64748B" font-size="12">Wire Collect → Analyze → Act into one command</text>
+  <line x1="455" y1="512" x2="775" y2="512" stroke="#E2E8F0" stroke-width="1"/>
+  <!-- Input -->
+  <text x="455" y="532" fill="#94A3B8" font-size="11" font-weight="600">INPUT</text>
+  <rect x="455" y="540" width="150" height="24" rx="4" fill="#F1F5F9"/>
+  <text x="530" y="557" fill="#475569" font-size="11" text-anchor="middle">One command</text>
+  <!-- Output -->
+  <text x="625" y="532" fill="#94A3B8" font-size="11" font-weight="600">OUTPUT</text>
+  <rect x="625" y="540" width="160" height="24" rx="4" fill="#D1FAE5"/>
+  <text x="705" y="557" fill="#065F46" font-size="11" text-anchor="middle">Tickets on the board</text>
+  <!-- Key detail -->
+  <rect x="455" y="578" width="330" height="30" rx="6" fill="#EEF2FF"/>
+  <text x="620" y="598" fill="#6366F1" font-size="11" font-weight="600" text-anchor="middle">Three phases: collect, analyze, post</text>
+  <!-- Why integrate -->
+  <rect x="455" y="618" width="330" height="30" rx="6" fill="#1B2A4A"/>
+  <text x="620" y="638" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">End-to-end automation in one script</text>
+
+  <!-- Summary box -->
+  <rect x="830" y="420" width="410" height="245" rx="10" fill="#1B2A4A"/>
+  <text x="1035" y="460" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">Design Principles</text>
+  <line x1="880" y1="472" x2="1190" y2="472" stroke="#334155" stroke-width="1"/>
+  <text x="870" y="500" fill="#0EA5E9" font-size="13" font-weight="600">1.</text>
+  <text x="890" y="500" fill="#E2E8F0" font-size="13">Separation of concerns</text>
+  <text x="870" y="525" fill="#0EA5E9" font-size="13" font-weight="600">2.</text>
+  <text x="890" y="525" fill="#E2E8F0" font-size="13">Standard protocols (MCP)</text>
+  <text x="870" y="550" fill="#0EA5E9" font-size="13" font-weight="600">3.</text>
+  <text x="890" y="550" fill="#E2E8F0" font-size="13">Testable independently</text>
+  <text x="870" y="575" fill="#0EA5E9" font-size="13" font-weight="600">4.</text>
+  <text x="890" y="575" fill="#E2E8F0" font-size="13">Schema-enforced output</text>
+  <text x="870" y="600" fill="#0EA5E9" font-size="13" font-weight="600">5.</text>
+  <text x="890" y="600" fill="#E2E8F0" font-size="13">Swappable components</text>
+  <text x="870" y="630" fill="#94A3B8" font-size="12">Swap MCP image, swap tracker endpoint —</text>
+  <text x="870" y="648" fill="#94A3B8" font-size="12">the pipeline stays the same.</text>
+</svg>

@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 3: Trade-off Summary</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 04 — FinOps AI Architecture Design</text>
+
+  <!-- Title -->
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">What We Chose, What We Gave Up</text>
+  <line x1="40" y1="130" x2="380" y2="130" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Trade-off 1: MCP Server -->
+  <rect x="40" y="150" width="580" height="120" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="40" y="150" width="6" height="120" rx="3" fill="#0EA5E9"/>
+  <text x="65" y="178" fill="#1B2A4A" font-size="16" font-weight="700">MCP Server</text>
+  <text x="65" y="198" fill="#64748B" font-size="12">Prebuilt kubernetes MCP image vs writing our own</text>
+  <!-- We get -->
+  <rect x="65" y="210" width="250" height="28" rx="5" fill="#D1FAE5"/>
+  <text x="75" y="229" fill="#065F46" font-size="12" font-weight="600">We get:</text>
+  <text x="130" y="229" fill="#065F46" font-size="12">Standard protocol, minutes to validate</text>
+  <!-- We give up -->
+  <rect x="330" y="210" width="270" height="28" rx="5" fill="#FEF3C7"/>
+  <text x="340" y="229" fill="#92400E" font-size="12" font-weight="600">We give up:</text>
+  <text x="415" y="229" fill="#92400E" font-size="12">Control over the MCP implementation</text>
+  <!-- Verdict -->
+  <rect x="65" y="246" width="535" height="16" rx="4" fill="#F0F9FF"/>
+  <text x="332" y="258" fill="#0EA5E9" font-size="11" font-weight="600" text-anchor="middle">Worth it — time saved far outweighs the dependency</text>
+
+  <!-- Trade-off 2: LLM -->
+  <rect x="660" y="150" width="580" height="120" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="660" y="150" width="6" height="120" rx="3" fill="#F97316"/>
+  <text x="685" y="178" fill="#1B2A4A" font-size="16" font-weight="700">LLM Analyzer</text>
+  <text x="685" y="198" fill="#64748B" font-size="12">LLM with schema vs hardcoded rule engine</text>
+  <!-- We get -->
+  <rect x="685" y="210" width="250" height="28" rx="5" fill="#D1FAE5"/>
+  <text x="695" y="229" fill="#065F46" font-size="12" font-weight="600">We get:</text>
+  <text x="750" y="229" fill="#065F46" font-size="12">Flexible policy, reasoning about context</text>
+  <!-- We give up -->
+  <rect x="950" y="210" width="270" height="28" rx="5" fill="#FEF3C7"/>
+  <text x="960" y="229" fill="#92400E" font-size="12" font-weight="600">We give up:</text>
+  <text x="1035" y="229" fill="#92400E" font-size="12">Deterministic output (fix with Pydantic)</text>
+  <!-- Verdict -->
+  <rect x="685" y="246" width="535" height="16" rx="4" fill="#FFF7ED"/>
+  <text x="952" y="258" fill="#F97316" font-size="11" font-weight="600" text-anchor="middle">Worth it — schema validation catches bad output before it reaches the tracker</text>
+
+  <!-- Trade-off 3: Collector -->
+  <rect x="40" y="295" width="580" height="120" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="40" y="295" width="6" height="120" rx="3" fill="#0EA5E9"/>
+  <text x="65" y="323" fill="#1B2A4A" font-size="16" font-weight="700">Collector (Separate Step)</text>
+  <text x="65" y="343" fill="#64748B" font-size="12">Separate collection from analysis vs doing both in one step</text>
+  <!-- We get -->
+  <rect x="65" y="355" width="250" height="28" rx="5" fill="#D1FAE5"/>
+  <text x="75" y="374" fill="#065F46" font-size="12" font-weight="600">We get:</text>
+  <text x="130" y="374" fill="#065F46" font-size="12">Testable, diffable, cacheable snapshots</text>
+  <!-- We give up -->
+  <rect x="330" y="355" width="270" height="28" rx="5" fill="#FEF3C7"/>
+  <text x="340" y="374" fill="#92400E" font-size="12" font-weight="600">We give up:</text>
+  <text x="415" y="374" fill="#92400E" font-size="12">Simplicity of a single-step process</text>
+  <!-- Verdict -->
+  <rect x="65" y="391" width="535" height="16" rx="4" fill="#F0F9FF"/>
+  <text x="332" y="403" fill="#0EA5E9" font-size="11" font-weight="600" text-anchor="middle">Worth it — when something breaks, you know where to look</text>
+
+  <!-- Trade-off 4: Tracker -->
+  <rect x="660" y="295" width="580" height="120" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="660" y="295" width="6" height="120" rx="3" fill="#10B981"/>
+  <text x="685" y="323" fill="#1B2A4A" font-size="16" font-weight="700">Issue Tracker</text>
+  <text x="685" y="343" fill="#64748B" font-size="12">Simple FastAPI tracker vs integrating with Jira</text>
+  <!-- We get -->
+  <rect x="685" y="355" width="250" height="28" rx="5" fill="#D1FAE5"/>
+  <text x="695" y="374" fill="#065F46" font-size="12" font-weight="600">We get:</text>
+  <text x="750" y="374" fill="#065F46" font-size="12">Full control, local demo, no API keys</text>
+  <!-- We give up -->
+  <rect x="950" y="355" width="270" height="28" rx="5" fill="#FEF3C7"/>
+  <text x="960" y="374" fill="#92400E" font-size="12" font-weight="600">We give up:</text>
+  <text x="1035" y="374" fill="#92400E" font-size="12">Workflows, permissions, webhooks</text>
+  <!-- Verdict -->
+  <rect x="685" y="391" width="535" height="16" rx="4" fill="#F0FDF4"/>
+  <text x="952" y="403" fill="#10B981" font-size="11" font-weight="600" text-anchor="middle">Worth it — the integration code (POST JSON) is identical to Jira</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="440" x2="1240" y2="440" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- The big picture -->
+  <text x="640" y="475" fill="#1B2A4A" font-size="20" font-weight="700" text-anchor="middle">The Transferable Architecture</text>
+
+  <!-- Diagram: Teaching vs Production -->
+  <rect x="40" y="500" width="580" height="170" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="330" y="530" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">What We Teach With</text>
+  <line x1="120" y1="540" x2="540" y2="540" stroke="#CBD5E1" stroke-width="1"/>
+  <!-- Boxes -->
+  <rect x="70" y="555" width="100" height="45" rx="6" fill="#1B2A4A"/>
+  <text x="120" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Kind</text>
+  <text x="178" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="190" y="555" width="100" height="45" rx="6" fill="#0EA5E9"/>
+  <text x="240" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">MCP</text>
+  <text x="298" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="310" y="555" width="80" height="45" rx="6" fill="#0EA5E9"/>
+  <text x="350" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Python</text>
+  <text x="398" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="410" y="555" width="80" height="45" rx="6" fill="#F97316"/>
+  <text x="450" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">LLM</text>
+  <text x="498" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="510" y="555" width="100" height="45" rx="6" fill="#10B981"/>
+  <text x="560" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">FastAPI</text>
+  <!-- Labels -->
+  <text x="330" y="625" fill="#64748B" font-size="12" text-anchor="middle">Local demo tools</text>
+  <text x="330" y="645" fill="#64748B" font-size="12" text-anchor="middle">mcp/kubernetes image, OpenAI, simple tracker</text>
+
+  <rect x="660" y="500" width="580" height="170" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="950" y="530" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">What You Swap in Production</text>
+  <line x1="740" y1="540" x2="1160" y2="540" stroke="#CBD5E1" stroke-width="1"/>
+  <!-- Boxes -->
+  <rect x="690" y="555" width="100" height="45" rx="6" fill="#1B2A4A"/>
+  <text x="740" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">EKS/GKE</text>
+  <text x="798" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="810" y="555" width="100" height="45" rx="6" fill="#0EA5E9"/>
+  <text x="860" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">MCP</text>
+  <text x="918" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="930" y="555" width="80" height="45" rx="6" fill="#0EA5E9"/>
+  <text x="970" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Agent</text>
+  <text x="1018" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="1030" y="555" width="80" height="45" rx="6" fill="#F97316"/>
+  <text x="1070" y="583" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Bedrock</text>
+  <text x="1118" y="578" fill="#CBD5E1" font-size="16">→</text>
+  <rect x="1130" y="555" width="100" height="45" rx="6" fill="#10B981"/>
+  <text x="1180" y="578" fill="#FFFFFF" font-size="11" font-weight="600" text-anchor="middle">Jira</text>
+  <!-- Labels -->
+  <text x="950" y="625" fill="#64748B" font-size="12" text-anchor="middle">Production tools</text>
+  <text x="950" y="645" fill="#64748B" font-size="12" text-anchor="middle">Same pipeline, different endpoints</text>
+
+  <!-- Bottom bar -->
+  <rect x="40" y="690" width="1200" height="22" rx="4" fill="#1B2A4A"/>
+  <text x="640" y="706" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="middle">Every trade-off favors speed and teachability. The architecture transfers to production by swapping endpoints.</text>
+</svg>

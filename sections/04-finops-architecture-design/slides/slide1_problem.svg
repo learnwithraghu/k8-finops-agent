@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 1: The Problem We're Soloring</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 04 — FinOps AI Architecture Design</text>
+
+  <!-- Section title -->
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">The 02a Incident — What Happened</text>
+  <line x1="40" y1="130" x2="300" y2="130" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Timeline -->
+  <!-- Timeline line -->
+  <line x1="120" y1="200" x2="1160" y2="200" stroke="#CBD5E1" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Step 1 -->
+  <circle cx="180" cy="200" r="24" fill="#0EA5E9"/>
+  <text x="180" y="207" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">1</text>
+  <text x="180" y="250" fill="#1E293B" font-size="14" font-weight="600" text-anchor="middle">Alert Arrives</text>
+  <rect x="100" y="265" width="160" height="55" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="180" y="288" fill="#475569" font-size="12" text-anchor="middle">"Payments are</text>
+  <text x="180" y="305" fill="#475569" font-size="12" text-anchor="middle">broken"</text>
+
+  <!-- Step 2 -->
+  <circle cx="380" cy="200" r="24" fill="#0EA5E9"/>
+  <text x="380" y="207" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">2</text>
+  <text x="380" y="250" fill="#1E293B" font-size="14" font-weight="600" text-anchor="middle">kubectl Debug</text>
+  <rect x="300" y="265" width="160" height="55" rx="8" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="380" y="288" fill="#475569" font-size="12" text-anchor="middle">get, describe,</text>
+  <text x="380" y="305" fill="#475569" font-size="12" text-anchor="middle">logs, endpoints</text>
+
+  <!-- Step 3 -->
+  <circle cx="580" cy="200" r="24" fill="#0EA5E9"/>
+  <text x="580" y="207" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">3</text>
+  <text x="580" y="250" fill="#1E293B" font-size="14" font-weight="600" text-anchor="middle">Root Cause</text>
+  <rect x="500" y="265" width="160" height="55" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <text x="580" y="288" fill="#92400E" font-size="12" text-anchor="middle">API scaled to</text>
+  <text x="580" y="305" fill="#92400E" font-size="12" font-weight="600" text-anchor="middle">0 replicas</text>
+
+  <!-- Step 4 -->
+  <circle cx="780" cy="200" r="24" fill="#0EA5E9"/>
+  <text x="780" y="207" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">4</text>
+  <text x="780" y="250" fill="#1E293B" font-size="14" font-weight="600" text-anchor="middle">Quick Fix</text>
+  <rect x="700" y="265" width="160" height="55" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="1"/>
+  <text x="780" y="288" fill="#065F46" font-size="12" text-anchor="middle">kubectl scale</text>
+  <text x="780" y="305" fill="#065F46" font-size="12" text-anchor="middle">--replicas=1</text>
+
+  <!-- Step 5 — THE WALL -->
+  <circle cx="980" cy="200" r="24" fill="#EF4444"/>
+  <text x="980" y="207" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">5</text>
+  <text x="980" y="250" fill="#EF4444" font-size="14" font-weight="700" text-anchor="middle">THE WALL</text>
+  <rect x="900" y="265" width="160" height="55" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <text x="980" y="288" fill="#991B1B" font-size="12" text-anchor="middle">No owner label</text>
+  <text x="980" y="305" fill="#991B1B" font-size="12" font-weight="600" text-anchor="middle">Who owns this?</text>
+
+  <!-- Arrow pointing right on timeline -->
+  <polygon points="1170,200 1155,190 1155,210" fill="#CBD5E1"/>
+
+  <!-- Divider -->
+  <line x1="40" y1="360" x2="1240" y2="360" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- Bottom section — Two columns -->
+  <!-- Left: Technical fix -->
+  <rect x="40" y="385" width="570" height="290" rx="12" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="325" y="420" fill="#065F46" font-size="18" font-weight="700" text-anchor="middle">Technical Fix</text>
+  <line x1="200" y1="432" x2="450" y2="432" stroke="#10B981" stroke-width="1.5"/>
+  <text x="325" y="462" fill="#065F46" font-size="32" font-weight="800" text-anchor="middle">1 command</text>
+  <text x="325" y="490" fill="#065F46" font-size="14" text-anchor="middle">kubectl scale deployment</text>
+  <text x="325" y="508" fill="#065F46" font-size="14" text-anchor="middle">payment-gateway-api --replicas=1</text>
+  <rect x="120" y="530" width="410" height="50" rx="8" fill="#FFFFFF" opacity="0.6"/>
+  <text x="325" y="555" fill="#065F46" font-size="14" text-anchor="middle">Service restored in seconds.</text>
+  <text x="325" y="575" fill="#065F46" font-size="14" text-anchor="middle">This was easy.</text>
+  <text x="325" y="630" fill="#10B981" font-size="16" font-weight="600" text-anchor="middle">SOLVED</text>
+
+  <!-- Right: Organizational failure -->
+  <rect x="640" y="385" width="600" height="290" rx="12" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <text x="940" y="420" fill="#991B1B" font-size="18" font-weight="700" text-anchor="middle">Organizational Failure</text>
+  <line x1="740" y1="432" x2="1140" y2="432" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="940" y="462" fill="#991B1B" font-size="16" text-anchor="middle">Questions we could NOT answer:</text>
+  <!-- Question list -->
+  <text x="700" y="495" fill="#991B1B" font-size="14">Who do I page?</text>
+  <text x="700" y="520" fill="#991B1B" font-size="14">What Slack channel do I post in?</text>
+  <text x="700" y="545" fill="#991B1B" font-size="14">Whose budget pays for this?</text>
+  <text x="700" y="570" fill="#991B1B" font-size="14">Is this service even supposed to exist?</text>
+  <!-- X marks -->
+  <text x="1120" y="495" fill="#EF4444" font-size="16" font-weight="700">✗</text>
+  <text x="1120" y="520" fill="#EF4444" font-size="16" font-weight="700">✗</text>
+  <text x="1120" y="545" fill="#EF4444" font-size="16" font-weight="700">✗</text>
+  <text x="1120" y="570" fill="#EF4444" font-size="16" font-weight="700">✗</text>
+  <text x="940" y="630" fill="#EF4444" font-size="16" font-weight="700" text-anchor="middle">UNSOLVED</text>
+
+  <!-- Bottom insight -->
+  <rect x="240" y="690" width="800" height="22" rx="4" fill="#1B2A4A"/>
+  <text x="640" y="706" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="middle">The incident was technical. The failure was organizational. That is what we need to solve.</text>
+</svg>

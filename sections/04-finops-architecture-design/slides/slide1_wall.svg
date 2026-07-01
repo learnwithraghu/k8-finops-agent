@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 1: The Ownership Wall</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 04 — FinOps AI Architecture Design</text>
+
+  <!-- Title -->
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Why Manual FinOps Does Not Scale</text>
+  <line x1="40" y1="130" x2="340" y2="130" stroke="#0EA5E9" stroke-width="3"/>
+
+  <!-- Scale visual: Small vs Large -->
+  <!-- Left: Small (Demo) -->
+  <rect x="40" y="155" width="380" height="250" rx="12" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="230" y="185" fill="#1B2A4A" font-size="18" font-weight="700" text-anchor="middle">Demo Scale</text>
+  <line x1="120" y1="195" x2="340" y2="195" stroke="#CBD5E1" stroke-width="1"/>
+
+  <!-- Small scale icons -->
+  <rect x="70" y="215" width="90" height="40" rx="6" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+  <text x="115" y="240" fill="#065F46" font-size="12" font-weight="600" text-anchor="middle">5 namespaces</text>
+  <rect x="175" y="215" width="90" height="40" rx="6" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+  <text x="220" y="240" fill="#065F46" font-size="12" font-weight="600" text-anchor="middle">10 services</text>
+  <rect x="280" y="215" width="90" height="40" rx="6" fill="#D1FAE5" stroke="#10B981" stroke-width="1.5"/>
+  <text x="325" y="240" fill="#065F46" font-size="12" font-weight="600" text-anchor="middle">1 cluster</text>
+
+  <text x="230" y="290" fill="#475569" font-size="13" text-anchor="middle">You can grep labels manually.</text>
+  <text x="230" y="310" fill="#475569" font-size="13" text-anchor="middle">You can check each namespace.</text>
+  <text x="230" y="340" fill="#475569" font-size="13" text-anchor="middle">It is annoying but doable.</text>
+  <rect x="160" y="355" width="140" height="30" rx="6" fill="#10B981"/>
+  <text x="230" y="375" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="middle">Manual works</text>
+
+  <!-- Right: Production -->
+  <rect x="460" y="155" width="780" height="250" rx="12" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="850" y="185" fill="#92400E" font-size="18" font-weight="700" text-anchor="middle">Production Scale</text>
+  <line x1="560" y1="195" x2="1140" y2="195" stroke="#F59E0B" stroke-width="1"/>
+
+  <!-- Production scale icons -->
+  <rect x="490" y="215" width="110" height="40" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="545" y="240" fill="#991B1B" font-size="12" font-weight="600" text-anchor="middle">50+ namespaces</text>
+  <rect x="615" y="215" width="110" height="40" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="670" y="240" fill="#991B1B" font-size="12" font-weight="600" text-anchor="middle">200+ services</text>
+  <rect x="740" y="215" width="110" height="40" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="795" y="240" fill="#991B1B" font-size="12" font-weight="600" text-anchor="middle">10+ clusters</text>
+  <rect x="865" y="215" width="130" height="40" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="930" y="240" fill="#991B1B" font-size="12" font-weight="600" text-anchor="middle">1000+ resources</text>
+
+  <text x="850" y="290" fill="#92400E" font-size="13" text-anchor="middle">grep breaks. Spreadsheets break.</text>
+  <text x="850" y="310" fill="#92400E" font-size="13" text-anchor="middle">Someone checks labels for 200 deployments?</text>
+  <text x="850" y="340" fill="#92400E" font-size="13" text-anchor="middle">Every untagged resource is a billing gap.</text>
+  <rect x="780" y="355" width="140" height="30" rx="6" fill="#EF4444"/>
+  <text x="850" y="375" fill="#FFFFFF" font-size="13" font-weight="600" text-anchor="middle">Manual fails</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="430" x2="1240" y2="430" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- Cost of inaction -->
+  <text x="640" y="465" fill="#1B2A4A" font-size="20" font-weight="700" text-anchor="middle">The Cost of Untagged Resources</text>
+
+  <!-- Cost cards -->
+  <rect x="40" y="490" width="280" height="140" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="40" y="490" width="280" height="8" rx="4" fill="#EF4444"/>
+  <text x="180" y="530" fill="#1B2A4A" font-size="15" font-weight="700" text-anchor="middle">Incident Response</text>
+  <text x="180" y="558" fill="#EF4444" font-size="28" font-weight="800" text-anchor="middle">+30 min</text>
+  <text x="180" y="580" fill="#64748B" font-size="12" text-anchor="middle">per incident to find the owner</text>
+  <text x="180" y="598" fill="#64748B" font-size="12" text-anchor="middle">when labels are missing</text>
+  <text x="180" y="620" fill="#94A3B8" font-size="11" text-anchor="middle">Slack pings, email chains, guessing</text>
+
+  <rect x="360" y="490" width="280" height="140" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="360" y="490" width="280" height="8" rx="4" fill="#F97316"/>
+  <text x="500" y="530" fill="#1B2A4A" font-size="15" font-weight="700" text-anchor="middle">Billing Gaps</text>
+  <text x="500" y="558" fill="#F97316" font-size="28" font-weight="800" text-anchor="middle">Unknown $</text>
+  <text x="500" y="580" fill="#64748B" font-size="12" text-anchor="middle">costs with no owner means</text>
+  <text x="500" y="598" fill="#64748B" font-size="12" text-anchor="middle">no one is accountable</text>
+  <text x="500" y="620" fill="#94A3B8" font-size="11" text-anchor="middle">Orphaned PVCs, idle services, waste</text>
+
+  <rect x="680" y="490" width="280" height="140" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="680" y="490" width="280" height="8" rx="4" fill="#F59E0B"/>
+  <text x="820" y="530" fill="#1B2A4A" font-size="15" font-weight="700" text-anchor="middle">Compliance Risk</text>
+  <text x="820" y="558" fill="#F59E0B" font-size="28" font-weight="800" text-anchor="middle">Audit Fail</text>
+  <text x="820" y="580" fill="#64748B" font-size="12" text-anchor="middle">cannot prove ownership or</text>
+  <text x="820" y="598" fill="#64748B" font-size="12" text-anchor="middle">cost allocation without tags</text>
+  <text x="820" y="620" fill="#94A3B8" font-size="11" text-anchor="middle">SOC2, HIPAA, internal policy</text>
+
+  <rect x="1000" y="490" width="240" height="140" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="1000" y="490" width="240" height="8" rx="4" fill="#8B5CF6"/>
+  <text x="1120" y="530" fill="#1B2A4A" font-size="15" font-weight="700" text-anchor="middle">Team Friction</text>
+  <text x="1120" y="558" fill="#8B5CF6" font-size="28" font-weight="800" text-anchor="middle">Blame</text>
+  <text x="1120" y="580" fill="#64748B" font-size="12" text-anchor="middle">"whose service is this?"</text>
+  <text x="1120" y="598" fill="#64748B" font-size="12" text-anchor="middle">becomes a political question</text>
+  <text x="1120" y="620" fill="#94A3B8" font-size="11" text-anchor="middle">Not a technical one</text>
+
+  <!-- Bottom bar -->
+  <rect x="40" y="655" width="1200" height="40" rx="8" fill="#1B2A4A"/>
+  <text x="640" y="680" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">Manual FinOps does not work at scale. We need a system that automates: Collect → Analyze → Act.</text>
+</svg>
