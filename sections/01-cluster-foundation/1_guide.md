@@ -1,30 +1,55 @@
-# Demo 1: Environment Cleanup & Tool Verification
+# Demo 1: Create the Kind Cluster
 
-**Time Budget:** 2-3 mins
+**Time Budget:** 2 mins
 
-### 1) Clean old state
+**Narrative:** We need a local Kubernetes cluster. Kind runs one inside Docker — fast, disposable, no cloud account needed. This is how most people prototype K8 workflows on their laptop.
+
+---
+
+### 1) Create the cluster
+
 ```bash
-./helper/local-kind/cleanup.sh --yes
-```
-> *Expected: Removes any old Kind clusters.*
-
-### 2) Verify Docker is installed and running
-```bash
-docker --version
-docker info
+kind create cluster --name finops-cluster
 ```
 
-### 3) Verify Helm is installed
+**What it does:** Spins up a single-node Kubernetes cluster inside a Docker container. Takes about 30 seconds on a good machine.
+
+> *Talking point: "Kind stands for 'Kubernetes IN Docker.' It gives you a real API server, real etcd, real kubelet — just running in containers instead of VMs. Perfect for local dev and teaching."*
+
+---
+
+### 2) Confirm the cluster exists
+
 ```bash
-helm version --short
+kind get clusters
 ```
 
-### 4) Verify Kind is installed
+**What it does:** Lists all Kind clusters on your machine. You should see `finops-cluster`.
+
+---
+
+### 3) Confirm kubectl can talk to it
+
 ```bash
-kind version
+kubectl cluster-info
 ```
 
-### 5) Verify kubectl is installed
+**What it does:** Hits the Kubernetes API server and prints its URL. If this works, kubectl is wired correctly to the new cluster.
+
+> *Talking point: "Kind automatically updates your kubeconfig. That is why kubectl works immediately — no manual config step."*
+
+---
+
+### 4) Confirm nodes are ready
+
 ```bash
-kubectl version --client
+kubectl get nodes
 ```
+
+**What it does:** Lists all cluster nodes and their status. You should see one node in `Ready` state.
+
+> *Expected: One node listed, status `Ready`, role `control-plane`.*
+
+---
+
+**Next:** Cluster is up. Next we create the namespaces our airline app will use → `2_guide.md`

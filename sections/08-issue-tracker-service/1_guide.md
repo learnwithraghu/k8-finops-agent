@@ -1,24 +1,43 @@
-# Demo 1: Standing up the Tracker Service
+# Demo 1: Run the Tracker
 
-**Time Budget:** 3-4 mins
+**Time Budget:** 2–3 mins
 
-### 1) Clean up and inspect
-```bash
-docker stop finops-issue-tracker 2>/dev/null || true
-docker rm finops-issue-tracker 2>/dev/null || true
-find sections/08-issue-tracker-service/service -maxdepth 3 -type f | sort
-```
+**Narrative:** We need a place for FinOps findings to become actionable tickets. This service is a lightweight Jira — a Kanban board with a REST API and an MCP server. Agents post findings here; humans review them on the board.
 
-### 2) Build the Docker image
-```bash
-docker build -t finops-issue-tracker:latest sections/08-issue-tracker-service/service
-```
+---
 
-### 3) Run the tracker container (In a second terminal)
+### 1) Run the tracker container
+
+In a **dedicated terminal**:
+
 ```bash
 docker run --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
 ```
 
-### 4) Open the board UI and FastAPI docs
-- Board: `http://localhost:8085`
-- Docs: `http://localhost:8085/docs`
+**What it does:** Starts the tracker container. Port 8085 serves the REST API and board UI. Port 8086 serves the MCP server.
+
+> *Expected: FastAPI startup logs, "Uvicorn running on http://0.0.0.0:8000".*
+
+---
+
+### 2) Open the board UI
+
+Open `http://localhost:8085` in your browser.
+
+**What it does:** Shows the Kanban board — columns for ticket status (open, in progress, done). Empty for now.
+
+> *Talking point: "This is where FinOps findings land as tickets. Right now it is empty — we will populate it in the next demo."*
+
+---
+
+### 3) Open the API docs
+
+Open `http://localhost:8085/docs` in your browser.
+
+**What it does:** Shows the FastAPI Swagger UI — interactive API documentation. You can test endpoints directly from the browser.
+
+> *Talking point: "The docs show every endpoint the tracker exposes. The `/create-issue` POST is the one agents use to create tickets."*
+
+---
+
+**Next:** Tracker is running. Next we create our first ticket via the REST API → `2_guide.md`

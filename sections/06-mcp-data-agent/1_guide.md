@@ -1,18 +1,47 @@
-# Demo 1: Running the Data Agent
+# Demo 1: Run the Data Agent
 
-**Time Budget:** 3-4 mins
+**Time Budget:** 3 mins
 
-> *Note: Ensure your `supergateway` from Section 05 is still running in the background!*
+**Narrative:** The agent connects to our MCP endpoint, calls `kubectl_get` for each resource type across all namespaces, and writes a JSON snapshot. This is deterministic collection — same input, same output every time.
 
-### 1) Install dependencies
+---
+
+### 1) Confirm MCP endpoint is alive
+
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-python3 -m pip install -r sections/06-mcp-data-agent/requirements.txt
+curl -s http://localhost:8000/healthz
 ```
 
-### 2) Inspect the agent script
+**What it does:** Quick health check before running the agent. If this fails, Supergateway is not running.
+
+> *Expected: `ok`*
+
+---
+
+### 2) Run the agent
+
 ```bash
-cat sections/06-mcp-data-agent/agent.py
+python3 sections/06-mcp-data-agent/agent.py > k8s_metadata.json
 ```
-> *Talking point: This is our base agent. It connects to the Kubernetes MCP via SSE to our supergateway, calls the tool to list resources, and prints the raw JSON.*
+
+**What it does:** Connects to the MCP endpoint, lists namespaces, fetches resources per namespace, and writes the snapshot to `k8s_metadata.json`.
+
+> *Talking point: "The agent calls `kubectl_get` through MCP — the same tool we validated with curl in Section 05. Python just automates the loop."*
+
+---
+
+### 3) Review the output
+
+```bash
+cat k8s_metadata.json | jq 'del(.resources[].annotations)' | head -n 20
+```
+
+**What it does:** Pretty-prints the first 20 lines of the snapshot, stripping annotations for readability.
+
+> *Expected: JSON with `scanned_at`, `cluster`, `namespaces`, and `resources` keys. Resources include deployments, pods, services, PVCs, and configmaps from the airline namespaces.*
+
+> *Talking point: "This is raw data. No compliance verdicts, no severity scores, no ownership recommendations. Just facts from the cluster."*
+
+---
+
+**Next:** We have a snapshot. Next we inspect what is in it and discuss why it is unstructured → `2_guide.md`

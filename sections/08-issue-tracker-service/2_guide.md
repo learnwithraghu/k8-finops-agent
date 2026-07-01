@@ -1,15 +1,20 @@
-# Demo 2: Manually Creating Issues from Findings
+# Demo 2: Create Tickets via REST
 
-**Time Budget:** 4-5 mins
+**Time Budget:** 3–4 mins
 
-### 1) Create a ticket through the REST API
+**Narrative:** Let's simulate what the agent does — POST a FinOps finding as a ticket. This is the same payload shape Section 07 produces. We are doing it by hand first; Section 09 automates it.
+
+---
+
+### 1) Create a ticket via curl
+
 ```bash
 curl -X POST http://localhost:8085/create-issue \
   -H 'Content-Type: application/json' \
   -d '{
     "title": "[FinOps] payment/payment-processor - UNALLOCATED ($8.47/month)",
     "summary": "Missing cost-center and owner metadata",
-    "body": "Bedrock flagged this as a tech-debt item.",
+    "body": "The agent flagged this deployment as having no ownership labels.",
     "namespace": "payment",
     "resource_name": "payment-processor",
     "resource_kind": "Deployment",
@@ -19,43 +24,55 @@ curl -X POST http://localhost:8085/create-issue \
     "suggested_owner": "payment-team",
     "suggested_cost_center": "payment",
     "reasoning": "Missing cost-center tag means the workload cannot be billed correctly.",
-    "source": "bedrock"
+    "source": "manual-demo"
   }'
 ```
-> *Talking point: Switch to browser to show the new ticket on the board.*
 
-### 2) Validate MCP endpoint & Create a ticket
+**What it does:** Sends a POST request to create a ticket. The tracker stores it and returns the created ticket with an ID.
+
+> *Expected: JSON response with the ticket details and a generated ID.*
+
+> *Talking point: "This is the exact payload shape Section 07 produces. The agent automates this curl call — we are doing it manually to see what happens."*
+
+---
+
+### 2) Verify the ticket on the board
+
+Open `http://localhost:8085` in your browser.
+
+**What it does:** Refreshes the Kanban board. The new ticket should appear in the "Open" column.
+
+> *Expected: One ticket visible — "[FinOps] payment/payment-processor - UNALLOCATED".*
+
+> *Talking point: "The board is a human view of what the agent produces. Ops teams use this to triage and assign findings."*
+
+---
+
+### 3) Create a second ticket (optional)
+
 ```bash
-cat << 'EOF' > test_mcp.py
-import asyncio
-from mcp.client.sse import sse_client
-from mcp.client.session import ClientSession
-
-async def main():
-    async with sse_client("http://localhost:8086/sse") as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            print("Tools available:")
-            print(await session.list_tools())
-            print("\nCreating issue via MCP...")
-            result = await session.call_tool("create_issue", {
-                "title": "[MCP] payment/payment-processor - UNALLOCATED",
-                "summary": "Created via MCP tool call",
-                "namespace": "payment",
-                "resource_name": "payment-processor",
-                "resource_kind": "Deployment",
-                "category": "unallocated",
-                "priority": "high",
-                "cost_impact": 8.47,
-                "suggested_owner": "payment-team",
-                "source": "mcp-agent"
-            })
-            print(result)
-
-asyncio.run(main())
-EOF
-
-source venv/bin/activate
-python3 test_mcp.py
+curl -X POST http://localhost:8085/create-issue \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "[FinOps] flight-search/flight-search-service - MISSING OWNER",
+    "summary": "No owner label on deployment",
+    "namespace": "flight-search",
+    "resource_name": "flight-search-service",
+    "resource_kind": "Deployment",
+    "category": "missing-owner",
+    "priority": "medium",
+    "suggested_owner": "flight-team",
+    "reasoning": "No owner label means no team is accountable for this workload.",
+    "source": "manual-demo"
+  }'
 ```
-> *Expected: See the second ticket appear on the Kanban board.*
+
+**What it does:** Creates a second ticket. Refresh the board to see both.
+
+> *Talking point: "In a real run, the agent creates one ticket per finding. You might get 5, 10, or 20 tickets from a single scan."*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **tracker bridge** — REST and MCP inputs feed the same Kanban board. Use **Need a hint?** if stuck, then press **Create Ticket** to validate.
+
+**Next:** Tickets work via REST. Next we automate the full flow — agent posts findings directly → `sections/09-agent-to-tracker-integration`

@@ -1,32 +1,60 @@
-# Demo 3: Baseline Namespaces Creation & Validation
+# Demo 3: Verify the Baseline
 
-**Time Budget:** 2-3 mins
+**Time Budget:** 3 mins
 
-### 1) Create the baseline namespaces
+**Narrative:** Before we deploy anything, let's confirm what the cluster looks like with nothing in it. This is your blank canvas — everything from Section 02 onwards builds on top.
+
+---
+
+### 1) Check for any existing workloads
+
 ```bash
-kubectl create namespace booking-api
-kubectl create namespace flight-search
-kubectl create namespace inventory
-kubectl create namespace payment
-kubectl create namespace airline
+kubectl get all -A
 ```
 
-### 2) Verify namespaces
+**What it does:** Lists every pod, service, deployment, and replicaset across all namespaces. In a clean cluster you should only see system components under `kube-system`.
+
+> *Talking point: "If you see anything under the airline namespaces, something leaked from a previous run. That is what the cleanup script in the prereq guide prevents."*
+
+---
+
+### 2) Check services across namespaces
+
 ```bash
-kubectl get namespaces
+kubectl get svc -A
 ```
 
-### 3) Confirm kubectl access works
+**What it does:** Lists all Services cluster-wide. The airline namespaces should be empty — only `kubernetes` in the `default` namespace and `kube-dns` in `kube-system`.
+
+> *Expected: Two services total — `kubernetes` and `kube-dns`. Nothing in the airline namespaces.*
+
+---
+
+### 3) Check node details
+
 ```bash
-kubectl auth can-i get pods -A
+kubectl get nodes -o wide
 ```
 
-### 4) Confirm there are no app workloads yet
+**What it does:** Shows node info including OS, kernel version, container runtime, and internal IP. Useful for confirming the Kind node is healthy.
+
+> *Talking point: "This single node runs everything. In production you would have many nodes — but the kubectl commands are the same."*
+
+---
+
+### 4) Confirm no workloads in airline namespaces
+
 ```bash
-kubectl get pods -A
+kubectl get pods -n booking-api
+kubectl get pods -n payment
 ```
-> *Expected: No app deployments returned, cluster is clean.*
+
+**What it does:** Explicitly checks two airline namespaces for pods. Both should return "No resources found."
+
+> *Expected: Empty — no pods, no deployments, nothing. The namespaces are clean containers waiting for Section 02.*
 
 ---
 
 **Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to assemble the cluster foundation flow from memory — drag components into the correct slots, use **Need a hint?** if stuck, then press **Run Flow** to validate. Placed components move to **On canvas** so you can reassign them.
+
+**Next:** Foundation done. Next section deploys the airline app → `sections/02-airline-app-deployment`

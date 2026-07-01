@@ -1,22 +1,36 @@
-# Demo 1: The Full End-to-End Agent
+# Demo 1: Run the Full Agent
 
-**Time Budget:** 3-4 mins
+**Time Budget:** 3 mins
 
-> *Note: Ensure your `supergateway` from Section 05 is still running in the background!*
+**Narrative:** The agent does three things in sequence: collect cluster data via MCP, analyze it with the LLM, and post findings as tickets to the tracker. One command, end to end.
 
-### 1) Ensure the tracker is running
-*(If it is already running from Section 08, skip this)*
+---
+
+### 1) Confirm both services are running
+
 ```bash
-docker run -d --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
+curl -s http://localhost:8000/healthz
+curl -s http://localhost:8085/docs | head -1
 ```
 
-### 2) Inspect the new script
-```bash
-cat sections/09-agent-to-tracker-integration/agent.py
-```
-> *Talking point: We've now added MCP SSE client logic to our agent to POST the structured output directly into the Issue Tracker, using `call_tool("create_issue")`.*
+**What it does:** Quick health checks — Supergateway (MCP) and Issue Tracker (REST). Both should respond.
 
-### 3) Run the full agent
+> *Talking point: "If either service is down, the agent fails. In production you would have retries and health checks. For the demo, we just confirm before running."*
+
+---
+
+### 2) Run the full agent
+
 ```bash
 python3 sections/09-agent-to-tracker-integration/agent.py
 ```
+
+**What it does:** Connects to the Kubernetes MCP, collects the cluster snapshot, analyzes it with the LLM using tagging rules, and posts each finding as a ticket to the tracker via MCP.
+
+> *Expected: Log lines showing connection, scanning, analysis, and ticket creation. Final line: "ALL ISSUES POSTED TO TRACKER".*
+
+> *Talking point: "Watch the logs. Three phases — collect, analyze, post. Each one is a separate concern. That is why Section 10 refactors them into separate files."*
+
+---
+
+**Next:** Agent ran and posted tickets. Next we verify they landed on the board → `2_guide.md`

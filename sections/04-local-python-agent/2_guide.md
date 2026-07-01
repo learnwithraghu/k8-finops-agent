@@ -1,35 +1,59 @@
-# Demo 2: Run Scanner and Review Output
+# Demo 2: Manual vs Automated
 
-**Time Budget:** 4-5 mins
+**Time Budget:** 3–4 mins
 
-### 1) Run the collector across the cluster
+**Narrative:** The collector gave us JSON. Let's see what it would take to get the same information by hand — and why raw data alone is not enough.
+
+---
+
+### 1) List all deployments with labels (manual)
+
 ```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.collect -o k8s_metadata.json
-python3 -m json.tool k8s_metadata.json | head -80
-```
-> *Expected: A messy, raw JSON dump of Kubernetes objects without compliance verdicts.*
-
-### 2) Run collector for one namespace
-```bash
-PYTHONPATH=sections/04-local-python-agent python -m agent.collect --namespace booking-api -o booking_api_metadata.json
-```
-
-### 3) Spot check with kubectl to show how tedious manual checks are
-```bash
-# All deployments with labels
 kubectl get deployments -A --show-labels
+```
 
-# Deployments missing owner
+**What it does:** Shows every deployment across all namespaces with their full label set. This is what you would scan manually to check for missing tags.
+
+> *Talking point: "Now imagine doing this for 50 namespaces, 200 deployments. The collector does it in one API call."*
+
+---
+
+### 2) Find deployments missing an owner label (manual)
+
+```bash
 kubectl get deployments -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER:.metadata.labels.owner' | grep '<none>'
+```
 
-# Services missing cost-center
+**What it does:** Lists deployments where the `owner` label is not set. Lines with `<none>` are the gaps.
+
+> *Expected: Several deployments with `<none>` — these are the FinOps problems.*
+
+> *Talking point: "This grep approach works for one label. But what about `cost-center`, `tier`, `environment`? And what about services, configmaps, PVCs? It gets unwieldy fast."*
+
+---
+
+### 3) Find services missing cost-center (manual)
+
+```bash
 kubectl get services -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,COST_CENTER:.metadata.labels.cost-center' | grep '<none>'
+```
 
-# PVCs status
+**What it does:** Same approach, checking `cost-center` on services. Shows which services are not tagged for billing.
+
+---
+
+### 4) Check PVC status (manual)
+
+```bash
 kubectl get pvc -A -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATUS:.status.phase'
 ```
-> *Talking point: Raw data is disconnected from policy. This is why we need the LLM in Section 07.*
+
+**What it does:** Shows PVCs and their binding status. Unbound PVCs may be orphaned or misconfigured.
+
+> *Talking point: "Raw data is disconnected from policy. The collector gives you the data; the tagging rules define what 'good' looks like. But connecting the two requires logic — and that is where the LLM comes in Section 07."*
 
 ---
 
 **Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to wire the **laptop ↔ cluster bridge** — local collect.py reads the Kind API and writes JSON on your machine. Use **Need a hint?** if stuck, then press **Run Scan** to validate.
+
+**Next:** Collector works but output is unstructured. Next we add MCP for standardized tool access → `sections/05-mcp-k8-agent`

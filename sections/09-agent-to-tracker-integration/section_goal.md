@@ -1,26 +1,46 @@
 # Section 09 Goal: Agent to Tracker Integration
 
 ## Goal
-Consume the Section 07 structured findings (`TicketBatch`) and post each actionable `TrackerTicket` to the Section 08 issue tracker service via MCP tools.
+Connect the Section 07 structured findings to the Section 08 issue tracker. The agent collects cluster data, analyzes it with the LLM, and posts each finding as a ticket to the tracker — fully automated end to end.
+
+## Prerequisites
+Sections 01–08 complete.
+
+You should already have:
+- a working Kind cluster (`finops-cluster`)
+- Supergateway running from Section 05 (port 8000)
+- Issue tracker running from Section 08 (ports 8085/8086)
+- OpenAI API key set
+
+## Instructor setup (before the live demo)
+Run `0_prerequisite_guide.md` before teaching. It confirms both services are running and inspects the agent code. Do not walk students through service startup during the live demo.
+
+## Demo structure (2 parts)
+| Demo | Focus | Time |
+|------|-------|------|
+| **1** | Run the full agent end to end | 3 min |
+| **2** | Verify tickets on the board, explain the MCP flow | 2–3 min |
+
+Each demo is one clear beat. Students go from "separate pieces" to "one command, cluster → findings → tickets" in under 7 minutes.
 
 ## Scope
 - Read the Section 07 `TicketBatch` JSON output
-- Add an MCP tracker client (`agent/tracker.py`) that calls `create_issue` tool
-- Map each `TrackerTicket` to MCP tool arguments and call the tool
+- Add an MCP tracker client that calls `create_issue` tool
+- Map each `TrackerTicket` to MCP tool arguments
 - Verify tickets show up in the Section 08 board UI
-- Explain idempotency and retry considerations
-- Compare MCP integration vs REST integration
 
 ## Out of scope
 - Collecting cluster data (Section 06)
 - LLM analysis and tagging rule enforcement (Section 07)
 - Kubernetes deployment of the agent (Section 10)
-- De-duplication / persistent state across runs (handled in a future hardening section)
+- De-duplication / persistent state across runs
 
 ## Notes on the current code
-`agent/scanner.py`, `agent/analyzer.py`, `agent/main.py`, and `agent/config/tagging-rules.yaml` are **transitional**: they reproduce the legacy LangChain scanner pipeline and produce `ResourceDecision` objects. `tracker.py` is already streamlined to ~15 lines using `langchain-mcp-tools` for auto-discovery — the LLM calls `create_issue` directly via tool binding. In the follow-up "work on 1st agent" session, this section's agent is being rewritten to consume Section 07's `TicketBatch` directly, dropping the scanner + analyzer + `ResourceDecision`.
-
-Until that rewrite lands, the integration still works end to end (scan → LLM decision → tracker ticket) but bypasses Section 07.
+The agent is being rewritten to consume Section 07's `TicketBatch` directly. The current version still runs its own scan + analysis internally. The rewrite will drop the scanner and analyzer, accepting `--findings <file>` instead.
 
 ## Success criteria
-The learner can run the agent with the Section 08 tracker running and see tickets created automatically in the issue tracker board via MCP tool calls, and can articulate how the rewrite will switch the agent from scanning on its own to consuming Section 07's structured findings.
+The learner can:
+1. Run the agent with the tracker running and see tickets created automatically
+2. Verify tickets appear on the Kanban board
+3. Explain the full flow: cluster → MCP → LLM → tracker
+4. Articulate how the rewrite will simplify the agent to just consume + post
