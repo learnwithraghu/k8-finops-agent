@@ -50,7 +50,7 @@ kubectl get all -n payment
 In a **separate terminal**, keep this running for the whole session:
 
 ```bash
-kubectl port-forward svc/payment-gateway -n payment 8089:80
+kubectl port-forward svc/payment-gateway -n payment 8089:80 --address 0.0.0.0
 ```
 
 **What it does:** Maps `localhost:8089` on your machine to the UI Service inside the cluster so students can use the browser without extra ingress setup.

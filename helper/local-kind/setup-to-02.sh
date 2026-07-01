@@ -189,7 +189,7 @@ main() {
   echo "  ┌─────────────────────────────────────────────────────────────────┐"
   echo "  │  Next steps:                                                    │"
   echo "  │   • Port-forward the UI:                                        │"
-  echo "  │     kubectl port-forward svc/payment-gateway -n payment 8089:80 │"
+  echo "  │     kubectl port-forward svc/payment-gateway -n payment 8089:80 --address 0.0.0.0 │"
   echo "  │   • Open http://localhost:8089 to see the incident scenario     │"
   echo "  │   • Follow guide: sections/02a-payment-gateway-down/guide.md   │"
   echo "  │                                                                 │"
