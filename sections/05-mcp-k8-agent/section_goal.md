@@ -14,6 +14,12 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It pulls the MCP image, confirms kubeconfig, and validates cluster access. Do not walk students through Docker image pulls during the live demo.
 
+## Video structure (2 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Collect phase; kubectl vs Python client vs MCP | 3–4 min |
+| **2** | HTTP seam; curl as proof; read-only guardrails | 3–4 min |
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

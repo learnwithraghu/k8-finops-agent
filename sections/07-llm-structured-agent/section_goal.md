@@ -14,6 +14,13 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive, installs Python deps, and inspects the agent code. Do not walk students through pip install during the live demo.
 
+## Video structure (3 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Policy in tagging-rules.yaml; context reasoning | 3–4 min |
+| **2** | ChatOpenAI + Pydantic; auditable TicketBatch | 3–4 min |
+| **3** | Side-by-side: snapshot vs structured findings | 3–4 min |
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

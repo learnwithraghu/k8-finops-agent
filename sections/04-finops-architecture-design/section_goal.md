@@ -14,11 +14,13 @@ You should have experienced:
 - The pain of manual debugging without metadata
 
 ## Video structure (3 videos)
+
 | Video | Focus | Time |
-|-------|-------|------|
-| **1** | The problem we're solving — recap the pain, define the system question | 3 min |
-| **2** | The architecture pattern — data flow, tool selection, the pipeline | 3 min |
-| **3** | Component design — responsibilities, inputs, outputs, trade-offs | 3 min |
+|-------|------------|-------|------|
+| **1** | The problem we're solving — recap 02a, define system question | 3 min |
+| **2** | Architecture pattern — Collect, Analyze, Act tool choices | 3 min |
+| **3** | Component design — responsibilities, inputs, trade-offs | 3 min |
+
 
 Each video is one clear beat. Students go from "I felt the pain" to "I understand the design" in under 10 minutes.
 

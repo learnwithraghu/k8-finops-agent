@@ -3,6 +3,16 @@
 ## Goal
 Show why the cluster is hard to govern at scale by surfacing missing tags, inconsistent ownership, and orphaned resources.
 
+## Prerequisites
+Complete Sections 01 and 02.
+
+## Video structure (3 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Missing owner/cost-center; billing blind spots | 3–4 min |
+| **2** | PVCs with no pods; idle burn | 3–4 min |
+| **3** | Escalation pain; why grep does not scale | 3–4 min |
+
 ## Scope
 - Compare well-tagged and poorly tagged workloads
 - Demonstrate missing tags/labels/annotations

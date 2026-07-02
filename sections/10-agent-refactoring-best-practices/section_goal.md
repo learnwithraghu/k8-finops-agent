@@ -5,6 +5,11 @@ Before deploying our agent to production as a Kubernetes CronJob, we need to add
 
 The goal of this section is to step back and discuss the architectural best practices for organizing an AI agent. We will explore how to logically decouple collection, analysis, and integration logic to produce maintainable, testable, and scalable enterprise-grade software.
 
+## Video structure (1 video)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | collector / analyzer / tracker modules; testability | 3–4 min |
+
 ## Key Concepts
 - **Separation of Concerns**: Ensuring each module has a single responsibility.
 - **Maintainability**: Making it easier for multiple engineers to work on the codebase simultaneously.

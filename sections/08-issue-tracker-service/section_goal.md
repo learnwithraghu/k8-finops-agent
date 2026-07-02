@@ -9,6 +9,12 @@ Docker running on your machine.
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It cleans old containers and builds the Docker image. Do not walk students through Docker build during the live demo.
 
+## Video structure (2 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Why JSON files don't close loops; Kanban for FinOps | 3–4 min |
+| **2** | `/create-issue`, severity, owner fields | 3–4 min |
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

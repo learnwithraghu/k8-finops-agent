@@ -10,10 +10,13 @@ Each section should be self-contained for learning, but later sections may refer
 - Shared config should only exist once unless the section needs a teaching-specific copy.
 - Avoid mixing "lesson explanation" files with runtime code.
 - If a section reuses code from an earlier section, reference it instead of copying it.
+- Demo scripts stay in `N_guide.md`. Section 04 concept videos use `1_guide.md`–`3_guide.md`.
 
 ## Current top-level structure
 ```text
 sections/
+├── 00-course-introduction/
+│   └── section_goal.md
 ├── 01-cluster-foundation/
 │   ├── section_goal.md
 │   ├── guide.md
@@ -26,8 +29,9 @@ sections/
 │   └── kubectl-examples/
 ├── 02a-payment-gateway-down/
 │   ├── section_goal.md
-│   ├── guide.md
 │   └── manifests/
+├── 02b-introduction-to-finops/
+│   └── section_goal.md
 ├── 03-finops-problems/
 │   ├── section_goal.md
 │   ├── guide.md

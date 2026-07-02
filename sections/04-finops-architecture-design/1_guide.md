@@ -1,78 +1,58 @@
-# Video 1: The Problem We're Soloring
+# Video: The Problem We're Solving
 
+**GSheet concepts:** 040-000 Converting problem statement to code design
+**Expanded concepts:** Organizational cost of manual governance, system design before implementation
 **Time Budget:** 3 min
-
-**Format:** Whiteboard / talking head with slides
-
-**Slides:** `slides/slide1_problem.svg` (create later)
+**Format:** Whiteboard / talking head
+**Prerequisites:** Ownership gaps at scale
 
 ---
 
 ## Transcript
 
-### Opening (20s)
+### Opening
 
-In Section 02a, we had a real incident. The payment API was down. The UI loaded fine — you could open the browser, see the AirPay page, fill in the form. But when you hit submit, it failed.
+You have felt SkyLine Air's pain manually: untagged workloads, idle storage, findings with no owner. This module designs the system that replaces heroic inspection with a repeatable pipeline.
 
-We debugged it with kubectl. We found the root cause — the API deployment was scaled to zero replicas. We even fixed it.
-
-But there was a bigger problem we could not fix.
+No implementation yet — only architecture.
 
 ---
 
-### The Ownership Wall (60s)
+### Recap the failure modes
 
-When we looked at the failing deployment, we asked a simple question: who owns this?
+Technical outages recover with the right operational change. Organizational outages recover only when **metadata and process** exist — owners, cost centers, trackable remediation.
 
-The answer was nowhere.
+Manual walks work on a laptop. They fail at production scale. The design question is:
 
-No `owner` label. No `cost-center` label. No `team` label. Nothing.
-
-In a real incident, this is where everything breaks down. Not the technical failure — that was one `kubectl scale` command. The organizational failure. You have a broken service and you cannot answer:
-
-- Who do I page?
-- What Slack channel do I post in?
-- Whose budget pays for this?
-- Is this service even supposed to exist?
-
-We tried searching across all namespaces. We grepped labels. We found nothing. The resource was untagged, unowned, and invisible to any FinOps process.
-
-> *Talking point: "This is not a Kubernetes problem. This is a governance problem. Kubernetes runs the workload. It does not tell you who is accountable for it."*
+How do we move from a live platform to actionable governance findings **automatically**?
 
 ---
 
-### The Real Cost (40s)
+### Three movements
 
-In a small demo, this is annoying. In production, this is expensive.
+**Gather** platform state into neutral inventory.
 
-Every untagged resource is a billing gap. Every missing owner is an incident that takes 30 minutes longer to resolve. Every orphaned PVC is money spent on storage nobody owns.
+**Analyze** inventory against written policy to produce structured findings.
 
-And the worst part: the more services you run, the worse it gets. You cannot manually check every deployment for labels. You cannot grep your way to compliance across 200 namespaces.
+**Act** by creating trackable tasks teams close.
 
-> *Talking point: "At scale, manual FinOps does not work. You need automation."*
+That sequence mirrors Inform, Optimize, and Operate. Each stage has one job. Mixed responsibilities make debugging painful.
+
+> *Talking point: "Design the line before you hire the workers."*
 
 ---
 
-### The System Question (30s)
+### Close
 
-So here is the problem we need to solve:
-
-**How do we go from a running cluster to actionable FinOps findings — automatically?**
-
-Not manually. Not with 20 kubectl commands. Not with someone checking labels in a spreadsheet.
-
-We need a system that:
-1. Reads the cluster
-2. Applies policy — what labels are required, what looks orphaned
-3. Produces action — tickets, alerts, something a team can act on
-
-That is the architecture we are designing. Three phases: Collect, Analyze, Act.
-
-> *Talking point: "Next video, we pick the tools and draw the pipeline."*
+Next video compares approaches for each movement — trade-offs, not brand names as instructions.
 
 ---
 
 ## Key takeaways
-- The 02a incident was a technical failure (0 replicas), but the bigger failure was organizational (no ownership metadata)
-- Manual kubectl does not scale — you need automation for FinOps
-- The system needs three phases: Collect → Analyze → Act
+- Organizational governance failures need system design, not more manual grep
+- Gather → analyze → act is the core pipeline
+- Whiteboard clarity precedes implementation in this course
+
+## Demo handoff
+
+This module has no hands-on build. Demos resume once each pipeline stage is defined and then implemented.

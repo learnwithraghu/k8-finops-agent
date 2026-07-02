@@ -38,7 +38,15 @@ Three full-screen scenes with draw-on animation. Click **→** (or press `ArrowR
 |------|-------|------|
 | **1** | Orient in the cluster, confirm the symptom in the UI | 3–4 min |
 | **2** | Investigate the `payment` namespace, find root cause | 4–5 min |
-| **3** | Hit the ownership wall, apply a quick fix, validate | 3–4 min |
+| **3** | Ownership wall, apply a quick fix, validate | 3–4 min |
+
+## Video structure (4 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | On-call page; why K8 makes triage harder at scale | 3–4 min |
+| **2** | UI up / API down; endpoints as truth teller | 3–4 min |
+| **3** | No labels → no owner; governance failure | 3–4 min |
+| **4** | Postmortem format; FinOps action items | 3–4 min |
 
 Each demo is one clear beat. Students see *what* is broken before *why*, and only then talk about *who owns it* and *how to restore service*.
 

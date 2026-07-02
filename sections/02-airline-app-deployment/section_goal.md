@@ -14,6 +14,12 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It confirms the cluster is healthy and shows the manifest layout. Do not walk students through manifest discovery during the live demo.
 
+## Video structure (2 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Booking, search, inventory, payment, analytics services | 3–4 min |
+| **2** | Kind demo footprint vs production scale | 3–4 min |
+
 ## Demo structure (3 parts)
 | Demo | Focus | Time |
 |------|-------|------|

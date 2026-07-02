@@ -15,6 +15,12 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It confirms both services are running and inspects the agent code. Do not walk students through service startup during the live demo.
 
+## Video structure (2 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | Cluster → MCP → LLM → tracker; demo preview | 3–4 min |
+| **2** | Same scan twice; stable correlation keys | 3–4 min |
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

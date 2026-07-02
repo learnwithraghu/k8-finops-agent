@@ -9,6 +9,12 @@ None — this is the first section.
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It verifies tools are installed and old state is cleaned up. Do not walk students through tool installation during the live demo.
 
+## Video structure (2 videos)
+| Video | Focus | Time |
+|-------|------------|-------|------|
+| **1** | FinOps starts with a knowable cluster; Kind as sandbox | 3–4 min |
+| **2** | SkyLine Air teams → namespaces; labels as billing keys | 3–4 min |
+
 ## Demo structure (3 parts)
 | Demo | Focus | Time |
 |------|-------|------|
