@@ -1,0 +1,53 @@
+# Video: Why YAML for Tagging Policy
+
+**Time Budget:** 2 min
+**Format:** Talking head + open `examples/tagging-rules.yaml` on screen
+**Prerequisites:** Sections 01–02 (cluster + SkyLine Air app deployed)
+
+---
+
+## Transcript
+
+### Opening
+
+Welcome back. In the last section you deployed SkyLine Air — booking API, flight search, payment, inventory — all running across multiple namespaces. That felt like a win.
+
+But here is the FinOps reality: Kubernetes does not hand you a bill broken down by team. It hands you pods, PVCs, and services. If those objects are not tagged consistently, nobody can answer a simple question like *who owns this cost?*
+
+Before we start hunting problems in the cluster, we need a **written standard** — a single document that says what "good" looks like. In this course, that document is `tagging-rules.yaml` in the examples folder. Today I want to talk about **why we chose YAML** as the format — and why not JSON, or something else.
+
+---
+
+### Why YAML, not JSON?
+
+You have probably seen tagging policy stored as JSON, spreadsheets, or wiki pages. All of those can work for humans. They are harder to use as **machine-readable policy** inside an agent pipeline.
+
+**JSON** is great for APIs and structured output — and we will use it later when the agent *returns* findings. But JSON is a poor fit for a policy file people edit every week. No comments. Strict quoting rules. A trailing comma breaks the whole file. FinOps standards evolve — teams rename cost centers, add compliance tiers, exclude new system namespaces. Policy needs to be easy to change without a linter fight.
+
+**YAML** solves that. It is human-readable. You can add comments right next to a value — like noting that `booking-engine` owns core reservation logic. It supports lists and nested keys without ceremony. And here is the big one for this course: **Kubernetes already speaks YAML.** Your deployments, services, and ConfigMaps are YAML. Your tagging policy living in the same format means one mental model — not "manifests in YAML, policy in something else."
+
+We are not picking YAML because it is trendy. We are picking it because the people who own FinOps policy — platform engineers, SRE leads, finance partners — need to read and edit it, and the automation that enforces it needs to parse it reliably. YAML sits comfortably in the middle.
+
+---
+
+### What about other formats?
+
+TOML and HCL are fine for application config. CSV works for cost-center lookups. But they are not what your cluster objects are written in, and they do not carry inline documentation as naturally as YAML. For a **shared contract** between humans and an agent, YAML keeps everyone on the same page — literally.
+
+---
+
+### Close
+
+So: YAML for policy, JSON later for structured findings. Open `examples/tagging-rules.yaml` alongside this video — in the next lesson we will walk through the key sections at a high level and map them to how SkyLine Air is actually organized. After that, we will take those rules into the cluster and see where reality does not match the standard.
+
+---
+
+## Key takeaways
+
+- FinOps governance starts with a written tagging standard, not ad-hoc `kubectl` greps
+- YAML is editable, comment-friendly, and aligned with Kubernetes manifests
+- JSON is better suited to agent output than to human-maintained policy
+
+## Demo handoff
+
+Next → `0_tagging_keys_guide.md` — high-level tour of the keys in `tagging-rules.yaml`

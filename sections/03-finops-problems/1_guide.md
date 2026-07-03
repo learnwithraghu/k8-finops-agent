@@ -2,6 +2,8 @@
 
 **Time Budget:** 3-4 mins
 
+**Prerequisites:** `0_tagging_yaml_guide.md` and `0_tagging_keys_guide.md` — why we use YAML and what each key in `tagging-rules.yaml` means.
+
 ### 1) Read the tagging rules
 ```bash
 cat sections/03-finops-problems/examples/tagging-rules.yaml
