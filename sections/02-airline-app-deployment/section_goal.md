@@ -14,22 +14,20 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It confirms the cluster is healthy and shows the manifest layout. Do not walk students through manifest discovery during the live demo.
 
-## Video structure (2 videos)
+## Video structure (1 video)
 | Video | Focus | Time |
 |-------|------------|-------|------|
-| **1** | Booking, search, inventory, payment, analytics services | 3–4 min |
-| **2** | Manifest folder code walkthrough | 3 min |
+| **1** | Manifest folder sneak peek — folders, key files, why Kustomize | 4–5 min |
 
-Transcripts: `transcript/1.md`, `transcript/2.md`
+Transcript: `transcript/1.md`
 
-## Demo structure (3 parts)
+## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|
-| **1** | Deploy the airline app with Kustomize | 2 min |
-| **2** | Validate the runtime footprint across namespaces | 2–3 min |
-| **3** | Deep dive into a single workload (describe, logs, exec) | 2–3 min |
+| **1** | Deploy the airline app and validate the runtime footprint | 4–5 min |
+| **2** | Deep dive into a single workload (describe, logs, exec) | 2–3 min |
 
-Each demo is one clear beat. Students go from "empty namespaces" to "running app they can inspect" in under 7 minutes.
+Each demo is one clear beat. Students go from "empty namespaces" to "running app they can inspect" in under 8 minutes.
 
 ## Scope
 - Deploy airline services using `kubectl apply -k`

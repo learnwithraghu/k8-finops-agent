@@ -51,9 +51,8 @@ cat sections/02-airline-app-deployment/manifests/airline-k8-deployment/kustomiza
 
 When checks pass, start the live walkthrough with:
 
-- `1_guide.md` — Deploy the app
-- `2_guide.md` — Validate the runtime footprint
-- `3_guide.md` — Workload deep dive
+- `1_guide.md` — Deploy and validate the app
+- `2_guide.md` — Workload deep dive
 
 ## Reset for another run (optional)
 

@@ -1,62 +1,71 @@
-# Demo 2: Validate the Runtime Footprint
+# Demo 2: Workload Deep Dive
 
 **Time Budget:** 2–3 mins
 
-**Narrative:** Deployments succeeded. Let's check each namespace to confirm pods, services, and config are healthy. In production you would have monitoring dashboards — for now, kubectl is our dashboard.
+**Narrative:** Let's inspect a single service end-to-end. These five commands cover 90% of on-call triage — describe the deployment, find the pod, read its events, tail its logs, and exec into it.
 
 ---
 
-### 1) Check deployments across namespaces
+### 1) Describe the deployment
 
 ```bash
-kubectl get deployments -n booking-api
-kubectl get deployments -n flight-search
-kubectl get deployments -n inventory
-kubectl get deployments -n payment
+kubectl describe deployment flight-search-service -n flight-search
 ```
 
-**What it does:** Shows deployments per namespace with `READY` count (e.g. `1/1`). All should be fully ready.
+**What it does:** Shows the deployment spec — labels, pod template, replica count, strategy, and recent events. This is your first stop when something is wrong.
 
-> *Talking point: "If you see `0/1` or `1/2`, something is wrong — pod is crashing or not scheduling. Here everything should be green."*
+> *Talking point: "Events at the bottom are gold. If a pod is failing to schedule or pulling a bad image, it shows up here."*
 
 ---
 
-### 2) Check pods across namespaces
+### 2) Find the pod name
 
 ```bash
-kubectl get pods -n booking-api
 kubectl get pods -n flight-search
 ```
 
-**What it does:** Lists pods and their status. You should see `Running` and `1/1` for each.
-
-> *Expected: One pod per deployment, all in `Running` state.*
+**What it does:** Lists pods. Copy the pod name for the next steps (e.g. `flight-search-service-abc123`).
 
 ---
 
-### 3) Check services and configmaps
+### 3) Describe the pod
 
 ```bash
-kubectl get services -n inventory
-kubectl get configmaps -n payment
+kubectl describe pod <pod-name> -n flight-search
 ```
 
-**What it does:** Shows Services (ClusterIP endpoints) and ConfigMaps (configuration data) in the given namespaces.
+**What it does:** Shows pod-level detail — container status, resource requests, volumes, and events. Replace `<pod-name>` with the actual name from step 2.
 
-> *Talking point: "Services give you a stable DNS name. ConfigMaps inject configuration without rebuilding images. Both are core K8 primitives."*
+> *Expected: Status `Running`, container `Ready`, no warning events.*
 
 ---
 
-### 4) Check persistent volume claims
+### 4) Tail the logs
 
 ```bash
-kubectl get pvc -n booking-api
+kubectl logs -n flight-search deploy/flight-search-service
 ```
 
-**What it does:** Shows PVCs — persistent storage requests. If a PVC is `Pending`, the storage class is missing or the volume cannot provision.
+**What it does:** Streams logs from the pod owned by the deployment. Use `deploy/<name>` to target the deployment — kubectl resolves to the active pod automatically.
 
-> *Expected: PVCs in `Bound` state. In Kind, local-path provisioner handles this automatically.*
+> *Talking point: "In production you would use a logging stack. For local dev, `kubectl logs` is fast and enough."*
 
 ---
 
-**Next:** Resources are healthy. Next we go deeper into one workload — describe, logs, exec → `3_guide.md`
+### 5) Exec into the container
+
+```bash
+kubectl exec -it -n flight-search deploy/flight-search-service -- sh
+```
+
+**What it does:** Opens an interactive shell inside the running container. You can inspect files, check environment variables, or test network calls from inside the pod.
+
+> *Expected: Shell prompt inside the container. Type `exit` to leave.*
+
+> *Talking point: "This is your last resort when logs are not enough. You can see exactly what the container sees — env vars, mounted files, network reachability."*
+
+---
+
+**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **namespace stack** — deploy gate first, then resources inside the booking-api box. Use **Need a hint?** if stuck, then press **Deploy & Inspect** to validate.
+
+**Next:** App is live and you can inspect it. Next section simulates a payment failure → `sections/02a-payment-gateway-down`
