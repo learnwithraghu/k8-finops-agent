@@ -10,6 +10,8 @@ The goal of this section is to step back and discuss the architectural best prac
 |-------|------------|-------|------|
 | **1** | collector / analyzer / tracker modules; testability | 3–4 min |
 
+Transcripts: `transcript/1.md`
+
 ## Key Concepts
 - **Separation of Concerns**: Ensuring each module has a single responsibility.
 - **Maintainability**: Making it easier for multiple engineers to work on the codebase simultaneously.

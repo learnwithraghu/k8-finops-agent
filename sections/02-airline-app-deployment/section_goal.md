@@ -18,7 +18,9 @@ Run `0_prerequisite_guide.md` before teaching. It confirms the cluster is health
 | Video | Focus | Time |
 |-------|------------|-------|------|
 | **1** | Booking, search, inventory, payment, analytics services | 3–4 min |
-| **2** | Kind demo footprint vs production scale | 3–4 min |
+| **2** | Manifest folder code walkthrough | 3 min |
+
+Transcripts: `transcript/1.md`, `transcript/2.md`
 
 ## Demo structure (3 parts)
 | Demo | Focus | Time |

@@ -21,6 +21,8 @@ Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive
 | **2** | ChatOpenAI + Pydantic; auditable TicketBatch | 3–4 min |
 | **3** | Side-by-side: snapshot vs structured findings | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`, `transcript/3.md`
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

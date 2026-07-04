@@ -48,6 +48,8 @@ Three full-screen scenes with draw-on animation. Click **→** (or press `ArrowR
 | **3** | No labels → no owner; governance failure | 3–4 min |
 | **4** | Postmortem format; FinOps action items | 3–4 min |
 
+Transcripts: `transcript/1.md` … `transcript/4.md`
+
 Each demo is one clear beat. Students see *what* is broken before *why*, and only then talk about *who owns it* and *how to restore service*.
 
 ## Scope

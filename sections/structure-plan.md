@@ -10,7 +10,8 @@ Each section should be self-contained for learning, but later sections may refer
 - Shared config should only exist once unless the section needs a teaching-specific copy.
 - Avoid mixing "lesson explanation" files with runtime code.
 - If a section reuses code from an earlier section, reference it instead of copying it.
-- Demo scripts stay in `N_guide.md`. Section 04 concept videos use `1_guide.md`–`3_guide.md`.
+- Demo scripts stay in `N_guide.md` (and `0_prerequisite_guide.md` for instructors). Section 04 video index pages use `1_guide.md`–`3_guide.md`.
+- Video narration lives in `transcript/N.md` (numbered by playback order within each section).
 
 ## Current top-level structure
 ```text

@@ -2,7 +2,7 @@
 
 **Time Budget:** 3-4 mins
 
-**Prerequisites:** `0_tagging_yaml_guide.md` and `0_tagging_keys_guide.md` — why we use YAML and what each key in `tagging-rules.yaml` means.
+**Prerequisites:** [`transcript/1.md`](transcript/1.md) and [`transcript/2.md`](transcript/2.md) — why we use YAML and what each key in `tagging-rules.yaml` means.
 
 ### 1) Read the tagging rules
 ```bash

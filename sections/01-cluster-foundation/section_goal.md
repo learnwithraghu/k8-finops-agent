@@ -12,8 +12,10 @@ Run `0_prerequisite_guide.md` before teaching. It verifies tools are installed a
 ## Video structure (2 videos)
 | Video | Focus | Time |
 |-------|------------|-------|------|
-| **1** | FinOps starts with a knowable cluster; Kind as sandbox | 3–4 min |
-| **2** | SkyLine Air teams → namespaces; labels as billing keys | 3–4 min |
+| **1** | FinOps starts with a knowable cluster; Kind as sandbox | 2 min |
+| **2** | SkyLine Air teams → namespaces; labels as billing keys | 2 min |
+
+Transcripts: `transcript/1.md`, `transcript/2.md`
 
 ## Demo structure (3 parts)
 | Demo | Focus | Time |

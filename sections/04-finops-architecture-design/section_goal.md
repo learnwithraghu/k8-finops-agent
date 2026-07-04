@@ -21,6 +21,7 @@ You should have experienced:
 | **2** | Architecture pattern — Collect, Analyze, Act tool choices | 3 min |
 | **3** | Component design — responsibilities, inputs, trade-offs | 3 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`, `transcript/3.md`
 
 Each video is one clear beat. Students go from "I felt the pain" to "I understand the design" in under 10 minutes.
 

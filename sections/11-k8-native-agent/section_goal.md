@@ -9,6 +9,8 @@ Package the MCP-agent pipeline (Sections 06 + 07, transitioning toward full in-c
 | **1** | CronJob vs Deployment; RBAC; secrets | 3–4 min |
 | **2** | Chart structure; validating scheduled scans | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`
+
 ## Scope
 - Reuse the existing agent code unchanged (transitional LangChain scanner-based code at present)
 - Containerize the agent with a Dockerfile

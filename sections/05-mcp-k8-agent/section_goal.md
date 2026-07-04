@@ -20,6 +20,8 @@ Run `0_prerequisite_guide.md` before teaching. It pulls the MCP image, confirms 
 | **1** | Collect phase; kubectl vs Python client vs MCP | 3–4 min |
 | **2** | HTTP seam; curl as proof; read-only guardrails | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

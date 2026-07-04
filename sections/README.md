@@ -6,6 +6,7 @@ This directory is the curriculum skeleton for the repo.
 - Each numbered folder is one lesson/section.
 - Each section has a `section_goal.md` that defines scope and guardrails.
 - Demo scripts live in `N_guide.md` (and `0_prerequisite_guide.md` for instructors).
+- Video narration lives in `transcript/N.md` (numbered by playback order within each section).
 - Future code/docs should stay inside the section that owns the lesson.
 - If a change crosses sections, update the relevant `section_goal.md` files first.
 

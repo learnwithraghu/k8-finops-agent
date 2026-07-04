@@ -6,12 +6,16 @@ Show why the cluster is hard to govern at scale by surfacing missing tags, incon
 ## Prerequisites
 Complete Sections 01 and 02.
 
-## Video structure (3 videos)
+## Video structure (5 videos)
 | Video | Focus | Time |
 |-------|------------|-------|------|
-| **1** | Missing owner/cost-center; billing blind spots | 3–4 min |
-| **2** | PVCs with no pods; idle burn | 3–4 min |
-| **3** | Escalation pain; why grep does not scale | 3–4 min |
+| **1** | Why YAML for tagging policy (not JSON) | 2 min |
+| **2** | Tagging rules at a glance — keys and values | 2 min |
+| **3** | Missing owner/cost-center; billing blind spots | 3–4 min |
+| **4** | PVCs with no pods; idle burn | 3–4 min |
+| **5** | Escalation pain; why grep does not scale | 3–4 min |
+
+Transcripts: `transcript/1.md` … `transcript/5.md`
 
 ## Scope
 - Compare well-tagged and poorly tagged workloads

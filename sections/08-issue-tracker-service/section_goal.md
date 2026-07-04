@@ -15,6 +15,8 @@ Run `0_prerequisite_guide.md` before teaching. It cleans old containers and buil
 | **1** | Why JSON files don't close loops; Kanban for FinOps | 3–4 min |
 | **2** | `/create-issue`, severity, owner fields | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

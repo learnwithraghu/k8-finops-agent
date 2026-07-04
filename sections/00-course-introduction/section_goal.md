@@ -11,6 +11,7 @@ None — this is the first section.
 |-------|-------|------|
 | **1** | Welcome to SkyLine Air FinOps Agent — course promise and arc | 3–4 min |
 
+Transcripts: `transcript/1.md`
 
 ## Scope
 - Introduce SkyLine Air as the fictional airline running on Kubernetes

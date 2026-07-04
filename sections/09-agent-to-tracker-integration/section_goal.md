@@ -21,6 +21,8 @@ Run `0_prerequisite_guide.md` before teaching. It confirms both services are run
 | **1** | Cluster → MCP → LLM → tracker; demo preview | 3–4 min |
 | **2** | Same scan twice; stable correlation keys | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

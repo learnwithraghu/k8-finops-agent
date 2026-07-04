@@ -19,6 +19,8 @@ Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive
 | **1** | Agent loop; unstructured output; parser limits | 3–4 min |
 | **2** | Raw JSON is not action; why we stop before LLM | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`
+
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|

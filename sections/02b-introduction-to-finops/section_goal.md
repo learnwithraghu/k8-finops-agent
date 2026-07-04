@@ -18,6 +18,7 @@ You should have experienced:
 | **2** | FinOps for AI — why agents change FinOps now | 3–4 min |
 | **3** | Blueprint for SkyLine Air — Collect, Analyze, Act | 3–4 min |
 
+Transcripts: `transcript/1.md`, `transcript/2.md`, `transcript/3.md`
 
 ## Scope
 - Define FinOps and the three phases (Inform, Optimize, Operate)
