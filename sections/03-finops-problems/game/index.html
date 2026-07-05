@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinOps 3 Phases — Interactive Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Shantell+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="game.css" />
+</head>
+<body>
+  <header id="header">
+    <div class="header-left">
+      <h1>Explore the FinOps Map</h1>
+      <p class="subtitle" id="subtitle">Click a zone, then drag blocks (or tap block → tap target)</p>
+    </div>
+    <div class="progress-dots" role="progressbar" aria-label="Phase progress">
+      <span class="dot" data-phase="inform" title="Inform"></span>
+      <span class="dot" data-phase="optimize" title="Optimize"></span>
+      <span class="dot" data-phase="operate" title="Operate"></span>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="map-wrapper">
+      <div id="map-stage" aria-label="FinOps lifecycle diagram">
+        <div id="svg-root">
+          <object
+            id="svg-object"
+            type="image/svg+xml"
+            data="FinOps 3 Phases - visual selection.svg"
+            aria-label="Achieving Cloud Financial Management diagram"
+          ></object>
+        </div>
+
+        <svg id="game-overlay" viewBox="0 0 1044 546" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs>
+            <linearGradient id="block-grad-inform" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f5dfa8"/>
+              <stop offset="100%" stop-color="#e3c47c"/>
+            </linearGradient>
+            <linearGradient id="block-grad-optimize" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#b8ddd0"/>
+              <stop offset="100%" stop-color="#9ccbb5"/>
+            </linearGradient>
+            <linearGradient id="block-grad-operate" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffb08a"/>
+              <stop offset="100%" stop-color="#f97b4f"/>
+            </linearGradient>
+          </defs>
+
+          <g id="hub-paths" opacity="0">
+            <path id="path-inform" class="hub-path" d="M 522 273 Q 420 240 380 200" fill="none" stroke="#e3c47c" stroke-width="3" stroke-dasharray="8 6"/>
+            <path id="path-optimize" class="hub-path" d="M 522 273 Q 600 240 640 230" fill="none" stroke="#9ccbb5" stroke-width="3" stroke-dasharray="8 6"/>
+            <path id="path-operate" class="hub-path" d="M 522 273 Q 460 320 400 350" fill="none" stroke="#f97b4f" stroke-width="3" stroke-dasharray="8 6"/>
+          </g>
+
+          <g id="drop-zones" opacity="0">
+            <g id="drop-inform" class="drop-zone inform" transform="translate(380, 175)">
+              <circle cx="0" cy="0" r="52" class="drop-ring"/>
+              <text x="0" y="5" text-anchor="middle" class="drop-label">Drop here to reveal</text>
+            </g>
+            <g id="drop-optimize" class="drop-zone optimize" transform="translate(640, 225)">
+              <rect x="-55" y="-30" width="110" height="60" rx="10" class="drop-ring"/>
+              <text x="0" y="5" text-anchor="middle" class="drop-label">Trim waste here</text>
+            </g>
+          </g>
+
+          <g id="footprint-slots" opacity="0">
+            <g class="slot" data-slot="1" transform="translate(280, 400)"><circle r="18" class="slot-ring"/><text y="5" text-anchor="middle" class="slot-num">1</text></g>
+            <g class="slot" data-slot="2" transform="translate(360, 370)"><circle r="18" class="slot-ring"/><text y="5" text-anchor="middle" class="slot-num">2</text></g>
+            <g class="slot" data-slot="3" transform="translate(440, 360)"><circle r="18" class="slot-ring"/><text y="5" text-anchor="middle" class="slot-num">3</text></g>
+            <g class="slot" data-slot="4" transform="translate(520, 375)"><circle r="18" class="slot-ring"/><text y="5" text-anchor="middle" class="slot-num">4</text></g>
+            <path id="footprint-trail" d="" fill="none" stroke="#f97b4f" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+          </g>
+
+          <g id="savings-float" opacity="0">
+            <rect x="720" y="180" width="130" height="36" rx="8" fill="#fff" stroke="#9ccbb5" stroke-width="2"/>
+            <text x="785" y="203" text-anchor="middle" class="savings-text">Saved: $0/mo</text>
+          </g>
+        </svg>
+
+        <!-- HTML draggable blocks (reliable drag vs SVG transforms) -->
+        <div id="blocks-layer"></div>
+
+        <div class="phase-labels" aria-hidden="true">
+          <div class="phase-label inform-label" data-phase="inform">
+            <strong>Inform</strong>
+            <span>Gain visibility into cloud costs</span>
+          </div>
+          <div class="phase-label optimize-label" data-phase="optimize">
+            <strong>Optimize</strong>
+            <span>Reduce unnecessary cloud spending</span>
+          </div>
+          <div class="phase-label operate-label" data-phase="operate">
+            <strong>Operate</strong>
+            <span>Embed FinOps practices into culture</span>
+          </div>
+        </div>
+
+        <button class="hit-zone pulse" id="zone-inform" data-phase="inform"
+          aria-label="Inform: gain visibility into cloud costs"
+          style="left:6%; top:16%; width:34%; height:42%;"></button>
+        <button class="hit-zone pulse" id="zone-optimize" data-phase="optimize"
+          aria-label="Optimize: reduce unnecessary cloud spending"
+          style="left:54%; top:34%; width:16%; height:22%;"></button>
+        <button class="hit-zone pulse" id="zone-operate" data-phase="operate"
+          aria-label="Operate: embed FinOps practices into culture"
+          style="left:28%; top:50%; width:16%; height:18%;"></button>
+        <button class="hit-zone hub-zone" id="zone-hub" data-phase="hub"
+          aria-label="Kubernetes cluster hub"
+          style="left:42%; top:30%; width:14%; height:38%;" disabled></button>
+
+        <div id="phase-banner" class="hidden" role="status">
+          <span id="phase-banner-text"></span>
+          <button id="phase-banner-close" aria-label="Exit phase">&times;</button>
+        </div>
+
+        <div id="load-error" class="load-error hidden" role="alert">
+          Could not load the diagram. Open via a local server:
+          <code>python3 -m http.server 8765</code>
+        </div>
+
+        <div id="panel-complete" class="completion-card hidden" role="dialog" aria-labelledby="complete-title">
+          <h2 id="complete-title">All Three Phases Complete</h2>
+          <p>Every phase acts on the same running infrastructure — your Kubernetes cluster.</p>
+          <table class="summary-table">
+            <thead><tr><th>Phase</th><th>Takeaway</th></tr></thead>
+            <tbody>
+              <tr><td>Inform</td><td>See costs, owners, and orphans before acting</td></tr>
+              <tr><td>Optimize</td><td>Trim measurable waste</td></tr>
+              <tr><td>Operate</td><td>Embed practice in culture and automation</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-replay" id="btn-replay">Play again</button>
+        </div>
+      </div>
+    </div>
+
+    <p id="instruction">Click the <strong>binoculars</strong>, <strong>sailboat</strong>, or <strong>boot</strong> to start.</p>
+  </main>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
