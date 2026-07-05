@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaCart — FinOps Journey</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F6F8;
+      --surface: #FFFFFF;
+      --border: #D5DBDB;
+      --text: #232F3E;
+      --text-muted: #607D8B;
+      --accent: #FF9900;
+      --accent-dark: #EC7211;
+      --insight-bg: #FFF8F0;
+      --inform: #0073BB;
+      --inform-bg: #E8F4FC;
+      --optimize: #FF9900;
+      --optimize-bg: #FFF8F0;
+      --operate: #1D8102;
+      --operate-bg: #EAF5E6;
+      --danger: #D13212;
+      --danger-bg: #FDECEA;
+      --warn: #E47911;
+      --warn-bg: #FFF8F0;
+      --ok: #1D8102;
+      --ok-bg: #EAF5E6;
+      --ns-border: #AAB7B8;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+    header {
+      height: 56px; padding: 0 1.25rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    header .brand { font-weight: 700; font-size: 0.95rem; }
+    header .brand span { color: var(--text-muted); font-weight: 400; }
+
+    .intro {
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .intro-card {
+      max-width: 560px; width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(35,47,62,0.06);
+    }
+    .email-header {
+      padding: 1rem 1.25rem; background: var(--bg); border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .email-body { padding: 1.5rem 1.25rem; }
+    .email-body .from { font-weight: 700; margin-bottom: 0.25rem; }
+    .email-body .subject { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+    .email-body .body-text { color: var(--text-muted); line-height: 1.65; font-size: 0.95rem; }
+    .email-body .highlight {
+      margin-top: 1rem; padding: 0.85rem 1rem; background: var(--danger-bg);
+      border-left: 3px solid var(--danger); border-radius: 0 8px 8px 0; font-size: 0.9rem;
+    }
+    .intro-cta {
+      padding: 1.25rem; border-top: 1px solid var(--border); text-align: center; background: var(--insight-bg);
+    }
+    .intro-cta p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.6rem 1.25rem; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit;
+    }
+    .btn:hover { border-color: var(--accent); background: var(--insight-bg); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-color: var(--accent); color: #fff;
+    }
+    .btn-primary:hover { box-shadow: 0 4px 16px rgba(255,153,0,0.3); }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+
+    .journey { flex: 1; display: none; flex-direction: column; min-height: 0; }
+    .journey.active { display: flex; }
+
+    .phase-rail { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1rem; }
+    .phase-tab {
+      flex: 1; max-width: 280px; padding: 1rem 1.25rem; border: none; background: none;
+      cursor: pointer; text-align: left; border-bottom: 3px solid transparent; transition: all 0.2s; font-family: inherit;
+    }
+    .phase-tab:hover { background: var(--bg); }
+    .phase-tab.active { border-bottom-color: var(--accent); background: var(--insight-bg); }
+    .phase-tab.locked { opacity: 0.45; cursor: not-allowed; }
+    .phase-tab .num {
+      display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+      font-size: 0.72rem; font-weight: 700; line-height: 22px; text-align: center; margin-right: 0.5rem; color: #fff;
+    }
+    .phase-tab[data-phase="inform"] .num { background: var(--inform); }
+    .phase-tab[data-phase="optimize"] .num { background: var(--optimize); }
+    .phase-tab[data-phase="operate"] .num { background: var(--operate); }
+    .phase-tab.done .num::after { content: '✓'; }
+    .phase-tab .label { font-weight: 700; font-size: 0.9rem; display: block; }
+    .phase-tab .desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    .metrics {
+      display: flex; gap: 1rem; padding: 0.85rem 1.25rem; background: var(--surface);
+      border-bottom: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .metric { flex: 1; min-width: 140px; }
+    .metric-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .metric-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .metric-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; width: 0%; }
+    .metric-fill.inform { background: var(--inform); }
+    .metric-fill.optimize { background: var(--optimize); }
+    .metric-fill.operate { background: var(--operate); }
+    .metric-val { font-size: 0.78rem; font-weight: 600; margin-top: 0.25rem; }
+
+    .phase-panel { flex: 1; display: none; overflow: hidden; min-height: 0; }
+    .phase-panel.active { display: flex; flex-direction: column; }
+
+    .panel-layout {
+      flex: 1; display: grid; grid-template-columns: 1fr 320px;
+      gap: 0; overflow: hidden; min-height: 0;
+    }
+    .panel-main { padding: 1rem 1.25rem; overflow-y: auto; border-right: 1px solid var(--border); }
+    .panel-side { background: var(--surface); padding: 1rem 1.15rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.85rem; }
+
+    .phase-intro {
+      padding: 0.85rem 1rem; border-radius: 10px; margin-bottom: 1rem; line-height: 1.6; font-size: 0.88rem;
+    }
+    .phase-intro.inform { background: var(--inform-bg); border: 1px solid rgba(0,115,187,0.2); }
+    .phase-intro.optimize { background: var(--optimize-bg); border: 1px solid rgba(255,153,0,0.25); }
+    .phase-intro.operate { background: var(--operate-bg); border: 1px solid rgba(29,129,2,0.2); }
+    .phase-intro strong { display: block; margin-bottom: 0.25rem; font-size: 0.92rem; }
+
+    /* ── K8 Cluster Architecture Diagram ── */
+    .cluster-diagram {
+      background: var(--surface);
+      border: 2px solid #326CE5;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(50,108,229,0.08);
+    }
+
+    .cluster-titlebar {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.65rem 1rem;
+      background: linear-gradient(135deg, #326CE5 0%, #1a4fb5 100%);
+      color: #fff; font-size: 0.82rem; font-weight: 600;
+    }
+    .cluster-titlebar i { font-size: 1.1rem; opacity: 0.9; }
+
+    .cluster-body { padding: 1rem; background: var(--bg); }
+
+    .control-plane {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+      padding: 0.5rem 0.75rem; margin-bottom: 0.85rem;
+      background: var(--surface); border: 1px dashed var(--border); border-radius: 8px;
+      font-size: 0.68rem; color: var(--text-muted);
+    }
+    .control-plane .cp-item {
+      display: flex; align-items: center; gap: 0.3rem;
+      padding: 0.25rem 0.5rem; background: var(--bg); border-radius: 4px;
+    }
+    .control-plane .cp-item i { color: #326CE5; }
+
+    .namespace-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+
+    .namespace-box {
+      border: 1.5px solid var(--ns-border);
+      border-radius: 10px;
+      padding: 0.55rem;
+      background: var(--surface);
+      min-height: 88px;
+    }
+    .namespace-box.span-2 { grid-column: span 2; }
+    .namespace-box.highlight-ns { border-color: var(--inform); background: var(--inform-bg); }
+
+    .ns-header {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--text-muted);
+      margin-bottom: 0.45rem; padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .ns-header i { color: #326CE5; font-size: 0.7rem; }
+
+    .k8-resource {
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0.45rem 0.55rem; margin-bottom: 0.3rem;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 7px; cursor: pointer; font-size: 0.72rem;
+      position: relative; transition: all 0.2s; text-align: left; width: 100%;
+      font-family: inherit; color: var(--text);
+    }
+    .k8-resource:last-child { margin-bottom: 0; }
+    .k8-resource:hover { border-color: var(--inform); transform: translateX(2px); }
+
+    .k8-resource .res-icon {
+      width: 26px; height: 26px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0;
+    }
+    .k8-resource .res-icon.deploy { background: #E8F4FC; color: var(--inform); }
+    .k8-resource .res-icon.pvc { background: #F3E8FF; color: #7C3AED; }
+    .k8-resource .res-icon.cm { background: #EAF5E6; color: var(--operate); }
+
+    .k8-resource .res-info { flex: 1; min-width: 0; }
+    .k8-resource .res-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .k8-resource .res-kind { font-size: 0.62rem; color: var(--text-muted); }
+
+    .k8-resource.status-warn { border-left: 3px solid var(--warn); }
+    .k8-resource.status-bad { border-left: 3px solid var(--danger); }
+    .k8-resource.status-good { border-left: 3px solid var(--ok); }
+
+    .k8-resource.selected {
+      border-color: var(--inform) !important;
+      box-shadow: 0 0 0 3px rgba(0,115,187,0.2);
+      background: var(--inform-bg);
+    }
+
+    .k8-resource.needs-inspect {
+      border-color: var(--danger);
+      animation: pulse-ring 2s ease infinite;
+    }
+    .k8-resource.needs-inspect::after {
+      content: 'Inspect';
+      position: absolute; top: -8px; right: 6px;
+      background: var(--danger); color: #fff;
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+      padding: 1px 6px; border-radius: 999px; letter-spacing: 0.03em;
+    }
+    .k8-resource.inspected::after { display: none; }
+    .k8-resource.inspected.needs-inspect { animation: none; border-color: var(--border); }
+
+    .k8-resource.has-finding::before {
+      content: '';
+      position: absolute; top: 4px; left: 4px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--warn);
+    }
+    .k8-resource.finding-logged::before { background: var(--ok); }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(209,50,18,0.35); }
+      50% { box-shadow: 0 0 0 5px rgba(209,50,18,0); }
+    }
+
+    .arch-legend {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.85rem;
+      padding: 0.55rem 0.75rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 8px; font-size: 0.68rem; color: var(--text-muted);
+    }
+    .arch-legend span { display: flex; align-items: center; gap: 0.35rem; }
+    .leg-swatch { width: 10px; height: 10px; border-radius: 2px; }
+    .leg-swatch.bad { background: var(--danger); }
+    .leg-swatch.warn { background: var(--warn); }
+    .leg-swatch.ok { background: var(--ok); }
+    .leg-swatch.pulse { background: var(--danger); animation: pulse-ring 2s infinite; border-radius: 50%; width: 8px; height: 8px; }
+
+    /* Task checklist */
+    .task-panel {
+      background: var(--inform-bg); border: 1px solid rgba(0,115,187,0.25);
+      border-radius: 10px; padding: 0.85rem 1rem;
+    }
+    .task-panel-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--inform); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .task-steps { list-style: none; }
+    .task-step {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      font-size: 0.8rem; color: var(--text-muted); padding: 0.35rem 0.5rem;
+      line-height: 1.4; border-radius: 8px; border: 2px solid transparent;
+      transition: all 0.25s;
+    }
+    .task-step .step-body { flex: 1; }
+    .task-step .step-hint {
+      display: none; font-size: 0.68rem; font-weight: 600; color: var(--accent-dark);
+      margin-top: 0.3rem;
+    }
+    .task-step .tick {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; margin-top: 1px;
+    }
+    .task-step.done { color: var(--text-muted); opacity: 0.7; }
+    .task-step.done .tick { background: var(--ok); border-color: var(--ok); color: #fff; }
+    .task-step.active {
+      color: var(--text); font-weight: 600;
+      background: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,153,0,0.18);
+      animation: guide-pulse 2.2s ease infinite;
+    }
+    .task-step.active .tick { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .task-step.active .step-hint { display: block; }
+
+    @keyframes guide-pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(255,153,0,0.18); }
+      50% { box-shadow: 0 0 0 8px rgba(255,153,0,0.08); }
+    }
+
+    /* Guide highlight zones — point students at the next click target */
+    .guide-zone {
+      position: relative; border-radius: 12px;
+      border: 2px solid transparent; transition: all 0.3s;
+    }
+    .guide-zone.guide-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,153,0,0.2), 0 4px 20px rgba(255,153,0,0.12);
+      animation: guide-pulse 2.2s ease infinite;
+    }
+    .guide-zone.guide-active::before {
+      content: attr(data-guide-label);
+      position: absolute; top: -11px; left: 10px; z-index: 5;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #fff; font-size: 0.62rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(255,153,0,0.35);
+    }
+    .guide-zone.guide-active-map::after {
+      content: '\f061';
+      font-family: 'Font Awesome 6 Free'; font-weight: 900;
+      position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+      color: var(--accent); font-size: 1.1rem;
+      animation: nudge-left 1s ease infinite;
+    }
+    @keyframes nudge-left {
+      0%, 100% { transform: translateY(-50%) translateX(0); opacity: 1; }
+      50% { transform: translateY(-50%) translateX(-6px); opacity: 0.6; }
+    }
+
+    .inspect-wrap.guide-active::after {
+      content: none;
+    }
+
+    .log-finding-zone {
+      display: none; margin-top: 0.65rem;
+      padding: 0.85rem; border-radius: 10px;
+      background: linear-gradient(135deg, #FFF8F0 0%, #FFEDD5 100%);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,153,0,0.2);
+      animation: guide-pulse 2.2s ease infinite;
+    }
+    .log-finding-zone.visible { display: block; }
+    .log-finding-zone .zone-label {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--accent-dark); margin-bottom: 0.55rem;
+    }
+    .log-finding-zone .zone-label i { animation: bounce-down 1s ease infinite; }
+    @keyframes bounce-down {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(3px); }
+    }
+    .btn-log-finding {
+      width: 100%; padding: 0.75rem 1rem !important;
+      font-size: 0.92rem !important;
+      animation: btn-glow 2s ease infinite;
+    }
+    @keyframes btn-glow {
+      0%, 100% { box-shadow: 0 4px 16px rgba(255,153,0,0.35); }
+      50% { box-shadow: 0 4px 24px rgba(255,153,0,0.55); transform: translateY(-1px); }
+    }
+
+    .panel-footer .btn-primary.guide-active-footer {
+      animation: btn-glow 2s ease infinite;
+      outline: 3px solid rgba(255,153,0,0.35);
+      outline-offset: 2px;
+    }
+
+    .inspect-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem;
+    }
+    .inspect-card h3 { font-size: 0.92rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem; }
+    .inspect-card .meta { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+    .inspect-card .tags {
+      font-family: Consolas, Monaco, monospace; font-size: 0.7rem; line-height: 1.55;
+      color: var(--text-muted); background: var(--surface); padding: 0.65rem;
+      border-radius: 6px; border: 1px solid var(--border); white-space: pre-wrap;
+    }
+    .inspect-card .verdict {
+      font-size: 0.82rem; padding: 0.55rem 0.7rem; border-radius: 6px; margin-top: 0.65rem;
+      display: flex; align-items: flex-start; gap: 0.4rem;
+    }
+    .verdict.bad { background: var(--danger-bg); color: var(--danger); }
+    .verdict.warn { background: var(--warn-bg); color: #B45309; }
+    .verdict.good { background: var(--ok-bg); color: var(--ok); }
+
+    .cta-banner {
+      display: none;
+    }
+
+    .findings-list { list-style: none; }
+    .findings-list li {
+      padding: 0.55rem 0.65rem; background: var(--bg); border-radius: 8px; margin-bottom: 0.4rem;
+      font-size: 0.78rem; border-left: 3px solid var(--inform);
+      display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.4;
+    }
+    .findings-list li i { color: var(--inform); margin-top: 2px; flex-shrink: 0; }
+    .findings-list li.fixed { border-left-color: var(--ok); opacity: 0.65; text-decoration: line-through; }
+
+    .action-grid { display: flex; flex-direction: column; gap: 0.65rem; }
+    .action-card {
+      display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.9rem 1rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      border-left: 3px solid var(--optimize);
+    }
+    .action-card.pending-highlight { border-left-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,153,0,0.2); }
+    .action-card.applied { background: var(--ok-bg); border-left-color: var(--ok); }
+    .action-card .action-icon {
+      width: 32px; height: 32px; border-radius: 8px; background: var(--optimize-bg);
+      display: flex; align-items: center; justify-content: center; color: var(--accent-dark); flex-shrink: 0;
+    }
+    .action-card.applied .action-icon { background: var(--ok-bg); color: var(--ok); }
+    .action-card h3 { font-size: 0.88rem; margin-bottom: 0.25rem; }
+    .action-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; }
+    .action-card .savings { font-size: 0.72rem; font-weight: 600; color: var(--ok); margin-top: 0.35rem; }
+
+    .cycle-wrap { max-width: 640px; margin: 0 auto; }
+    .cycle-ring { display: flex; flex-direction: column; align-items: center; padding: 1rem 0; }
+    .cycle-step {
+      width: 100%; max-width: 420px; padding: 1rem 1.15rem;
+      background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .cycle-step:hover:not(.done) { border-color: var(--operate); }
+    .cycle-step.active { border-color: var(--operate); background: var(--operate-bg); box-shadow: 0 4px 16px rgba(29,129,2,0.12); }
+    .cycle-step.done { border-color: var(--ok); background: var(--ok-bg); cursor: default; }
+    .cycle-step .step-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem; }
+    .cycle-step .step-desc { font-size: 0.8rem; color: var(--text-muted); }
+    .cycle-step .step-detail {
+      display: none; margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px solid var(--border);
+      font-size: 0.8rem; line-height: 1.5;
+    }
+    .cycle-step.active .step-detail, .cycle-step.done .step-detail { display: block; }
+    .cycle-arrow { width: 2px; height: 24px; background: var(--border); position: relative; }
+    .cycle-arrow::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: var(--border);
+    }
+    .cycle-arrow.lit { background: var(--operate); }
+    .cycle-arrow.lit::after { border-top-color: var(--operate); }
+    .loop-badge {
+      margin-top: 1.25rem; text-align: center; padding: 0.75rem 1rem;
+      background: var(--operate-bg); border: 1px dashed var(--operate); border-radius: 10px;
+      font-size: 0.85rem; color: var(--operate); font-weight: 600; opacity: 0; transition: opacity 0.5s;
+    }
+    .loop-badge.visible { opacity: 1; }
+
+    .panel-footer {
+      padding: 0.75rem 1.25rem; background: var(--surface); border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+
+    .complete {
+      flex: 1; display: none; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .complete.active { display: flex; }
+    .complete-card {
+      max-width: 520px; width: 100%; text-align: center; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 2rem;
+      box-shadow: 0 4px 24px rgba(35,47,62,0.06);
+    }
+    .complete-card h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .complete-card p { color: var(--text-muted); line-height: 1.65; margin-bottom: 1.5rem; }
+    .phase-recap { text-align: left; display: grid; gap: 0.6rem; margin-bottom: 1.5rem; }
+    .phase-recap div { padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; }
+    .phase-recap .r-inform { background: var(--inform-bg); }
+    .phase-recap .r-optimize { background: var(--optimize-bg); }
+    .phase-recap .r-operate { background: var(--operate-bg); }
+    .complete-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .namespace-grid { grid-template-columns: repeat(2, 1fr); }
+      .namespace-box.span-2 { grid-column: span 1; }
+    }
+    @media (max-width: 768px) {
+      .panel-layout { grid-template-columns: 1fr; }
+      .panel-main { border-right: none; border-bottom: 1px solid var(--border); }
+      .namespace-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">NovaCart <span>· FinOps Journey</span></div>
+      <span id="headerPhase" style="font-size:0.8rem;color:var(--text-muted);"></span>
+    </header>
+
+    <section class="intro" id="intro">
+      <div class="intro-card">
+        <div class="email-header">Inbox · Monday 8:47 AM</div>
+        <div class="email-body">
+          <div class="from">Priya Sharma, VP Finance</div>
+          <div class="subject">Re: Q1 ecommerce infra — who owns the $52K spike?</div>
+          <div class="body-text">
+            Platform team,<br><br>
+            NovaCart's Kubernetes spend hit <strong>$214,800</strong> in March — 41% over plan.
+            Checkout blames catalog. Catalog blames the Black Friday scale-up nobody rolled back.
+            Payments says their namespace is "PCI compliant" but Finance can't map spend to product lines.<br><br>
+            I need a cost breakdown by team with evidence, not opinions. Board prep is Thursday.
+          </div>
+          <div class="highlight">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            $52,400 sits in "unallocated" — workloads with no owner, no cost-center, or orphaned storage still billing.
+          </div>
+        </div>
+        <div class="intro-cta">
+          <p>You lead platform for NovaCart. Navigate Inform → Optimize → Operate on the prod cluster before Priya's 3 PM sync.</p>
+          <button class="btn btn-primary" id="startBtn"><i class="fa-solid fa-dharmachakra"></i> Open cluster map</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="journey" id="journey">
+      <nav class="phase-rail">
+        <button class="phase-tab active" data-phase="inform">
+          <span class="num">1</span><span class="label">Inform</span><span class="desc">See where the money went</span>
+        </button>
+        <button class="phase-tab locked" data-phase="optimize">
+          <span class="num">2</span><span class="label">Optimize</span><span class="desc">Fix what you found</span>
+        </button>
+        <button class="phase-tab locked" data-phase="operate">
+          <span class="num">3</span><span class="label">Operate</span><span class="desc">Make it stick monthly</span>
+        </button>
+      </nav>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Visibility</div>
+          <div class="metric-bar"><div class="metric-fill inform" id="barVisibility"></div></div>
+          <div class="metric-val" id="valVisibility">0% — flying blind</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Allocated spend</div>
+          <div class="metric-bar"><div class="metric-fill optimize" id="barAllocated"></div></div>
+          <div class="metric-val" id="valAllocated">$52.4K unallocated</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Automation</div>
+          <div class="metric-bar"><div class="metric-fill operate" id="barAutomation"></div></div>
+          <div class="metric-val" id="valAutomation">Manual grep only</div>
+        </div>
+      </div>
+
+      <div class="phase-panel active" id="panelInform">
+        <div class="panel-layout">
+          <div class="panel-main">
+            <div class="phase-intro inform">
+              <strong>Phase 1 — Inform</strong>
+              Resources pulsing red need inspection. Click each one, review labels in the inspector, and log findings for anything broken.
+            </div>
+            <div class="guide-zone" id="clusterGuideZone" data-guide-label="Click here next">
+              <div class="cluster-diagram" id="clusterDiagram"></div>
+            </div>
+            <div class="arch-legend">
+              <span><span class="leg-swatch pulse"></span> Needs inspection</span>
+              <span><span class="leg-swatch bad"></span> Critical gap</span>
+              <span><span class="leg-swatch warn"></span> Partial tags</span>
+              <span><span class="leg-swatch ok"></span> Compliant baseline</span>
+            </div>
+          </div>
+          <div class="panel-side">
+            <div class="task-panel" id="taskPanel"></div>
+            <div class="guide-zone inspect-wrap" id="inspectGuideZone" data-guide-label="Review here">
+              <div class="metric-label">Inspector</div>
+              <div class="inspect-card" id="inspectCard">
+                <p style="color:var(--text-muted);font-size:0.82rem;"><i class="fa-solid fa-arrow-pointer"></i> Select a pulsing resource on the cluster map.</p>
+              </div>
+              <div class="log-finding-zone" id="logFindingZone">
+                <div class="zone-label"><i class="fa-solid fa-arrow-down"></i> Next step — log this finding</div>
+                <button class="btn btn-primary btn-log-finding" id="logFindingBtn">
+                  <i class="fa-solid fa-clipboard-list"></i> Log finding
+                </button>
+              </div>
+            </div>
+            <div>
+              <div class="metric-label">Findings (<span id="findingCount">0</span>/4 required)</div>
+              <ul class="findings-list" id="findingsList"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-panel" id="panelOptimize">
+        <div class="panel-layout">
+          <div class="panel-main">
+            <div class="phase-intro optimize">
+              <strong>Phase 2 — Optimize</strong>
+              Apply a fix for each finding you logged. Highlighted cards are still pending — this is informed action, not blanket cost cuts.
+            </div>
+            <div class="action-grid" id="actionGrid"></div>
+          </div>
+          <div class="panel-side">
+            <div class="task-panel">
+              <div class="task-panel-title"><i class="fa-solid fa-list-check"></i> Optimize checklist</div>
+              <ul class="task-steps" id="optimizeTasks"></ul>
+            </div>
+            <div class="inspect-card">
+              <div class="metric-label" style="margin-bottom:0.5rem;">Unallocated remaining</div>
+              <div style="font-size:2rem;font-weight:700;color:var(--accent-dark);" id="unallocatedDisplay">$52,400</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-panel" id="panelOperate">
+        <div class="panel-main" style="overflow-y:auto;">
+          <div class="phase-intro operate">
+            <strong>Phase 3 — Operate</strong>
+            One firefight won't survive next quarter's scale event. Click each step to wire the monthly FinOps loop your agent will automate.
+          </div>
+          <div class="cycle-wrap">
+            <div class="cycle-ring" id="cycleRing"></div>
+            <div class="loop-badge" id="loopBadge"><i class="fa-solid fa-rotate"></i> Cycle live — Inform → Optimize → Operate every month</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="panel-footer">
+        <button class="btn btn-sm" id="backPhaseBtn" disabled><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <span id="phaseHint" style="font-size:0.82rem;color:var(--text-muted);"></span>
+        <button class="btn btn-primary btn-sm" id="nextPhaseBtn" disabled>Continue to Optimize <i class="fa-solid fa-arrow-right"></i></button>
+      </footer>
+    </section>
+
+    <section class="complete" id="complete">
+      <div class="complete-card">
+        <h2><i class="fa-solid fa-circle-check" style="color:var(--ok);"></i> Lifecycle complete</h2>
+        <p>You moved NovaCart from a finance blind spot to a governable cluster — the same path real FinOps teams run every month.</p>
+        <div class="phase-recap">
+          <div class="r-inform"><strong>Inform</strong> — Mapped the cluster architecture and surfaced tagging gaps, orphans, and ghost resources.</div>
+          <div class="r-optimize"><strong>Optimize</strong> — Applied targeted fixes; unallocated spend dropped without killing team velocity.</div>
+          <div class="r-operate"><strong>Operate</strong> — Wired policy → scan → ticket so next month's spike gets caught early.</div>
+        </div>
+        <div class="complete-actions">
+          <button class="btn btn-primary" id="restartBtn"><i class="fa-solid fa-rotate-right"></i> Run again</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+  (function () {
+    var NAMESPACES = [
+      { id: 'checkout', label: 'checkout', span: 1 },
+      { id: 'catalog', label: 'catalog', span: 1 },
+      { id: 'payments', label: 'payments', span: 1 },
+      { id: 'default', label: 'default', span: 1 },
+      { id: 'data', label: 'data', span: 1 },
+      { id: 'platform', label: 'platform', span: 1 }
+    ];
+
+    var RESOURCES = [
+      {
+        id: 'checkout-api', ns: 'checkout', name: 'checkout-api', kind: 'Deployment', iconClass: 'deploy', faIcon: 'fa-cube',
+        status: 'warn', priority: true,
+        tags: 'app.kubernetes.io/name: checkout-api\ncost-center: checkout\nenvironment: prod\n# Missing: owner',
+        verdict: 'warn', verdictText: 'Partial tags — cost-center exists but no owner. Priya cannot escalate checkout spikes to a team.',
+        finding: 'checkout-api missing owner — $14.2K/mo unattributable'
+      },
+      {
+        id: 'catalog-svc', ns: 'catalog', name: 'catalog-service', kind: 'Deployment', iconClass: 'deploy', faIcon: 'fa-cube',
+        status: 'warn', priority: true,
+        tags: 'app: catalog-service\nenvironment: prod\n# Missing: owner, cost-center',
+        verdict: 'warn', verdictText: 'Catalog prod traffic with no cost-center — invisible on finance dashboards.',
+        finding: 'catalog-service missing cost-center — $9.8K/mo untracked'
+      },
+      {
+        id: 'payment-gw', ns: 'payments', name: 'payment-gateway', kind: 'Deployment', iconClass: 'deploy', faIcon: 'fa-cube',
+        status: 'warn', priority: true,
+        tags: 'owner: payments-team\ncost-center: payments\n# Missing: environment, tier',
+        verdict: 'warn', verdictText: 'PCI-adjacent workload missing environment tag — fails policy scan.',
+        finding: 'payment-gateway missing environment tag'
+      },
+      {
+        id: 'stale-pvc', ns: 'data', name: 'stale-orders-pvc', kind: 'PVC', iconClass: 'pvc', faIcon: 'fa-database',
+        status: 'bad', priority: true,
+        tags: 'app: batch-jobs\n# No owner, no cost-center\n# No pod mounts this claim — idle since BFCM',
+        verdict: 'bad', verdictText: 'Orphaned PVC — 20Gi EBS billing idle since Black Friday scale-up was never torn down.',
+        finding: 'stale-orders-pvc orphan — $1,240/mo idle burn'
+      },
+      {
+        id: 'legacy-cm', ns: 'default', name: 'legacy-feature-flags', kind: 'ConfigMap', iconClass: 'cm', faIcon: 'fa-file-code',
+        status: 'bad', priority: true,
+        tags: '# Zero labels\n# No team owns default namespace objects',
+        verdict: 'bad', verdictText: 'Ghost resource — appears in scans but maps to no team or cost-center.',
+        finding: 'legacy-feature-flags in default — governance gap'
+      },
+      {
+        id: 'api-gateway', ns: 'platform', name: 'api-gateway', kind: 'Deployment', iconClass: 'deploy', faIcon: 'fa-cube',
+        status: 'good', priority: false,
+        tags: 'owner: platform-team\ncost-center: platform\nenvironment: prod\ntier: backend',
+        verdict: 'good', verdictText: 'Green baseline — all required FinOps tags present. This is the standard other teams should match.',
+        finding: null
+      }
+    ];
+
+    var ACTIONS = [
+      { id: 'fix-checkout', finding: 'checkout-api missing owner — $14.2K/mo unattributable', title: 'Add owner: checkout-team', desc: 'PR to checkout-api deployment — finance can route spikes to #checkout-oncall.', savings: 14200, icon: 'fa-tag' },
+      { id: 'fix-catalog', finding: 'catalog-service missing cost-center — $9.8K/mo untracked', title: 'Tag catalog-service cost-center: catalog', desc: 'Links product catalog infra to the correct P&L line.', savings: 9800, icon: 'fa-tags' },
+      { id: 'fix-payment', finding: 'payment-gateway missing environment tag', title: 'Add environment: prod to payment-gateway', desc: 'Brings PCI scope workload into full policy compliance.', savings: 0, icon: 'fa-shield-halved' },
+      { id: 'fix-pvc', finding: 'stale-orders-pvc orphan — $1,240/mo idle burn', title: 'Reclaim stale-orders-pvc', desc: 'Verify no mounts, snapshot if needed, delete claim. Post-BFCM cleanup.', savings: 1240, icon: 'fa-trash-can' },
+      { id: 'fix-cm', finding: 'legacy-feature-flags in default — governance gap', title: 'Label or remove legacy-feature-flags', desc: 'Assign to platform or delete if abandoned from 2023 rebrand.', savings: 0, icon: 'fa-ghost' }
+    ];
+
+    var CYCLE = [
+      { title: 'Policy as YAML', icon: 'fa-file-code', desc: 'tagging-rules.yaml — humans edit, agents read', detail: 'Cost centers change after org restructures. YAML supports comments and matches K8 manifest format.' },
+      { title: 'Weekly cluster scan', icon: 'fa-magnifying-glass-chart', desc: 'All namespaces, all resource types', detail: 'Collect: Deployments, PVCs, ConfigMaps. Compare labels against required_tags and label_mappings.' },
+      { title: 'Findings → tech-debt tickets', icon: 'fa-ticket', desc: 'Structured Jira issues, not spreadsheet rows', detail: 'Analyze: LLM summarizes gaps. Act: ticket with owner, severity, suggested manifest fix.' },
+      { title: 'Teams fix → scan again', icon: 'fa-rotate', desc: 'The loop never ends', detail: 'Operate means next quarter\'s scale event gets caught in scan #2, not Priya\'s inbox.' }
+    ];
+
+    var state = {
+      phase: 'inform', inspected: {}, findings: [], actionsApplied: [], cycleStep: 0,
+      unallocated: 52400, selectedId: null
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    function resourceById(id) { return RESOURCES.find(function (r) { return r.id === id; }); }
+
+    function renderCluster() {
+      var html = '<div class="cluster-titlebar"><i class="fa-solid fa-dharmachakra"></i> novacart-prod · us-east-1 · EKS</div><div class="cluster-body">';
+      html += '<div class="control-plane">';
+      html += '<span style="font-weight:600;margin-right:0.25rem;">Control plane</span>';
+      ['fa-server', 'fa-database', 'fa-network-wired'].forEach(function (ic, i) {
+        html += '<span class="cp-item"><i class="fa-solid ' + ic + '"></i> ' + ['api-server', 'etcd', 'scheduler'][i] + '</span>';
+      });
+      html += '</div><div class="namespace-grid">';
+
+      NAMESPACES.forEach(function (ns) {
+        var resources = RESOURCES.filter(function (r) { return r.ns === ns.id; });
+        html += '<div class="namespace-box' + (ns.span === 2 ? ' span-2' : '') + '">';
+        html += '<div class="ns-header"><i class="fa-solid fa-layer-group"></i> ns/' + ns.label + '</div>';
+        resources.forEach(function (r) {
+          var cls = ['k8-resource', 'status-' + r.status];
+          if (r.priority && !state.inspected[r.id]) cls.push('needs-inspect');
+          if (state.inspected[r.id]) cls.push('inspected');
+          if (state.selectedId === r.id) cls.push('selected');
+          if (r.finding && state.findings.indexOf(r.finding) !== -1) cls.push('finding-logged');
+          else if (r.finding && state.inspected[r.id]) cls.push('has-finding');
+          html += '<button type="button" class="' + cls.join(' ') + '" data-id="' + r.id + '">';
+          html += '<span class="res-icon ' + r.iconClass + '"><i class="fa-solid ' + r.faIcon + '"></i></span>';
+          html += '<span class="res-info"><div class="res-name">' + r.name + '</div><div class="res-kind">' + r.kind + '</div></span>';
+          html += '</button>';
+        });
+        html += '</div>';
+      });
+
+      html += '</div></div>';
+      $('clusterDiagram').innerHTML = html;
+
+      document.querySelectorAll('.k8-resource').forEach(function (btn) {
+        btn.addEventListener('click', function () { selectResource(btn.dataset.id); });
+      });
+    }
+
+    function updateGuideHighlights(activeIdx, steps) {
+      var clusterZone = $('clusterGuideZone');
+      var inspectZone = $('inspectGuideZone');
+      var logZone = $('logFindingZone');
+      var nextBtn = $('nextPhaseBtn');
+      var r = state.selectedId ? resourceById(state.selectedId) : null;
+      var pendingLog = r && r.finding && state.findings.indexOf(r.finding) === -1;
+      var allDone = state.findings.length >= 4 && Object.keys(state.inspected).length >= 5;
+
+      clusterZone.classList.remove('guide-active', 'guide-active-map');
+      inspectZone.classList.remove('guide-active');
+      nextBtn.classList.remove('guide-active-footer');
+
+      if (state.phase !== 'inform') return;
+
+      if (allDone) {
+        nextBtn.classList.add('guide-active-footer');
+        $('phaseHint').textContent = 'Click Continue to Optimize →';
+        logZone.classList.remove('visible');
+        return;
+      }
+
+      if (pendingLog) {
+        logZone.classList.add('visible');
+        inspectZone.classList.add('guide-active');
+        inspectZone.setAttribute('data-guide-label', 'Then log below');
+        return;
+      }
+
+      logZone.classList.remove('visible');
+
+      if (activeIdx === 0 || (activeIdx === 2 && state.findings.length < 4)) {
+        clusterZone.classList.add('guide-active', 'guide-active-map');
+        clusterZone.setAttribute('data-guide-label', 'Click here next');
+      } else if (activeIdx === 1 && state.selectedId) {
+        inspectZone.classList.add('guide-active');
+        inspectZone.setAttribute('data-guide-label', 'Review here');
+      } else if (activeIdx === 2) {
+        clusterZone.classList.add('guide-active', 'guide-active-map');
+        clusterZone.setAttribute('data-guide-label', 'Find next issue');
+      }
+    }
+
+    function updateTaskPanel() {
+      var inspectedCount = Object.keys(state.inspected).length;
+      var priorityTotal = RESOURCES.filter(function (r) { return r.priority; }).length;
+      var priorityDone = RESOURCES.filter(function (r) { return r.priority && state.inspected[r.id]; }).length;
+      var findingsDone = state.findings.length >= 4;
+      var r = state.selectedId ? resourceById(state.selectedId) : null;
+      var pendingLog = r && r.finding && state.findings.indexOf(r.finding) === -1;
+
+      var steps = [
+        {
+          label: 'Click pulsing resources on the map (' + priorityDone + '/' + priorityTotal + ')',
+          hint: '→ Pick any resource with a red Inspect badge on the cluster map',
+          done: priorityDone >= priorityTotal
+        },
+        {
+          label: 'Review labels in the inspector',
+          hint: '→ Check the YAML labels and verdict message',
+          done: state.selectedId && state.inspected[state.selectedId] && !pendingLog
+        },
+        {
+          label: 'Log findings for problem resources (' + state.findings.length + '/4)',
+          hint: '→ Click the orange Log finding button',
+          done: findingsDone
+        },
+        {
+          label: 'Proceed to Optimize phase',
+          hint: '→ Click Continue to Optimize at the bottom',
+          done: findingsDone && inspectedCount >= 5
+        }
+      ];
+
+      var activeIdx = steps.findIndex(function (s) { return !s.done; });
+      if (pendingLog) activeIdx = 2;
+
+      $('taskPanel').innerHTML =
+        '<div class="task-panel-title"><i class="fa-solid fa-list-check"></i> What to do now</div>' +
+        '<ul class="task-steps">' +
+        steps.map(function (s, i) {
+          var cls = s.done ? 'done' : (i === activeIdx ? 'active' : '');
+          return '<li class="task-step ' + cls + '">' +
+            '<span class="tick">' + (s.done ? '✓' : (i + 1)) + '</span>' +
+            '<div class="step-body">' + s.label +
+            (i === activeIdx && !s.done ? '<div class="step-hint">' + s.hint + '</div>' : '') +
+            '</div></li>';
+        }).join('') + '</ul>';
+
+      updateGuideHighlights(activeIdx, steps);
+    }
+
+    function selectResource(id) {
+      var r = resourceById(id);
+      if (!r) return;
+      state.selectedId = id;
+      state.inspected[id] = true;
+      renderCluster();
+
+      var faKind = r.kind === 'Deployment' ? 'fa-cube' : r.kind === 'PVC' ? 'fa-database' : 'fa-file-code';
+      var pendingLog = r.finding && state.findings.indexOf(r.finding) === -1;
+
+      $('inspectCard').innerHTML =
+        '<h3><i class="fa-solid ' + faKind + '"></i> ' + r.name + '</h3>' +
+        '<div class="meta">' + r.kind + ' · namespace: <strong>' + r.ns + '</strong></div>' +
+        '<div class="tags">' + r.tags + '</div>' +
+        '<div class="verdict ' + r.verdict + '"><i class="fa-solid ' + (r.verdict === 'good' ? 'fa-circle-check' : 'fa-triangle-exclamation') + '"></i> ' + r.verdictText + '</div>' +
+        (pendingLog ? '' :
+          r.finding ? '<div style="margin-top:0.65rem;font-size:0.78rem;color:var(--ok);"><i class="fa-solid fa-check"></i> Finding logged</div>' :
+          '<div style="margin-top:0.65rem;font-size:0.78rem;color:var(--ok);"><i class="fa-solid fa-check"></i> Baseline — no finding needed</div>');
+
+      var logZone = $('logFindingZone');
+      var logBtn = $('logFindingBtn');
+      if (pendingLog) {
+        logZone.classList.add('visible');
+        logBtn.onclick = function () { logFinding(r); };
+      } else {
+        logZone.classList.remove('visible');
+        logBtn.onclick = null;
+      }
+
+      updateMetrics();
+      checkInformComplete();
+      updateTaskPanel();
+    }
+
+    function logFinding(r) {
+      if (r.finding && state.findings.indexOf(r.finding) === -1) {
+        state.findings.push(r.finding);
+        updateFindings();
+        selectResource(r.id);
+      }
+    }
+
+    function updateFindings() {
+      $('findingCount').textContent = state.findings.length;
+      $('findingsList').innerHTML = state.findings.length
+        ? state.findings.map(function (f) {
+            var fixed = state.actionsApplied.some(function (a) {
+              return ACTIONS.find(function (x) { return x.id === a; }).finding === f;
+            });
+            return '<li' + (fixed ? ' class="fixed"' : '') + '><i class="fa-solid fa-magnifying-glass"></i><span>' + f + '</span></li>';
+          }).join('')
+        : '<li style="border-left-color:var(--border);opacity:0.6;"><i class="fa-solid fa-circle-info"></i> None yet</li>';
+      updateTaskPanel();
+    }
+
+    function updateMetrics() {
+      var total = RESOURCES.length;
+      var inspectCount = Object.keys(state.inspected).length;
+      var visPct = Math.round((inspectCount / total) * 100);
+      $('barVisibility').style.width = visPct + '%';
+      $('valVisibility').textContent = visPct + '% — ' + (visPct < 100 ? inspectCount + '/' + total + ' resources inspected' : 'full cluster map');
+
+      var allocPct = Math.round(((52400 - state.unallocated) / 52400) * 100);
+      $('barAllocated').style.width = Math.max(allocPct, state.actionsApplied.length ? 8 : 0) + '%';
+      $('valAllocated').textContent = state.unallocated <= 0 ? 'Fully allocated' : '$' + (state.unallocated / 1000).toFixed(1) + 'K unallocated';
+
+      var autoPct = Math.round((state.cycleStep / CYCLE.length) * 100);
+      $('barAutomation').style.width = autoPct + '%';
+      $('valAutomation').textContent = autoPct === 100 ? 'Loop automated' : autoPct === 0 ? 'Manual grep only' : 'Building loop… ' + autoPct + '%';
+    }
+
+    function checkInformComplete() {
+      var ok = state.findings.length >= 4 && Object.keys(state.inspected).length >= 5;
+      $('nextPhaseBtn').disabled = !ok;
+      if (!ok) {
+        $('phaseHint').textContent = 'Follow the highlighted steps in the checklist';
+      }
+    }
+
+    function renderActions() {
+      var available = ACTIONS.filter(function (a) { return state.findings.indexOf(a.finding) !== -1; });
+      var nextPending = available.find(function (a) { return state.actionsApplied.indexOf(a.id) === -1; });
+
+      $('actionGrid').innerHTML = available.map(function (a) {
+        var applied = state.actionsApplied.indexOf(a.id) !== -1;
+        var highlight = !applied && a.id === (nextPending && nextPending.id);
+        return '<div class="action-card' + (applied ? ' applied' : '') + (highlight ? ' pending-highlight' : '') + '" data-id="' + a.id + '">' +
+          '<div class="action-icon"><i class="fa-solid ' + a.icon + '"></i></div>' +
+          '<div class="action-body"><h3>' + a.title + '</h3><p>' + a.desc + '</p>' +
+          (a.savings ? '<div class="savings"><i class="fa-solid fa-arrow-trend-down"></i> $' + a.savings.toLocaleString() + '/mo impact</div>' : '') +
+          '</div>' +
+          (applied ? '<i class="fa-solid fa-circle-check" style="color:var(--ok);font-size:1.2rem;"></i>' :
+            '<button class="btn btn-primary btn-sm apply-btn"><i class="fa-solid fa-wrench"></i> Apply</button>') +
+          '</div>';
+      }).join('');
+
+      $('optimizeTasks').innerHTML = available.map(function (a) {
+        var applied = state.actionsApplied.indexOf(a.id) !== -1;
+        return '<li class="task-step ' + (applied ? 'done' : '') + '"><span class="tick">' + (applied ? '✓' : '') + '</span>' + a.title + '</li>';
+      }).join('');
+
+      document.querySelectorAll('.apply-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.closest('.action-card').dataset.id;
+          var action = ACTIONS.find(function (a) { return a.id === id; });
+          if (action && state.actionsApplied.indexOf(id) === -1) {
+            state.actionsApplied.push(id);
+            state.unallocated = Math.max(0, state.unallocated - action.savings);
+            $('unallocatedDisplay').textContent = '$' + state.unallocated.toLocaleString();
+            updateFindings();
+            renderActions();
+            updateMetrics();
+            checkOptimizeComplete();
+          }
+        });
+      });
+      checkOptimizeComplete();
+    }
+
+    function checkOptimizeComplete() {
+      var available = ACTIONS.filter(function (a) { return state.findings.indexOf(a.finding) !== -1; }).length;
+      var done = state.actionsApplied.length >= available && available > 0;
+      $('nextPhaseBtn').disabled = !done;
+      $('phaseHint').textContent = done ? 'Ready for Operate' : 'Apply all fixes (' + state.actionsApplied.length + '/' + available + ')';
+    }
+
+    function renderCycle() {
+      var ring = $('cycleRing');
+      ring.innerHTML = '';
+      CYCLE.forEach(function (step, i) {
+        if (i > 0) {
+          var arrow = document.createElement('div');
+          arrow.className = 'cycle-arrow' + (i <= state.cycleStep ? ' lit' : '');
+          ring.appendChild(arrow);
+        }
+        var el = document.createElement('div');
+        el.className = 'cycle-step' + (i === state.cycleStep ? ' active' : '') + (i < state.cycleStep ? ' done' : '');
+        el.innerHTML =
+          '<div class="step-title"><i class="fa-solid ' + step.icon + '"></i> ' + (i < state.cycleStep ? '<i class="fa-solid fa-check" style="color:var(--ok);font-size:0.8rem;"></i> ' : '') + step.title + '</div>' +
+          '<div class="step-desc">' + step.desc + '</div>' +
+          '<div class="step-detail">' + step.detail + '</div>';
+        if (i >= state.cycleStep) {
+          el.addEventListener('click', function () {
+            if (i === state.cycleStep) { state.cycleStep++; renderCycle(); updateMetrics(); checkOperateComplete(); }
+          });
+        }
+        ring.appendChild(el);
+      });
+      checkOperateComplete();
+    }
+
+    function checkOperateComplete() {
+      var done = state.cycleStep >= CYCLE.length;
+      $('loopBadge').classList.toggle('visible', done);
+      $('nextPhaseBtn').disabled = !done;
+      $('nextPhaseBtn').innerHTML = done ? 'Finish <i class="fa-solid fa-flag-checkered"></i>' : 'Click step ' + (state.cycleStep + 1) + ' of ' + CYCLE.length;
+      $('phaseHint').textContent = done ? 'FinOps lifecycle complete' : 'Wire the monthly loop';
+    }
+
+    function setPhase(phase) {
+      state.phase = phase;
+      ['inform', 'optimize', 'operate'].forEach(function (p) {
+        $('panel' + p.charAt(0).toUpperCase() + p.slice(1)).classList.toggle('active', p === phase);
+        document.querySelector('.phase-tab[data-phase="' + p + '"]').classList.toggle('active', p === phase);
+      });
+      $('headerPhase').textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
+      $('backPhaseBtn').disabled = phase === 'inform';
+      if (phase === 'inform') { $('nextPhaseBtn').innerHTML = 'Continue to Optimize <i class="fa-solid fa-arrow-right"></i>'; checkInformComplete(); renderCluster(); updateTaskPanel(); }
+      else if (phase === 'optimize') { $('nextPhaseBtn').innerHTML = 'Continue to Operate <i class="fa-solid fa-arrow-right"></i>'; $('unallocatedDisplay').textContent = '$' + state.unallocated.toLocaleString(); renderActions(); }
+      else if (phase === 'operate') { renderCycle(); }
+    }
+
+    document.querySelectorAll('.phase-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (!tab.classList.contains('locked')) setPhase(tab.dataset.phase);
+      });
+    });
+
+    $('startBtn').addEventListener('click', function () {
+      $('intro').style.display = 'none';
+      $('journey').classList.add('active');
+      renderCluster();
+      updateTaskPanel();
+      updateFindings();
+      updateMetrics();
+      checkInformComplete();
+    });
+
+    $('nextPhaseBtn').addEventListener('click', function () {
+      if ($('nextPhaseBtn').disabled) return;
+      if (state.phase === 'inform') {
+        document.querySelector('.phase-tab[data-phase="inform"]').classList.add('done');
+        document.querySelector('.phase-tab[data-phase="optimize"]').classList.remove('locked');
+        setPhase('optimize');
+      } else if (state.phase === 'optimize') {
+        document.querySelector('.phase-tab[data-phase="optimize"]').classList.add('done');
+        document.querySelector('.phase-tab[data-phase="operate"]').classList.remove('locked');
+        setPhase('operate');
+      } else {
+        document.querySelector('.phase-tab[data-phase="operate"]').classList.add('done');
+        $('journey').classList.remove('active');
+        $('complete').classList.add('active');
+        $('headerPhase').textContent = 'Complete';
+      }
+    });
+
+    $('backPhaseBtn').addEventListener('click', function () {
+      if (state.phase === 'optimize') setPhase('inform');
+      else if (state.phase === 'operate') setPhase('optimize');
+    });
+
+    $('restartBtn').addEventListener('click', function () {
+      state = { phase: 'inform', inspected: {}, findings: [], actionsApplied: [], cycleStep: 0, unallocated: 52400, selectedId: null };
+      $('complete').classList.remove('active');
+      $('journey').classList.remove('active');
+      $('intro').style.display = 'flex';
+      document.querySelectorAll('.phase-tab').forEach(function (t) {
+        t.classList.remove('done', 'locked');
+        if (t.dataset.phase !== 'inform') t.classList.add('locked');
+        t.querySelector('.num').textContent = t.dataset.phase === 'inform' ? '1' : t.dataset.phase === 'optimize' ? '2' : '3';
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

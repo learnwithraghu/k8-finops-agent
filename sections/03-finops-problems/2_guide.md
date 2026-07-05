@@ -2,6 +2,8 @@
 
 **Time Budget:** 2-3 mins
 
+> **Try it first:** The FinOps Journey covers orphaned PVCs and ghost resources in the **Inform** phase — [`game/finops-game-1.html`](game/finops-game-1.html).
+
 ### 1) Inspect analytics in the default namespace
 ```bash
 kubectl get deployment analytics-collector -n default -o yaml

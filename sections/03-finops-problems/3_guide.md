@@ -2,6 +2,8 @@
 
 **Time Budget:** 3-4 mins
 
+> **Try it first:** The **Operate** phase in [`game/finops-game-1.html`](game/finops-game-1.html) shows why manual grep does not scale.
+
 ### 1) Inspect a good baseline (Inventory)
 ```bash
 kubectl get deployment inventory-service -n inventory -o yaml

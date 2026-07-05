@@ -4,6 +4,8 @@
 
 **Prerequisites:** [`transcript/1.md`](transcript/1.md) and [`transcript/2.md`](transcript/2.md) — why we use YAML and what each key in `tagging-rules.yaml` means.
 
+> **Try it first:** [`game/finops-game-1.html`](game/finops-game-1.html) — navigate the FinOps lifecycle (Inform → Optimize → Operate) on the SkyLine Air cluster before this demo.
+
 ### 1) Read the tagging rules
 ```bash
 cat sections/03-finops-problems/examples/tagging-rules.yaml
