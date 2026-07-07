@@ -39,13 +39,12 @@ data:
 
             location /api/payment/charge {
                 default_type application/json;
-                return 200 '{"transaction_id":"TXN_'"$RANDOM"'_'"$RANDOM"'","status":"success","amount":44900,"currency":"USD","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}';
+                return 200 '{"transaction_id":"TXN_12345_67890","status":"success","amount":44900,"currency":"USD","timestamp":"2023-01-01T00:00:00Z"}';
             }
 
             location /api/bookings {
                 default_type application/json;
-                set $booking_id "BK-$RANDOM-$RANDOM";
-                return 200 '{"booking_id":"'"$booking_id"'","status":"confirmed","flight":"FL001","passenger":"","transaction_id":"TXN_XXXX","total":449,"currency":"USD","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}';
+                return 200 '{"booking_id":"BK-98765-43210","status":"confirmed","flight":"FL001","passenger":"","transaction_id":"TXN_XXXX","total":449,"currency":"USD","timestamp":"2023-01-01T00:00:00Z"}';
             }
 
             location /api/health {
@@ -201,10 +200,11 @@ data:
             .payment-section { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
             .payment-form { display: flex; flex-direction: column; gap: 16px; }
             .card-preview-payment {
-                background: linear-gradient(135deg, #003873, #0056b3);
+                background: linear-gradient(135deg, #4c1d95, #1e3a8a);
                 border-radius: 16px; padding: 24px; color: white;
                 height: 200px; display: flex; flex-direction: column; justify-content: space-between;
                 margin-bottom: 16px;
+                box-shadow: 0 10px 25px rgba(76,29,149,0.3);
             }
             .card-preview-payment .card-num { font-size: 22px; letter-spacing: 3px; font-family: 'Courier New', monospace; }
             .card-preview-payment .card-bottom { display: flex; justify-content: space-between; }
@@ -293,6 +293,8 @@ data:
                                     <option value="BLR">Bangalore (BLR)</option>
                                     <option value="HYD">Hyderabad (HYD)</option>
                                     <option value="CCU">Kolkata (CCU)</option>
+                                    <option value="DXB">Dubai (DXB) - UAE</option>
+                                    <option value="AUH">Abu Dhabi (AUH) - UAE</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -302,7 +304,10 @@ data:
                                     <option value="LAX">Los Angeles (LAX)</option>
                                     <option value="SFO">San Francisco (SFO)</option>
                                     <option value="ORD">Chicago (ORD)</option>
-                                    <option value="LHR">London (LHR)</option>
+                                    <option value="MUM">Mumbai (MUM)</option>
+                                    <option value="DEL">Delhi (DEL)</option>
+                                    <option value="SIN">Singapore (SIN)</option>
+                                    <option value="FRA">Frankfurt (FRA) - Germany</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -412,20 +417,20 @@ data:
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Card Number</label>
-                                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="updateCardPreview()">
+                                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" value="1234 5678 9012 3456" maxlength="19" oninput="updateCardPreview()">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Cardholder Name</label>
-                                    <input type="text" class="form-input" id="cardHolder" placeholder="RAHUL SHARMA" oninput="updateCardPreview()">
+                                    <input type="text" class="form-input" id="cardHolder" placeholder="RAHUL SHARMA" value="RAHUL SHARMA" oninput="updateCardPreview()">
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                                     <div class="form-group">
                                         <label class="form-label">Expiry</label>
-                                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="updateCardPreview()">
+                                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" value="12/25" maxlength="5" oninput="updateCardPreview()">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">CVV</label>
-                                        <input type="password" class="form-input" id="cardCvv" placeholder="•••" maxlength="3">
+                                        <input type="password" class="form-input" id="cardCvv" placeholder="•••" value="123" maxlength="3">
                                     </div>
                                 </div>
                                 <button class="btn btn-primary" onclick="processPayment()" style="margin-top: 8px;">
@@ -715,6 +720,7 @@ data:
 
             document.getElementById('departureDate').valueAsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
             document.getElementById('dob').valueAsDate = new Date(1990, 0, 1);
+            updateCardPreview();
         </script>
     </body>
     </html>

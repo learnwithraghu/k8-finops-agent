@@ -1,0 +1,123 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Explore the FinOps Map" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Click the illustrations to learn each phase
+    - progressbar "Phase progress" [ref=e6]:
+      - generic "Inform" [ref=e7]
+      - generic "Optimize" [ref=e8]
+      - generic "Operate" [ref=e9]
+  - main [ref=e10]:
+    - generic "FinOps lifecycle diagram" [ref=e12]:
+      - generic "Achieving Cloud Financial Management diagram"
+      - generic:
+        - generic:
+          - strong: Inform
+          - generic: Gain visibility into cloud costs
+        - generic:
+          - strong: Optimize
+          - generic: Reduce unnecessary cloud spending
+        - generic:
+          - strong: Operate
+          - generic: Embed FinOps practices into culture
+      - 'button "Inform: gain visibility into cloud costs" [ref=e13] [cursor=pointer]'
+      - 'button "Optimize: reduce unnecessary cloud spending" [ref=e14] [cursor=pointer]'
+      - 'button "Operate: embed FinOps practices into culture" [active] [ref=e15] [cursor=pointer]'
+      - button "Kubernetes cluster hub" [disabled] [ref=e16]
+      - dialog "Open the Binoculars":
+        - button "Close": ×
+        - heading "Open the Binoculars" [level=2]
+        - paragraph: Finance can't manage what it can't see. Click the blind spots in this cost breakdown.
+        - generic:
+          - generic:
+            - generic: Production workloads
+            - generic: $48,200 / mo
+          - generic:
+            - generic: Untagged spend
+            - generic: 42%
+            - generic: 42% of total — no cost-center assigned
+          - generic:
+            - generic: Reserved instances
+            - generic: $12,400 / mo
+          - generic:
+            - generic: Services with unknown owner
+            - generic: 6 services
+            - generic: 6 services — nobody to page during incidents
+          - generic:
+            - generic: Networking
+            - generic: $3,800 / mo
+          - generic:
+            - generic: Orphan storage
+            - generic: $2,100 / mo
+            - generic: PVCs billing with no running pod attached
+        - paragraph: Visibility unlocked! You can now see what was hidden.
+        - paragraph: 3 / 3 blind spots found
+      - dialog "Trim the Sails":
+        - button "Close": ×
+        - heading "Trim the Sails" [level=2]
+        - paragraph: Optimization targets waste — not arbitrary budget cuts. Trim each sail to save spend.
+        - generic:
+          - generic:
+            - text: "Saved:"
+            - strong: $4,800
+            - text: / mo
+          - generic:
+            - button "⛵ Idle replicas 24/7 Right-size before you renegotiate contracts.":
+              - generic: ⛵
+              - generic: Idle replicas 24/7
+              - generic: Right-size before you renegotiate contracts.
+            - button "⛵ Oversized orphan PVC Delete storage with no workload attached.":
+              - generic: ⛵
+              - generic: Oversized orphan PVC
+              - generic: Delete storage with no workload attached.
+            - button "⛵ Duplicate unused configs Consolidate before adding more tooling.":
+              - generic: ⛵
+              - generic: Duplicate unused configs
+              - generic: Consolidate before adding more tooling.
+        - paragraph: 3 / 3 sails trimmed
+      - dialog "Walk the Footprint" [ref=e72]:
+        - button "Close" [ref=e73] [cursor=pointer]: ×
+        - heading "Walk the Footprint" [level=2] [ref=e74]
+        - paragraph [ref=e75]: Operate means sustained practice — not one-off fixes. Click the stepping stones in the right order.
+        - generic [ref=e76]:
+          - paragraph [ref=e77]:
+            - text: "Next step:"
+            - strong [ref=e78]: 1 of 4
+          - generic [ref=e79]:
+            - button "1 Tagging policy in Git (not manual kubectl label)" [ref=e80] [cursor=pointer]:
+              - generic [ref=e81]: "1"
+              - text: Tagging policy in Git (not manual kubectl label)
+            - button "2 Regular cost review ritual" [ref=e82] [cursor=pointer]:
+              - generic [ref=e83]: "2"
+              - text: Regular cost review ritual
+            - button "3 Automated checks / agent at scale" [ref=e84] [cursor=pointer]:
+              - generic [ref=e85]: "3"
+              - text: Automated checks / agent at scale
+            - button "4 Team ownership in sprint planning" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]: "4"
+              - text: Team ownership in sprint planning
+        - paragraph [ref=e88]: 0 / 4 steps placed
+      - dialog "All Three Phases Complete":
+        - button "Close": ×
+        - heading "All Three Phases Complete" [level=2]
+        - paragraph: Every phase acts on the same running infrastructure — your Kubernetes cluster.
+        - table:
+          - rowgroup:
+            - row "Phase Takeaway":
+              - columnheader "Phase"
+              - columnheader "Takeaway"
+          - rowgroup:
+            - row "Inform See costs, owners, and orphans before acting":
+              - cell "Inform"
+              - cell "See costs, owners, and orphans before acting"
+            - row "Optimize Trim measurable waste":
+              - cell "Optimize"
+              - cell "Trim measurable waste"
+            - row "Operate Embed practice in culture and automation":
+              - cell "Operate"
+              - cell "Embed practice in culture and automation"
+        - button "Play again"
+    - paragraph [ref=e17]:
+      - text: Explore the map — try the
+      - strong [ref=e89]: boot
+      - text: .

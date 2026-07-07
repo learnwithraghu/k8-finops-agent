@@ -1,0 +1,110 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Explore the FinOps Map" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Click a zone, then drag blocks (or tap block → tap target)
+    - progressbar "Phase progress" [ref=e6]:
+      - generic "Inform" [ref=e7]
+      - generic "Optimize" [ref=e8]
+      - generic "Operate" [ref=e9]
+  - main [ref=e10]:
+    - generic "FinOps lifecycle diagram" [ref=e12]:
+      - generic [ref=e13]:
+        - img:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Achieving Cloud Financial Management
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Inform
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Gain visibility into cloud costs
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Optimize
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Reduce unnecessary cloud spending
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Operate
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Embed FinOps practices into culture
+      - img:
+        - generic:
+          - generic:
+            - generic: Drop here to reveal
+          - generic:
+            - generic: Trim waste here
+        - generic:
+          - generic:
+            - generic: "1"
+          - generic:
+            - generic: "2"
+          - generic:
+            - generic: "3"
+          - generic:
+            - generic: "4"
+        - generic:
+          - generic: "Saved: $0/mo"
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: "???"
+          - generic [ref=e24]: no cost-center
+        - generic [ref=e25]:
+          - generic [ref=e26]: "???"
+          - generic [ref=e27]: no owner
+        - generic [ref=e28]:
+          - generic [ref=e29]: "???"
+          - generic [ref=e30]: orphan PVC
+      - generic:
+        - generic:
+          - strong: Inform
+          - generic: Gain visibility into cloud costs
+        - generic:
+          - strong: Optimize
+          - generic: Reduce unnecessary cloud spending
+        - generic:
+          - strong: Operate
+          - generic: Embed FinOps practices into culture
+      - 'button "Inform: gain visibility into cloud costs" [active]'
+      - 'button "Optimize: reduce unnecessary cloud spending"'
+      - 'button "Operate: embed FinOps practices into culture"'
+      - button "Kubernetes cluster hub" [disabled]
+      - status [ref=e31]:
+        - generic [ref=e32]: "Reveal blind spots: 0/3 → binoculars"
+        - button "Exit phase" [ref=e33] [cursor=pointer]: ×
+      - dialog "All Three Phases Complete":
+        - heading "All Three Phases Complete" [level=2]
+        - paragraph: Every phase acts on the same running infrastructure — your Kubernetes cluster.
+        - table:
+          - rowgroup:
+            - row "Phase Takeaway":
+              - columnheader "Phase"
+              - columnheader "Takeaway"
+          - rowgroup:
+            - row "Inform See costs, owners, and orphans before acting":
+              - cell "Inform"
+              - cell "See costs, owners, and orphans before acting"
+            - row "Optimize Trim measurable waste":
+              - cell "Optimize"
+              - cell "Trim measurable waste"
+            - row "Operate Embed practice in culture and automation":
+              - cell "Operate"
+              - cell "Embed practice in culture and automation"
+        - button "Play again"
+    - paragraph [ref=e17]:
+      - text: Drag blocks to the
+      - strong [ref=e34]: binoculars drop zone
+      - text: (or tap block, then tap target).

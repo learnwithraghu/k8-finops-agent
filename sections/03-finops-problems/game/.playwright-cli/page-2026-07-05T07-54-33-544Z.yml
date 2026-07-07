@@ -1,0 +1,82 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Explore the FinOps Map" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Drag blocks onto the map to unlock each phase
+    - progressbar "Phase progress" [ref=e6]:
+      - generic "Inform" [ref=e7]
+      - generic "Optimize" [ref=e8]
+      - generic "Operate" [ref=e9]
+  - main [ref=e10]:
+    - generic "FinOps lifecycle diagram" [ref=e12]:
+      - img [ref=e14]:
+        - generic [ref=e17]:
+          - generic [ref=e73]: Achieving Cloud Financial Management
+          - generic [ref=e77]: Inform
+          - generic [ref=e81]: Gain visibility into cloud costs
+          - generic [ref=e85]: Optimize
+          - generic [ref=e89]: Reduce unnecessary cloud spending
+          - generic [ref=e93]: Operate
+          - generic [ref=e97]: Embed FinOps practices into culture
+      - img:
+        - generic:
+          - generic:
+            - generic: Drop here to reveal
+          - generic:
+            - generic: Trim waste here
+          - generic:
+            - generic: Build the footprint
+        - generic:
+          - generic:
+            - generic: "1"
+          - generic:
+            - generic: "2"
+          - generic:
+            - generic: "3"
+          - generic:
+            - generic: "4"
+        - generic:
+          - generic: "Saved: $0/mo"
+      - generic:
+        - generic:
+          - strong: Inform
+          - generic: Gain visibility into cloud costs
+        - generic:
+          - strong: Optimize
+          - generic: Reduce unnecessary cloud spending
+        - generic:
+          - strong: Operate
+          - generic: Embed FinOps practices into culture
+      - 'button "Inform: gain visibility into cloud costs" [ref=e98] [cursor=pointer]'
+      - 'button "Optimize: reduce unnecessary cloud spending" [ref=e99] [cursor=pointer]'
+      - 'button "Operate: embed FinOps practices into culture" [ref=e100] [cursor=pointer]'
+      - button "Kubernetes cluster hub" [disabled] [ref=e101]
+      - status:
+        - button "Exit phase": ×
+      - dialog "All Three Phases Complete":
+        - heading "All Three Phases Complete" [level=2]
+        - paragraph: Every phase acts on the same running infrastructure — your Kubernetes cluster.
+        - table:
+          - rowgroup:
+            - row "Phase Takeaway":
+              - columnheader "Phase"
+              - columnheader "Takeaway"
+          - rowgroup:
+            - row "Inform See costs, owners, and orphans before acting":
+              - cell "Inform"
+              - cell "See costs, owners, and orphans before acting"
+            - row "Optimize Trim measurable waste":
+              - cell "Optimize"
+              - cell "Trim measurable waste"
+            - row "Operate Embed practice in culture and automation":
+              - cell "Operate"
+              - cell "Embed practice in culture and automation"
+        - button "Play again"
+    - paragraph [ref=e102]:
+      - text: Click the
+      - strong [ref=e103]: binoculars
+      - text: ","
+      - strong [ref=e104]: sailboat
+      - text: ","
+      - strong [ref=e105]: boot
+      - text: — drag blocks to play.

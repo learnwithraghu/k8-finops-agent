@@ -1,0 +1,105 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - 'heading "Section 01: Cluster Foundation Builder" [level=1] [ref=e4]'
+      - generic [ref=e5]: Recall the foundation chain from the demos — then Run Flow
+    - generic [ref=e6]:
+      - button "Need a hint?" [active] [ref=e7] [cursor=pointer]
+      - button "Auto Solve" [ref=e8] [cursor=pointer]
+      - button "Reset" [ref=e9] [cursor=pointer]
+      - button "▶ Run Flow" [ref=e10] [cursor=pointer]
+  - generic [ref=e11]:
+    - complementary [ref=e12]:
+      - generic [ref=e13]:
+        - heading "Available" [level=2] [ref=e14]
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - img [ref=e18]
+            - generic [ref=e20]: Kind
+          - generic [ref=e21]:
+            - img [ref=e23]
+            - generic [ref=e25]: LLM
+          - generic [ref=e26]:
+            - img [ref=e28]
+            - generic [ref=e30]: kubectl
+          - generic [ref=e31]:
+            - img [ref=e33]
+            - generic [ref=e35]: booking-api
+          - generic [ref=e36]:
+            - img [ref=e38]
+            - generic [ref=e40]: finops-cluster
+          - generic [ref=e41]:
+            - img [ref=e43]
+            - generic [ref=e45]: airline
+          - generic [ref=e46]:
+            - img [ref=e48]
+            - generic [ref=e50]: Docker
+          - generic [ref=e51]:
+            - img [ref=e53]
+            - generic [ref=e55]: FinOps Agent
+          - generic [ref=e56]:
+            - img [ref=e58]
+            - generic [ref=e60]: MCP Server
+          - generic [ref=e61]:
+            - img [ref=e63]
+            - generic [ref=e65]: inventory
+          - generic [ref=e66]:
+            - img [ref=e68]
+            - generic [ref=e70]: payment
+          - generic [ref=e71]:
+            - img [ref=e73]
+            - generic [ref=e75]: flight-search
+          - generic [ref=e76]:
+            - img [ref=e78]
+            - generic [ref=e80]: Helm
+      - generic [ref=e81]:
+        - heading "On canvas" [level=2] [ref=e82]
+        - generic [ref=e84]: Nothing placed yet
+      - generic [ref=e85]:
+        - text: Placed components move to
+        - strong [ref=e86]: On canvas
+        - text: . Drag them to reassign slots.
+        - strong [ref=e87]: Run Flow
+        - text: validates your work.
+    - generic [ref=e88]:
+      - generic [ref=e90]:
+        - generic [ref=e91]: Foundation chain
+        - generic [ref=e92]: Airline namespaces
+        - img
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]: Step 1
+            - generic [ref=e96]: Runs containers on your laptop
+          - generic [ref=e97]:
+            - generic [ref=e98]: Step 2
+            - generic [ref=e99]: Spins up a local Kubernetes cluster
+          - generic [ref=e100]:
+            - generic [ref=e101]: Step 3
+            - generic [ref=e102]: Command-line access to the cluster
+          - generic [ref=e103]:
+            - generic [ref=e104]: Step 4
+            - generic [ref=e105]: Name of your training cluster
+          - generic [ref=e106]:
+            - generic [ref=e107]: Step 5
+            - generic [ref=e108]: Handles ticket reservations
+          - generic [ref=e109]:
+            - generic [ref=e110]: Step 6
+            - generic [ref=e111]: Searches available flights
+          - generic [ref=e112]:
+            - generic [ref=e113]: Step 7
+            - generic [ref=e114]: Tracks seats and routes
+          - generic [ref=e115]:
+            - generic [ref=e116]: Step 8
+            - generic [ref=e117]: Collecting money service
+          - generic [ref=e118]:
+            - generic [ref=e119]: Step 9
+            - generic [ref=e120]: Parent namespace for airline apps
+      - generic [ref=e121]:
+        - button "Zoom out" [ref=e122] [cursor=pointer]: −
+        - button "Zoom in" [ref=e123] [cursor=pointer]: +
+        - button "Fit" [ref=e124] [cursor=pointer]
+        - button "Center" [ref=e125] [cursor=pointer]
+      - status:
+        - generic: Hint
+        - generic: This is the first link in the foundation chain — everything runs on top of it.
+      - generic: Drag components onto the slots — order matters
