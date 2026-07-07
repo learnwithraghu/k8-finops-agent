@@ -83,4 +83,27 @@ kubectl get pvc -n booking-api
 
 ---
 
+### 7) Access the Booking UI (Skyscanner-style)
+
+The `booking-api` now serves a full Skyscanner-style flight booking wizard with 5 steps:
+
+```bash
+kubectl port-forward -n booking-api svc/booking-api 8080:8080 --address 127.0.0.1
+```
+
+Then open **http://booking-api.local:8080** in your browser.
+
+> *Note: Add `127.0.0.1 booking-api.local` to your `/etc/hosts` if needed, or access directly via `http://localhost:8080`.*
+
+**The booking wizard includes:**
+- **Step 1:** Search flights (origin, destination, date, passengers)
+- **Step 2:** Select from mock flight results
+- **Step 3:** Enter passenger details
+- **Step 4:** Enter payment info (card preview updates live)
+- **Step 5:** Confirmation with booking ID
+
+> *Talking point: "This UI is served directly from the booking-api nginx container — no separate frontend deployment needed. The ConfigMap holds both the nginx config and the HTML/JS, mounted as a volume. This is a lightweight pattern for demos."*
+
+---
+
 **Next:** Resources are healthy. Next we go deeper into one workload — describe, logs, exec → `2_guide.md`

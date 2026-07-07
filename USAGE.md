@@ -109,6 +109,18 @@ kubectl get all -n payment
 - payment-processor (missing tier, application)
 - inventory-service (properly tagged - baseline)
 
+**Access the Booking UI:**
+```bash
+kubectl port-forward -n booking-api svc/booking-api 8080:8080 --address 127.0.0.1
+```
+Then open http://localhost:8080 in your browser to see the Skyscanner-style flight booking wizard.
+
+**Expected output:**
+- flight-search-service (missing cost-center, owner)
+- booking-api (serves a 5-step booking UI via nginx ConfigMap)
+- payment-processor (missing tier, application)
+- inventory-service (properly tagged - baseline)
+
 ## Step 5: Build the FinOps Agent Docker Image
 
 ```bash

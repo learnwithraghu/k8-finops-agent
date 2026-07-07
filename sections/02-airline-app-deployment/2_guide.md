@@ -66,6 +66,20 @@ kubectl exec -it -n flight-search deploy/flight-search-service -- sh
 
 ---
 
+### 6) Inspect the booking-api UI
+
+The `booking-api` deployment serves a Skyscanner-style UI directly from nginx. The HTML and nginx config are stored in a ConfigMap and mounted as volumes.
+
+```bash
+kubectl describe configmap booking-api-config -n booking-api
+```
+
+**What it does:** Shows the ConfigMap keys — notice `nginx.conf` and `index.html` are mounted into the container, replacing the default nginx page.
+
+> *Talking point: "The booking-api isn't a real backend — it's nginx serving a static UI. The UI makes API calls that return mock data from the nginx config itself. No database needed for this demo."*
+
+---
+
 **Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **namespace stack** — deploy gate first, then resources inside the booking-api box. Use **Need a hint?** if stuck, then press **Deploy & Inspect** to validate.
 
 **Next:** App is live and you can inspect it. Next section simulates a payment failure → `sections/02a-payment-gateway-down`

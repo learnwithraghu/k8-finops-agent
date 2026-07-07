@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: booking-api
+  namespace: booking-api
+  labels:
+    app.kubernetes.io/name: booking-api
+    app.kubernetes.io/tier: frontend
+    cost-center: booking-engine
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: booking-api.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: booking-api
+            port:
+              number: 8080

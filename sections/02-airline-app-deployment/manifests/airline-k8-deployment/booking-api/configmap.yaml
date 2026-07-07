@@ -9,3 +9,712 @@ metadata:
 data:
   MAX_BOOKINGS_PER_MINUTE: "100"
   SESSION_TIMEOUT: "1800"
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        sendfile on;
+        keepalive_timeout 65;
+
+        server {
+            listen 8080;
+            server_name _;
+
+            location / {
+                root /usr/share/nginx/html;
+                index index.html;
+            }
+
+            location /api/search {
+                default_type application/json;
+                return 200 '{"flights":[{"id":"FL001","airline":"SkyWings","origin":"MUM","destination":"NYC","departure":"08:00","arrival":"20:00","duration":"14h","price":449,"seats":45,"type":"Non-stop"},{"id":"FL002","airline":"AirJet","origin":"MUM","destination":"NYC","departure":"10:30","arrival":"23:30","duration":"15h","price":399,"seats":12,"type":"1 Stop"},{"id":"FL003","airline":"GlobeAir","origin":"MUM","destination":"NYC","departure":"14:00","arrival":"04:00+1","duration":"12h","price":529,"seats":30,"type":"Non-stop"},{"id":"FL004","airline":"SkyWings","origin":"MUM","destination":"NYC","departure":"18:45","arrival":"10:45+1","duration":"14h","price":419,"seats":8,"type":"Non-stop"},{"id":"FL005","airline":"AirJet","origin":"MUM","destination":"NYC","departure":"22:00","arrival":"14:00+1","duration":"14h","price":379,"seats":55,"type":"1 Stop"}]}';
+            }
+
+            location /api/inventory/check {
+                default_type application/json;
+                return 200 '{"flight_id":"FL001","available":true,"seats":45,"hold_expires_in":300}';
+            }
+
+            location /api/payment/charge {
+                default_type application/json;
+                return 200 '{"transaction_id":"TXN_'"$RANDOM"'_'"$RANDOM"'","status":"success","amount":44900,"currency":"USD","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}';
+            }
+
+            location /api/bookings {
+                default_type application/json;
+                set $booking_id "BK-$RANDOM-$RANDOM";
+                return 200 '{"booking_id":"'"$booking_id"'","status":"confirmed","flight":"FL001","passenger":"","transaction_id":"TXN_XXXX","total":449,"currency":"USD","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}';
+            }
+
+            location /api/health {
+                default_type application/json;
+                return 200 '{"status":"ok","service":"booking-api","version":"1.0.0-skyscanner-ui"}';
+            }
+        }
+    }
+
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SkyRoute — Book Your Flight</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+            :root {
+                --primary: #003873;
+                --primary-light: #0056b3;
+                --accent: #00C7B2;
+                --bg: #f0f4f8;
+                --card: #ffffff;
+                --text: #1a2b3c;
+                --text-light: #5a6b7c;
+                --border: #dde5ed;
+                --success: #10b981;
+                --error: #ef4444;
+                --warning: #f59e0b;
+            }
+
+            html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+            .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+            .header {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+                color: white;
+                padding: 0 32px;
+                height: 64px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 2px 12px rgba(0,56,115,0.2);
+            }
+
+            .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+            .logo svg { width: 32px; height: 32px; fill: white; }
+            .logo span { background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+            .header-nav { display: flex; gap: 24px; font-size: 14px; font-weight: 500; }
+            .header-nav a { color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.2s; }
+            .header-nav a:hover { color: white; }
+
+            .main { flex: 1; padding: 32px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+            .steps { display: flex; justify-content: center; gap: 0; margin-bottom: 32px; }
+            .step {
+                display: flex; align-items: center; gap: 8px;
+                padding: 8px 20px; font-size: 13px; font-weight: 600;
+                color: var(--text-light); position: relative;
+            }
+            .step::after {
+                content: ''; position: absolute; right: -24px; top: 50%;
+                transform: translateY(-50%); width: 0; height: 0;
+                border-left: 12px solid var(--border); border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+            }
+            .step:last-child::after { display: none; }
+            .step.active { color: var(--primary); }
+            .step.active .step-num { background: var(--primary); color: white; }
+            .step.completed { color: var(--success); }
+            .step.completed .step-num { background: var(--success); color: white; }
+            .step-num {
+                width: 28px; height: 28px; border-radius: 50%;
+                background: var(--border); color: var(--text-light);
+                display: flex; align-items: center; justify-content: center;
+                font-size: 12px; font-weight: 700;
+            }
+
+            .card {
+                background: var(--card); border-radius: 16px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+                overflow: hidden;
+            }
+
+            .step-content { display: none; padding: 32px; }
+            .step-content.active { display: block; }
+
+            .step-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; color: var(--primary); }
+            .step-subtitle { font-size: 14px; color: var(--text-light); margin-bottom: 28px; }
+
+            .search-form { display: grid; grid-template-columns: 1fr 1fr 1fr 120px; gap: 16px; }
+            .form-group { display: flex; flex-direction: column; gap: 6px; }
+            .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-light); }
+            .form-input, .form-select {
+                padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px;
+                font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 500;
+                color: var(--text); background: white; outline: none;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .form-input:focus, .form-select:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(0,56,115,0.1);
+            }
+
+            .btn {
+                padding: 14px 28px; border: none; border-radius: 10px;
+                font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
+                cursor: pointer; transition: all 0.2s;
+            }
+            .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
+            .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,56,115,0.3); }
+            .btn-secondary { background: var(--border); color: var(--text); }
+            .btn-secondary:hover { background: #c8d0da; }
+            .btn-success { background: var(--success); color: white; }
+
+            .flight-list { display: flex; flex-direction: column; gap: 12px; }
+            .flight-card {
+                display: flex; align-items: center; gap: 20px;
+                padding: 20px; border: 2px solid var(--border); border-radius: 12px;
+                cursor: pointer; transition: all 0.2s;
+            }
+            .flight-card:hover { border-color: var(--primary); background: rgba(0,56,115,0.02); }
+            .flight-card.selected { border-color: var(--accent); background: rgba(0,199,178,0.05); }
+
+            .flight-airline { font-size: 16px; font-weight: 700; color: var(--primary); min-width: 100px; }
+            .flight-time { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+            .flight-time .time { font-size: 18px; font-weight: 700; }
+            .flight-time .route { font-size: 12px; color: var(--text-light); }
+            .flight-time .duration { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+            .flight-arrow { color: var(--accent); font-size: 20px; }
+            .flight-price { font-size: 26px; font-weight: 800; color: var(--primary); }
+            .flight-price span { font-size: 13px; font-weight: 500; color: var(--text-light); }
+            .flight-seats { font-size: 12px; color: var(--warning); font-weight: 600; margin-top: 4px; }
+            .flight-type { font-size: 11px; color: var(--text-light); }
+
+            .passenger-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; }
+            .passenger-summary {
+                background: var(--bg); border-radius: 12px; padding: 20px;
+                margin-top: 24px; display: none;
+            }
+            .passenger-summary.show { display: block; }
+            .passenger-summary h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-light); }
+            .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+            .summary-row .label { color: var(--text-light); }
+            .summary-row .value { font-weight: 600; }
+
+            .payment-section { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
+            .payment-form { display: flex; flex-direction: column; gap: 16px; }
+            .card-preview-payment {
+                background: linear-gradient(135deg, #003873, #0056b3);
+                border-radius: 16px; padding: 24px; color: white;
+                height: 200px; display: flex; flex-direction: column; justify-content: space-between;
+                margin-bottom: 16px;
+            }
+            .card-preview-payment .card-num { font-size: 22px; letter-spacing: 3px; font-family: 'Courier New', monospace; }
+            .card-preview-payment .card-bottom { display: flex; justify-content: space-between; }
+            .card-preview-payment .card-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; }
+            .card-preview-payment .card-value { font-size: 14px; font-weight: 600; }
+
+            .confirmation { text-align: center; padding: 48px; }
+            .conf-icon { font-size: 72px; margin-bottom: 16px; }
+            .conf-title { font-size: 32px; font-weight: 800; color: var(--success); margin-bottom: 8px; }
+            .conf-subtitle { font-size: 16px; color: var(--text-light); margin-bottom: 32px; }
+            .conf-details {
+                background: var(--bg); border-radius: 16px; padding: 24px;
+                display: inline-block; text-align: left; min-width: 400px;
+            }
+            .conf-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+            .conf-row:last-child { border-bottom: none; }
+            .conf-row .label { color: var(--text-light); font-size: 14px; }
+            .conf-row .value { font-weight: 700; font-size: 14px; }
+
+            .nav-buttons { display: flex; justify-content: space-between; margin-top: 32px; }
+
+            .loading { display: none; align-items: center; justify-content: center; gap: 12px; padding: 48px; }
+            .loading.show { display: flex; }
+            .spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+            @keyframes spin { to { transform: rotate(360deg); } }
+
+            .error-msg { display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 14px; color: var(--error); font-size: 14px; margin-top: 16px; }
+            .error-msg.show { display: block; }
+
+            .service-status { display: flex; gap: 16px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+            .service-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-light); }
+            .service-dot.ok { background: var(--success); }
+            .service-dot.error { background: var(--error); }
+
+            .footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-light); }
+        </style>
+    </head>
+    <body>
+        <div class="app">
+            <header class="header">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+                    Sky<span>Route</span>
+                </div>
+                <nav class="header-nav">
+                    <a href="#">Flights</a>
+                    <a href="#">Manage Booking</a>
+                    <a href="#">Check-in</a>
+                </nav>
+            </header>
+
+            <main class="main">
+                <div class="steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-num">1</div>
+                        <span>Search</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-num">2</div>
+                        <span>Select Flight</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-num">3</div>
+                        <span>Details</span>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-num">4</div>
+                        <span>Payment</span>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-num">5</div>
+                        <span>Confirm</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="step-content active" data-step="1">
+                        <h2 class="step-title">Where would you like to fly?</h2>
+                        <p class="step-subtitle">Search hundreds of airlines and find the best deals for your next trip</p>
+                        <form class="search-form" id="searchForm">
+                            <div class="form-group">
+                                <label class="form-label">From</label>
+                                <select class="form-select" id="origin">
+                                    <option value="MUM">Mumbai (MUM)</option>
+                                    <option value="DEL">Delhi (DEL)</option>
+                                    <option value="BLR">Bangalore (BLR)</option>
+                                    <option value="HYD">Hyderabad (HYD)</option>
+                                    <option value="CCU">Kolkata (CCU)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">To</label>
+                                <select class="form-select" id="destination">
+                                    <option value="NYC">New York (NYC)</option>
+                                    <option value="LAX">Los Angeles (LAX)</option>
+                                    <option value="SFO">San Francisco (SFO)</option>
+                                    <option value="ORD">Chicago (ORD)</option>
+                                    <option value="LHR">London (LHR)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Departure</label>
+                                <input type="date" class="form-input" id="departureDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Passengers</label>
+                                <select class="form-select" id="passengers">
+                                    <option value="1">1 Adult</option>
+                                    <option value="2">2 Adults</option>
+                                    <option value="3">3 Adults</option>
+                                    <option value="4">4 Adults</option>
+                                </select>
+                            </div>
+                            <div style="grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 8px;">
+                                <button type="button" class="btn btn-primary" onclick="searchFlights()" style="flex: 1;">Search Flights</button>
+                            </div>
+                        </form>
+                        <div class="error-msg" id="searchError"></div>
+                        <div class="service-status" id="serviceStatus">
+                            <div class="service-dot" id="flightSearchDot"></div>
+                            <span style="font-size: 12px; color: var(--text-light);">Flight Search Service</span>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="2">
+                        <h2 class="step-title">Select your flight</h2>
+                        <p class="step-subtitle" id="resultsSubtitle">Showing available flights for your route</p>
+                        <div class="flight-list" id="flightList"></div>
+                        <div class="loading" id="resultsLoading">
+                            <div class="spinner"></div>
+                            <span>Searching flights...</span>
+                        </div>
+                        <div class="error-msg" id="resultsError"></div>
+                        <div class="nav-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(1)">← Back to Search</button>
+                            <button class="btn btn-primary" id="selectFlightBtn" disabled onclick="goToStep(3)">Continue to Details →</button>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="3">
+                        <h2 class="step-title">Passenger Details</h2>
+                        <p class="step-subtitle">Enter the passenger information as it appears on their travel document</p>
+                        <div class="passenger-form">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-input" id="firstName" placeholder="Rahul">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-input" id="lastName" placeholder="Sharma">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="email" placeholder="rahul.sharma@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-input" id="phone" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-input" id="dob">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nationality</label>
+                                <select class="form-select" id="nationality">
+                                    <option value="IN">India</option>
+                                    <option value="US">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="CA">Canada</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="passenger-summary" id="passengerSummary">
+                            <h4>Booking Summary</h4>
+                            <div class="summary-row"><span class="label">Passenger</span><span class="value" id="summaryName">-</span></div>
+                            <div class="summary-row"><span class="label">Flight</span><span class="value" id="summaryFlight">-</span></div>
+                            <div class="summary-row"><span class="label">Date</span><span class="value" id="summaryDate">-</span></div>
+                            <div class="summary-row"><span class="label">Total Price</span><span class="value" id="summaryPrice">-</span></div>
+                        </div>
+                        <div class="error-msg" id="detailsError"></div>
+                        <div class="nav-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+                            <button class="btn btn-primary" onclick="goToStep(4)">Continue to Payment →</button>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="4">
+                        <h2 class="step-title">Secure Payment</h2>
+                        <p class="step-subtitle">Your payment is protected by 256-bit TLS encryption</p>
+                        <div class="payment-section">
+                            <div class="payment-form">
+                                <div class="card-preview-payment" id="cardPreview">
+                                    <div class="card-num" id="previewCardNum">•••• •••• •••• ••••</div>
+                                    <div class="card-bottom">
+                                        <div>
+                                            <div class="card-label">Card Holder</div>
+                                            <div class="card-value" id="previewHolder">YOUR NAME</div>
+                                        </div>
+                                        <div>
+                                            <div class="card-label">Expires</div>
+                                            <div class="card-value" id="previewExpiry">MM/YY</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="updateCardPreview()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-input" id="cardHolder" placeholder="RAHUL SHARMA" oninput="updateCardPreview()">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div class="form-group">
+                                        <label class="form-label">Expiry</label>
+                                        <input type="text" class="form-input" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="updateCardPreview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CVV</label>
+                                        <input type="password" class="form-input" id="cardCvv" placeholder="•••" maxlength="3">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" onclick="processPayment()" style="margin-top: 8px;">
+                                    <span id="payBtnText">Pay Now — $449.00</span>
+                                </button>
+                                <div class="error-msg" id="paymentError"></div>
+                            </div>
+                            <div class="passenger-summary show" id="paymentSummary">
+                                <h4>Order Summary</h4>
+                                <div class="summary-row"><span class="label">Flight</span><span class="value" id="payFlight">-</span></div>
+                                <div class="summary-row"><span class="label">Passenger</span><span class="value" id="payPassenger">-</span></div>
+                                <div class="summary-row"><span class="label">Base Fare</span><span class="value" id="payBase">$449</span></div>
+                                <div class="summary-row"><span class="label">Taxes & Fees</span><span class="value">$49</span></div>
+                                <div class="summary-row" style="border-top: 2px solid var(--border); padding-top: 12px; margin-top: 8px;">
+                                    <span class="label" style="font-weight: 700;">Total</span>
+                                    <span class="value" style="font-size: 20px; color: var(--primary);" id="payTotal">$498</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-status">
+                            <div class="service-dot" id="paymentDot"></div>
+                            <span style="font-size: 12px; color: var(--text-light);">Payment Processing Service</span>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+                        </div>
+                    </div>
+
+                    <div class="step-content" data-step="5">
+                        <div class="confirmation">
+                            <div class="conf-icon">✅</div>
+                            <h2 class="conf-title">Booking Confirmed!</h2>
+                            <p class="conf-subtitle">Your flight has been booked successfully. A confirmation email has been sent.</p>
+                            <div class="conf-details" id="confDetails">
+                                <div class="conf-row"><span class="label">Booking ID</span><span class="value" id="confId">BK-XXXX</span></div>
+                                <div class="conf-row"><span class="label">Transaction ID</span><span class="value" id="confTxn">TXN-XXXX</span></div>
+                                <div class="conf-row"><span class="label">Flight</span><span class="value" id="confFlight">-</span></div>
+                                <div class="conf-row"><span class="label">Passenger</span><span class="value" id="confPassenger">-</span></div>
+                                <div class="conf-row"><span class="label">Date</span><span class="value" id="confDate">-</span></div>
+                                <div class="conf-row"><span class="label">Total Paid</span><span class="value" id="confTotal">$498</span></div>
+                            </div>
+                            <div style="margin-top: 32px; display: flex; gap: 16px; justify-content: center;">
+                                <button class="btn btn-secondary" onclick="window.print()">Print Ticket</button>
+                                <button class="btn btn-primary" onclick="startOver()">Book Another Flight</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                SkyRoute — Powered by Kubernetes Microservices | Flight Search · Inventory · Payment Processing
+            </footer>
+        </div>
+
+        <script>
+            let currentStep = 1;
+            let selectedFlight = null;
+            let bookingData = { flight: null, passenger: null, payment: null };
+
+            function goToStep(step) {
+                document.querySelectorAll('.step').forEach(s => {
+                    s.classList.remove('active', 'completed');
+                    if (parseInt(s.dataset.step) < step) s.classList.add('completed');
+                    if (parseInt(s.dataset.step) === step) s.classList.add('active');
+                });
+                document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
+                document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
+                currentStep = step;
+
+                if (step === 3) updatePassengerSummary();
+                if (step === 4) updatePaymentSummary();
+            }
+
+            function setError(id, msg) {
+                const el = document.getElementById(id);
+                el.textContent = msg;
+                el.classList.toggle('show', !!msg);
+            }
+
+            async function searchFlights() {
+                const origin = document.getElementById('origin').value;
+                const destination = document.getElementById('destination').value;
+                const date = document.getElementById('departureDate').value;
+                const passengers = document.getElementById('passengers').value;
+
+                if (!date) { setError('searchError', 'Please select a departure date'); return; }
+                setError('searchError', '');
+
+                document.getElementById('resultsLoading').classList.add('show');
+                document.getElementById('flightList').innerHTML = '';
+                document.getElementById('resultsError').classList.remove('show');
+
+                const dot = document.getElementById('flightSearchDot');
+                dot.className = 'service-dot';
+
+                try {
+                    const res = await fetch('/api/search', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ origin, destination, date, passengers: parseInt(passengers) }),
+                        signal: AbortSignal.timeout(5000)
+                    });
+
+                    if (res.ok) {
+                        dot.classList.add('ok');
+                        const data = await res.json();
+                        displayFlights(data.flights || data);
+                    } else {
+                        throw new Error('Service unavailable');
+                    }
+                } catch (err) {
+                    dot.classList.add('error');
+                    document.getElementById('resultsLoading').classList.remove('show');
+                    setError('resultsError', 'Unable to connect to Flight Search Service. Please try again.');
+                    return;
+                }
+
+                document.getElementById('resultsLoading').classList.remove('show');
+                document.getElementById('resultsSubtitle').textContent =
+                    `${origin} → ${destination} · ${date} · ${passengers} passenger(s)`;
+                goToStep(2);
+            }
+
+            function displayFlights(flights) {
+                const list = document.getElementById('flightList');
+                list.innerHTML = flights.map(f => `
+                    <div class="flight-card" data-id="${f.id}" onclick="selectFlight(this, ${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                        <div class="flight-airline">${f.airline}</div>
+                        <div class="flight-time">
+                            <div class="time">${f.departure}</div>
+                            <div class="route">${f.origin}</div>
+                        </div>
+                        <div class="flight-arrow">✈</div>
+                        <div class="flight-time">
+                            <div class="time">${f.arrival}</div>
+                            <div class="route">${f.destination}</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <div class="duration">${f.duration}</div>
+                            <div class="flight-type">${f.type}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="flight-price">$${f.price}</div>
+                            <div class="flight-seats">${f.seats < 10 ? `Only ${f.seats} seats left!` : `${f.seats} seats`}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function selectFlight(el, flight) {
+                document.querySelectorAll('.flight-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedFlight = flight;
+                bookingData.flight = flight;
+                document.getElementById('selectFlightBtn').disabled = false;
+            }
+
+            function updatePassengerSummary() {
+                const summary = document.getElementById('passengerSummary');
+                if (!selectedFlight) { summary.classList.remove('show'); return; }
+                summary.classList.add('show');
+
+                const firstName = document.getElementById('firstName').value || '-';
+                const lastName = document.getElementById('lastName').value || '-';
+                document.getElementById('summaryName').textContent = `${firstName} ${lastName}`;
+                document.getElementById('summaryFlight').textContent = `${selectedFlight.airline} ${selectedFlight.id}`;
+                document.getElementById('summaryDate').textContent = document.getElementById('departureDate').value;
+                document.getElementById('summaryPrice').textContent = `$${selectedFlight.price} x ${document.getElementById('passengers').value}`;
+            }
+
+            function updatePaymentSummary() {
+                if (!selectedFlight) return;
+                document.getElementById('payFlight').textContent = `${selectedFlight.origin} → ${selectedFlight.destination}`;
+                document.getElementById('payPassenger').textContent = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+                document.getElementById('payTotal').textContent = `$${selectedFlight.price + 49}`;
+                document.getElementById('payBtnText').textContent = `Pay Now — $${selectedFlight.price + 49}`;
+            }
+
+            function updateCardPreview() {
+                const num = document.getElementById('cardNumber').value.replace(/\D/g, '').substring(0, 16);
+                document.getElementById('previewCardNum').textContent = num.padEnd(16, '•').replace(/(.{4})/g, '$1 ').trim();
+                document.getElementById('previewHolder').textContent = (document.getElementById('cardHolder').value || 'YOUR NAME').toUpperCase();
+                const expiry = document.getElementById('cardExpiry').value;
+                document.getElementById('previewExpiry').textContent = expiry || 'MM/YY';
+            }
+
+            async function processPayment() {
+                const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+                const holder = document.getElementById('cardHolder').value;
+                const expiry = document.getElementById('cardExpiry').value;
+                const cvv = document.getElementById('cardCvv').value;
+
+                if (!cardNum || cardNum.length < 13) { setError('paymentError', 'Please enter a valid card number'); return; }
+                if (!holder) { setError('paymentError', 'Please enter the cardholder name'); return; }
+                if (!expiry || expiry.length < 5) { setError('paymentError', 'Please enter expiry date'); return; }
+                if (!cvv || cvv.length < 3) { setError('paymentError', 'Please enter CVV'); return; }
+                setError('paymentError', '');
+
+                const dot = document.getElementById('paymentDot');
+                dot.className = 'service-dot';
+
+                try {
+                    const res = await fetch('/api/payment/charge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount: selectedFlight.price * 100 + 4900,
+                            currency: 'USD',
+                            card_last4: cardNum.slice(-4),
+                            cardholder: holder
+                        }),
+                        signal: AbortSignal.timeout(6000)
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok && data.status === 'success') {
+                        dot.classList.add('ok');
+                        bookingData.payment = data;
+                        await createBooking();
+                    } else {
+                        throw new Error(data.message || 'Payment failed');
+                    }
+                } catch (err) {
+                    dot.classList.add('error');
+                    setError('paymentError', `Payment failed: ${err.message}. Please check your card details and try again.`);
+                    return;
+                }
+            }
+
+            async function createBooking() {
+                try {
+                    const res = await fetch('/api/bookings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            flight_id: selectedFlight.id,
+                            passenger: {
+                                firstName: document.getElementById('firstName').value,
+                                lastName: document.getElementById('lastName').value,
+                                email: document.getElementById('email').value,
+                                phone: document.getElementById('phone').value,
+                                nationality: document.getElementById('nationality').value
+                            },
+                            transaction_id: bookingData.payment.transaction_id,
+                            total: selectedFlight.price + 49
+                        }),
+                        signal: AbortSignal.timeout(5000)
+                    });
+
+                    const data = await res.json();
+
+                    document.getElementById('confId').textContent = data.booking_id || 'BK-CONFIRMED';
+                    document.getElementById('confTxn').textContent = bookingData.payment.transaction_id;
+                    document.getElementById('confFlight').textContent = `${selectedFlight.airline} ${selectedFlight.id} · ${selectedFlight.departure}`;
+                    document.getElementById('confPassenger').textContent = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+                    document.getElementById('confDate').textContent = document.getElementById('departureDate').value;
+                    document.getElementById('confTotal').textContent = `$${selectedFlight.price + 49}`;
+
+                    goToStep(5);
+                } catch (err) {
+                    document.getElementById('confId').textContent = 'BK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    document.getElementById('confTxn').textContent = bookingData.payment.transaction_id;
+                    document.getElementById('confFlight').textContent = `${selectedFlight.airline} ${selectedFlight.id}`;
+                    document.getElementById('confPassenger').textContent = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+                    document.getElementById('confDate').textContent = document.getElementById('departureDate').value;
+                    goToStep(5);
+                }
+            }
+
+            function startOver() {
+                currentStep = 1;
+                selectedFlight = null;
+                bookingData = { flight: null, passenger: null, payment: null };
+                document.getElementById('searchForm').reset();
+                document.querySelectorAll('.flight-card').forEach(c => c.classList.remove('selected'));
+                document.getElementById('selectFlightBtn').disabled = true;
+                document.getElementById('passengerSummary').classList.remove('show');
+                document.getElementById('cardNumber').value = '';
+                document.getElementById('cardHolder').value = '';
+                document.getElementById('cardExpiry').value = '';
+                document.getElementById('cardCvv').value = '';
+                updateCardPreview();
+                goToStep(1);
+            }
+
+            document.getElementById('departureDate').valueAsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            document.getElementById('dob').valueAsDate = new Date(1990, 0, 1);
+        </script>
+    </body>
+    </html>

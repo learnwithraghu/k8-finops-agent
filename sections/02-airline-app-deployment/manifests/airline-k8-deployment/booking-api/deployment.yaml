@@ -31,3 +31,23 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "250m"
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: html-content
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: booking-api-config
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+      - name: html-content
+        configMap:
+          name: booking-api-config
+          items:
+          - key: index.html
+            path: index.html

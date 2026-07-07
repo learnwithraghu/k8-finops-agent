@@ -47,3 +47,4 @@ The learner can:
 3. Describe a deployment and read its events
 4. Tail logs from a running pod
 5. Exec into a container and run a command
+6. Access the Skyscanner-style booking UI and walk through the full flight booking flow
