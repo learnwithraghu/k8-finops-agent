@@ -1,85 +1,57 @@
-# Demo 2: Workload Deep Dive
+# Demo 2: Label Inconsistencies Deep Dive
 
 **Time Budget:** 2–3 mins
 
-**Narrative:** Let's inspect a single service end-to-end. These five commands cover 90% of on-call triage — describe the deployment, find the pod, read its events, tail its logs, and exec into it.
+**Narrative:** In Kubernetes, labels are the glue that connects resources together. When services fail to discover pods, or deployments fail to match replica sets, the culprit is often a mismatched label. Let's practice inspecting configs to find label inconsistencies.
 
 ---
 
-### 1) Describe the deployment
+### 1) Open the Deployment Configuration
+
+Let's start by looking at a deployment configuration to see what labels are defined. 
 
 ```bash
-kubectl describe deployment flight-search-service -n flight-search
+cat manifests/airline-k8-deployment/flight-search-service/deployment.yaml
 ```
 
-**What it does:** Shows the deployment spec — labels, pod template, replica count, strategy, and recent events. This is your first stop when something is wrong.
+**What to look for:** Notice the `spec.selector.matchLabels` and compare them with the labels under `spec.template.metadata.labels`. These must match perfectly for the Deployment to manage its Pods. 
 
-> *Talking point: "Events at the bottom are gold. If a pod is failing to schedule or pulling a bad image, it shows up here."*
+> *Talking point: "A common mistake during copy-pasting is changing the template labels but forgetting to update the selector labels. This leads to orphan pods."*
 
 ---
 
-### 2) Find the pod name
+### 2) Check the Service Configuration
+
+Next, open the service config that is supposed to route traffic to these pods.
 
 ```bash
-kubectl get pods -n flight-search
+cat manifests/airline-k8-deployment/flight-search-service/service.yaml
 ```
 
-**What it does:** Lists pods. Copy the pod name for the next steps (e.g. `flight-search-service-abc123`).
+**What to look for:** Look at the `spec.selector` in the Service. The Service uses these labels to find the target pods.
+
+> *Talking point: "If the Service selector says `app: flight-search`, but the Pod template has `app: flight-search-svc`, the service won't route traffic to any pods. The endpoints list will be empty."*
 
 ---
 
-### 3) Describe the pod
+### 3) Spotting the Inconsistency
+
+Let's compare them side-by-side using `kubectl` if they are already deployed:
 
 ```bash
-kubectl describe pod <pod-name> -n flight-search
+# Check the labels on the running pods
+kubectl get pods -n flight-search --show-labels
+
+# Check the selector on the service
+kubectl describe svc flight-search-service -n flight-search | grep Selector
 ```
 
-**What it does:** Shows pod-level detail — container status, resource requests, volumes, and events. Replace `<pod-name>` with the actual name from step 2.
+**What it does:** By slowly comparing the output of these two commands, you can often spot subtle typos (like `version: v1` vs `version: v1.0`) or missing labels that break the connection.
 
-> *Expected: Status `Running`, container `Ready`, no warning events.*
+> *Expected: You should identify if the selector labels perfectly match the labels attached to the pods.*
 
 ---
 
-### 4) Tail the logs
+**Try it:** Open your `manifests/airline-k8-deployment/` configs in the editor. Deliberately change a label in `flight-search-service/service.yaml`, deploy it, and watch how the endpoints disappear. Then fix it and watch them recover.
 
-```bash
-kubectl logs -n flight-search deploy/flight-search-service
-```
-
-**What it does:** Streams logs from the pod owned by the deployment. Use `deploy/<name>` to target the deployment — kubectl resolves to the active pod automatically.
-
-> *Talking point: "In production you would use a logging stack. For local dev, `kubectl logs` is fast and enough."*
-
----
-
-### 5) Exec into the container
-
-```bash
-kubectl exec -it -n flight-search deploy/flight-search-service -- sh
-```
-
-**What it does:** Opens an interactive shell inside the running container. You can inspect files, check environment variables, or test network calls from inside the pod.
-
-> *Expected: Shell prompt inside the container. Type `exit` to leave.*
-
-> *Talking point: "This is your last resort when logs are not enough. You can see exactly what the container sees — env vars, mounted files, network reachability."*
-
----
-
-### 6) Inspect the booking-api UI
-
-The `booking-api` deployment serves a Skyscanner-style UI directly from nginx. The HTML and nginx config are stored in a ConfigMap and mounted as volumes.
-
-```bash
-kubectl describe configmap booking-api-config -n booking-api
-```
-
-**What it does:** Shows the ConfigMap keys — notice `nginx.conf` and `index.html` are mounted into the container, replacing the default nginx page.
-
-> *Talking point: "The booking-api isn't a real backend — it's nginx serving a static UI. The UI makes API calls that return mock data from the nginx config itself. No database needed for this demo."*
-
----
-
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **namespace stack** — deploy gate first, then resources inside the booking-api box. Use **Need a hint?** if stuck, then press **Deploy & Inspect** to validate.
-
-**Next:** App is live and you can inspect it. Next section simulates a payment failure → `sections/02a-payment-gateway-down`
+**Next:** Now that you know how to trace label inconsistencies, let's look at more complex failures. Next section simulates a payment failure → `sections/02a-payment-gateway-down`
