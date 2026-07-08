@@ -1,3 +1,13 @@
+# Video: Demo — Start the MCP Gateway (Supergateway Exposes kubectl as HTTP)
+
+**Transcript:** [`transcript/1.md`](transcript/1.md)
+
+**Time Budget:** 3 min
+**Format:** Live terminal demo
+**Prerequisites:** [`transcript/0.md`](transcript/0.md), [`0_prerequisite_guide.md`](0_prerequisite_guide.md) (instructor)
+
+---
+
 # Demo 1: Start the MCP Endpoint
 
 **Time Budget:** 3 mins

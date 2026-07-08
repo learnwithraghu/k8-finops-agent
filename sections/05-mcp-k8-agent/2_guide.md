@@ -1,3 +1,13 @@
+# Video: Demo — Prove the Chain with curl (Health, Handshake, and a Cluster Read)
+
+**Transcript:** [`transcript/2.md`](transcript/2.md)
+
+**Time Budget:** 3–4 min
+**Format:** Live terminal demo
+**Prerequisites:** [`1_guide.md`](1_guide.md) — Supergateway running on port 8000
+
+---
+
 # Demo 2: Validate with curl
 
 **Time Budget:** 3–4 mins
