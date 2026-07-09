@@ -1,4 +1,4 @@
-# Video: Demo — Prove the Chain with curl (Health, Handshake, and a Cluster Read)
+# Video: Demo — Validate the MCP-to-Kubernetes Connection with curl
 
 **Transcript:** [`transcript/2.md`](transcript/2.md)
 

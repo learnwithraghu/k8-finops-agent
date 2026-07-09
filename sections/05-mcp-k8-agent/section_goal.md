@@ -21,7 +21,7 @@ Students watch Video 0, then follow Demos 1 and 2.
 |-------|-------|------|------------|
 | **0** | What is MCP; MCP in Kubernetes; why it fits the Gather stage | 1:30 | `transcript/0.md` |
 | **1** | Start MCP HTTP endpoint via Supergateway | 3 min | `transcript/1.md` |
-| **2** | curl validation — health, handshake, cluster read | 3–4 min | `transcript/2.md` |
+| **2** | Validate MCP-to-Kubernetes connection with curl | 3–4 min | `transcript/2.md` |
 
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
