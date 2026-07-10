@@ -70,6 +70,8 @@ lsof -tiTCP:8000 -sTCP:LISTEN | xargs kill 2>/dev/null || true
 
 ### 6) Start the MCP HTTP endpoint
 
+**What is Supergateway?** The MCP server only speaks through stdin/stdout (like a local program). Supergateway wraps it and turns that into a normal HTTP URL on port 8000 so curl and agents can call it.
+
 In a **dedicated terminal** (leave it running):
 
 ```bash
