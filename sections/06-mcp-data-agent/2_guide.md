@@ -1,60 +1,73 @@
-# Demo 2: Inspect the Snapshot
+# Demo 2: Run `simple_mcp_llm.py` and Observe the Answer
 
 **Time Budget:** 3–4 mins
 
-**Narrative:** Let's see what the agent collected — and what it deliberately leaves out. The snapshot is unstructured on purpose. Analysis happens in Section 07.
+**Narrative:** One prompt — "list all namespaces". MCP reads the cluster, the LLM returns a plain-English summary.
+
+**Prerequisites:** [`0_guide.md`](0_guide.md) — understand the code first.
 
 ---
 
-### 1) Count resources by type
+### 1) Confirm MCP endpoint is alive
 
 ```bash
-cat k8s_metadata.json | jq '[.resources[] | .kind] | group_by(.) | map({kind: .[0], count: length})'
+curl -s http://localhost:8000/healthz
 ```
 
-**What it does:** Groups resources by kind and counts them. Shows the breakdown — how many deployments, pods, services, etc.
+**What it does:** Quick health check before running the agent. If this fails, Supergateway is not running.
 
-> *Talking point: "In a real cluster with hundreds of namespaces, this snapshot would be thousands of lines. The collector handles scale — manual kubectl does not."*
+> *Expected: `ok`*
 
 ---
 
-### 2) Find resources in a specific namespace
+### 2) Confirm LLM configuration
 
 ```bash
-cat k8s_metadata.json | jq '[.resources[] | select(.namespace == "payment")]'
+grep OPENAI .env
 ```
 
-**What it does:** Filters the snapshot to only `payment` namespace resources. Shows what the agent found for that service.
+**What it does:** Shows the OpenAI-compatible endpoint settings. The script reads these at startup.
 
-> *Expected: Deployments, pods, services, and configmaps for the payment service.*
+> *Talking point: "The LLM endpoint is separate from MCP. MCP reads the cluster; the LLM reads the MCP result and writes the answer."*
 
 ---
 
-### 3) Compare to kubectl (spot check)
+### 3) Run the script
 
 ```bash
-kubectl get all -n payment
-kubectl get configmaps -n payment
+python3 sections/06-mcp-data-agent/simple_mcp_llm.py
 ```
 
-**What it does:** Shows the same resources via kubectl. Compare the output to what the agent collected — they should match.
+**What it does:** Calls `kubectl_get` for all namespaces through MCP, then prints a short LLM summary.
 
-> *Talking point: "The agent sees the same data as kubectl. The difference is the agent writes it to a file, structured for downstream processing."*
+> *Expected: A few sentences listing airline namespaces like `booking-api`, `flight-search`, `inventory`, `payment`.*
+
+> *Talking point: "Same `kubectl_get` tool we proved with curl in Section 05 — now driven from Python."*
 
 ---
 
-### 4) Check what is missing
+### 4) Spot-check against kubectl
 
 ```bash
-cat k8s_metadata.json | jq '[.resources[] | select(.labels.owner == null)]'
+kubectl get ns
 ```
 
-**What it does:** Filters resources that have no `owner` label. This is the raw material for FinOps analysis — but the agent does not judge it yet.
+**What it does:** Confirms the LLM's answer matches what kubectl shows.
 
-> *Talking point: "We can see the gaps — missing labels, missing ownership. But the agent does not know what 'good' looks like. That requires policy, and policy requires the LLM. That is Section 07."*
+> *Talking point: "The LLM summarized real cluster data — MCP is the source of truth."*
 
 ---
 
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **collection hub** — MCP spokes merge into one unstructured JSON sink (no LLM). Use **Need a hint?** if stuck, then press **Collect Snapshot** to validate.
+### 5) What we learned
 
-**Next:** Raw data collected. Next we add LLM analysis to produce structured findings → `sections/07-llm-structured-agent`
+- **Prompt in** → `list all namespaces`
+- **MCP out** → raw namespace JSON
+- **LLM** → plain-English answer
+
+> *Talking point: "This answer is useful but unstructured — no severity, no tickets, no policy. Section 07 adds tagging rules and structured findings."*
+
+---
+
+**Optional:** For a full cluster snapshot without the LLM, see `1_guide.md` (`agent.py`).
+
+**Next:** Add policy and structured output → `sections/07-llm-structured-agent`

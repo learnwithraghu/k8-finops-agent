@@ -1,7 +1,7 @@
-# Section 06 Goal: First MCP Data Agent (Prompt → MCP → Unstructured Data)
+# Section 06 Goal: Simple MCP + LLM Agent (Prompt → MCP Tool Call → Answer)
 
 ## Goal
-Build the first agent that takes a prompt, calls MCP tools against the local Kind cluster, and returns unstructured cluster snapshot data. This is the prompt → MCP → raw data loop, with no LLM reasoning and no structured output yet.
+Build the first agentic loop: a prompt goes to an OpenAI-compatible LLM, the LLM chooses `kubectl_get` through MCP, and the script returns a plain-English answer about a namespace. This is the prompt → MCP → LLM answer loop — minimal code, maximum teaching clarity.
 
 ## Prerequisites
 Sections 01–05 complete.
@@ -9,41 +9,47 @@ Sections 01–05 complete.
 You should already have:
 - a working Kind cluster (`finops-cluster`)
 - Supergateway running from Section 05 (port 8000)
+- `.env` with OpenAI-compatible endpoint settings
 
 ## Instructor setup (before the live demo)
-Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive, installs Python deps, and inspects the agent code. Do not walk students through pip install during the live demo.
+Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive, installs Python deps, and inspects `simple_mcp_llm.py`. Do not walk students through pip install during the live demo.
 
 ## Video structure (2 videos)
 | Video | Focus | Time |
-|-------|------------|-------|------|
-| **1** | Agent loop; unstructured output; parser limits | 3–4 min |
-| **2** | Raw JSON is not action; why we stop before LLM | 3–4 min |
+|-------|------------|-------|
+| **1** | Agent loop; LLM tool choice; MCP execution | 3–4 min |
+| **2** | Run and observe; compare to kubectl | 3–4 min |
 
 Transcripts: `transcript/1.md`, `transcript/2.md`
 
 ## Demo structure (2 parts)
 | Demo | Focus | Time |
 |------|-------|------|
-| **1** | Run the data agent, review raw JSON snapshot | 3 min |
-| **2** | Inspect the snapshot, compare to kubectl, discuss why unstructured | 3–4 min |
+| **0** | Walk through `simple_mcp_llm.py` code | 4–5 min |
+| **2** | Run the agent, observe LLM answers, spot-check with kubectl | 3–4 min |
 
-Each demo is one clear beat. Students go from "MCP endpoint exists" to "Python agent producing a cluster snapshot" in under 7 minutes.
+Students go from "MCP endpoint exists" to "LLM-driven namespace query" in under 10 minutes.
+
+**Optional secondary demo:** `1_guide.md` runs `agent.py` for a full unstructured JSON snapshot (no LLM).
 
 ## Scope
 - Reuse the curl-validated MCP endpoint from Section 05
-- Drive MCP `kubectl_get` tool calls from a small Python collector
-- Assemble a raw snapshot (namespaces, deployments, pods, services, PVCs, configmaps)
-- Print the unstructured result — no tagging policy, no LLM, no tickets
+- Connect OpenAI-compatible LLM from `.env`
+- Let the LLM choose `kubectl_get` arguments for a namespace query
+- Return a plain-English answer — no tagging policy, no structured schema yet
 
 ## Out of scope
-- LLM analysis and structured findings (Section 07)
+- Structured findings / Pydantic output (Section 07)
 - Tagging rules / compliance evaluation (Section 07)
 - Posting to the issue tracker (Section 09)
 - Writing or customizing the MCP server itself (Section 05)
 
 ## Success criteria
 The learner can:
-1. Run the data agent against the local Kind cluster
-2. Explain the prompt → MCP tool call → raw JSON snapshot flow
-3. Confirm the snapshot contains namespaces and resources from the airline app
-4. Articulate why this output is deliberately unstructured and why the next section adds LLM structure
+1. Run `simple_mcp_llm.py` against the local Kind cluster
+2. Explain the prompt → LLM tool choice → MCP call → LLM answer flow
+3. Confirm the answer matches real cluster state (spot-check with kubectl)
+4. Articulate why this output is useful but unstructured — and why Section 07 adds policy and schema
+
+## Secondary artifact
+`agent.py` + `1_guide.md` — deterministic bulk collector that assembles a full JSON snapshot across all namespaces and resource types. Kept for downstream sections and optional teaching.
