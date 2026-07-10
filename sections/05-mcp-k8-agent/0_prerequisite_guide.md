@@ -60,14 +60,14 @@ npx -y supergateway \
   --stdio "docker run --rm -i --network host --user 0:0 \
     -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig \
     mcp/kubernetes:latest" \
-  --outputTransport sse \
+  --outputTransport streamableHttp \
   --port 8000 \
   --healthEndpoint /healthz
 ```
 
-**What it does:** Starts the MCP server inside Docker, wrapped by Supergateway as an HTTP endpoint on port 8000. The `/healthz` path is a health probe.
+**What it does:** Starts the MCP server inside Docker, wrapped by Supergateway as Streamable HTTP on port 8000 (`/mcp`). The `/healthz` path is a health probe.
 
-> *Expected: "Listening on port 8000". Leave this terminal open for the whole session.*
+> *Expected: "Listening on port 8000" and "StreamableHttp endpoint: http://localhost:8000/mcp". Leave this terminal open for the whole session.*
 
 ---
 

@@ -16,52 +16,82 @@
 
 ---
 
-### 1) Validate local cluster access
+### 1) Confirm kubectl context
 
 ```bash
 kubectl config current-context
+```
+
+**What it does:** Shows which cluster kubectl is pointed at. Expect `kind-finops-cluster`.
+
+---
+
+### 2) List namespaces
+
+```bash
 kubectl get ns
 ```
 
-**What it does:** Confirms kubectl is pointed at the Kind cluster and namespaces exist. If this fails, the MCP server will also fail.
+**What it does:** Confirms the Kind cluster is reachable and the airline namespaces exist. If this fails, the MCP server will also fail.
 
 > *Talking point: "The MCP server uses the same kubeconfig as kubectl. If kubectl works, the MCP server will work."*
 
 ---
 
-### 2) Confirm the kubeconfig path
+### 3) Resolve the kubeconfig path
 
 ```bash
 export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
-test -f "$KUBECONFIG_FILE" && echo "Using $KUBECONFIG_FILE"
 ```
 
-**What it does:** Resolves and validates the kubeconfig file path. We need this for the Docker volume mount.
+**What it does:** Sets `KUBECONFIG_FILE` to your kubeconfig path (defaults to `~/.kube/config`). Docker will mount this into the MCP container.
 
 ---
 
-### 3) Start the MCP HTTP endpoint
-
-In a **dedicated terminal**:
+### 4) Verify the kubeconfig file exists
 
 ```bash
-export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
+test -f "$KUBECONFIG_FILE" && echo "Using $KUBECONFIG_FILE"
+```
 
+**What it does:** Confirms the file is present before starting Supergateway. Expect `Using ~/.kube/config` (or your resolved path).
+
+---
+
+### 5) Free port 8000 (if needed)
+
+```bash
+lsof -tiTCP:8000 -sTCP:LISTEN | xargs kill 2>/dev/null || true
+```
+
+**What it does:** Stops whatever is already listening on port 8000 so Supergateway can bind. Fixes `EADDRINUSE` from a leftover process.
+
+---
+
+### 6) Start the MCP HTTP endpoint
+
+In a **dedicated terminal** (leave it running):
+
+```bash
 npx -y supergateway \
   --stdio "docker run --rm -i --network host --user 0:0 \
     -v ${KUBECONFIG_FILE}:/kubeconfig:ro -e KUBECONFIG=/kubeconfig \
     mcp/kubernetes:latest" \
-  --outputTransport sse \
+  --outputTransport streamableHttp \
   --port 8000 \
   --healthEndpoint /healthz
 ```
 
-**What it does:** Starts the MCP server inside Docker, wrapped by Supergateway as an HTTP endpoint. Port 8000 serves the SSE transport; `/healthz` is a liveness probe.
+**What it does:** Starts `mcp/kubernetes` in Docker and wraps its stdio MCP protocol as HTTP on port 8000. Clients POST to `/mcp`; `/healthz` is a liveness probe.
 
-> *Expected: "Listening on port 8000". Leave this terminal open.*
+**Streamable HTTP:** One POST to `/mcp` sends the MCP request and gets the reply in the same response — no separate SSE stream or session id to manage.
 
-> *Talking point: "Supergateway converts the MCP server's stdio protocol into HTTP/SSE. That is the bridge — stdio for local tools, HTTP for remote clients."*
+> *Say to students: "Streamable HTTP means request and response travel on one HTTP call — curl in, JSON out."*
+
+> *Expected: "Listening on port 8000" and "StreamableHttp endpoint: http://localhost:8000/mcp". Leave this terminal open.*
+
+> *Talking point: "Supergateway converts the MCP server's stdio protocol into HTTP. That is the bridge — stdio for local tools, HTTP for remote clients."*
 
 ---
 
-**Next:** Server is running. Next we prove it works with three curl calls → `2_guide.md`
+**Next:** Server is running. Next we prove it works with curl → `2_guide.md`

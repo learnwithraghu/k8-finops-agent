@@ -12,9 +12,9 @@
 
 **Time Budget:** 3–4 mins
 
-**Narrative:** Three curl calls prove the whole chain works — health check, MCP handshake, and a real cluster read. If curl works, any MCP client works.
+**Narrative:** Three curls prove the chain — health, MCP handshake, and a real cluster read. If curl works, any MCP client works.
 
-*(Run these in a new terminal — Supergateway stays running in the other one.)*
+*(Run these in a **new** terminal — Supergateway stays running in the other one.)*
 
 ---
 
@@ -24,43 +24,39 @@
 curl -s http://localhost:8000/healthz
 ```
 
-**What it does:** Hits the health endpoint. If Supergateway is running, this returns `ok`.
-
-> *Expected: `ok`*
-
-> *Talking point: "Health checks are table stakes for any service. This confirms the HTTP layer is up before we try MCP."*
+**What it does:** Confirms Supergateway is up. Expect `ok`.
 
 ---
 
 ### 2) MCP initialize handshake
 
 ```bash
-curl -s -X POST http://localhost:8000/message \
+curl -s -X POST http://localhost:8000/mcp \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"curl-test","version":"1.0"}}}'
 ```
 
-**What it does:** Sends the MCP `initialize` request. The server responds with its capabilities and name (should be `kubernetes`).
+**What it does:** Sends the MCP handshake to `/mcp`. The reply comes back in the same curl — look for `"name":"kubernetes"`.
 
-> *Expected: JSON response indicating server name "kubernetes" with supported tools.*
+> *Say to students: "Streamable HTTP means request and response travel on one HTTP call — curl in, JSON out."*
 
-> *Talking point: "This is the MCP handshake. Every client — curl, Python, VS Code — does this first. The server advertises what tools it has."*
+> *Talking point: "Every MCP client does initialize first. The server advertises what it can do."*
 
 ---
 
-### 3) Real cluster read — list namespaces
+### 3) List namespaces through MCP
 
 ```bash
-curl -s -X POST http://localhost:8000/message \
+curl -s -X POST http://localhost:8000/mcp \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"kubectl_get","arguments":{"resourceType":"namespaces","allNamespaces":true,"output":"name"}}}'
 ```
 
-**What it does:** Calls the `kubectl_get` MCP tool to list namespaces. The MCP server runs `kubectl get namespaces` inside Docker and returns the result.
+**What it does:** Calls the `kubectl_get` tool. Expect namespace names including `booking-api`, `flight-search`, `inventory`, `payment`.
 
-> *Expected: A clean list of namespaces from the cluster — `booking-api`, `flight-search`, `inventory`, `payment`, etc.*
-
-> *Talking point: "We just read the cluster through MCP using nothing but curl. No Python, no SDK, no kubeconfig on this terminal. The MCP server handled authentication and execution."*
+> *Talking point: "We just read the cluster through MCP with curl. No Python, no SDK — the MCP server handled kubectl."*
 
 ---
 

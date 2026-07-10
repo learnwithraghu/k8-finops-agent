@@ -27,7 +27,7 @@ Students watch Video 0, then follow Demos 1 and 2.
 | Demo | Focus | Time |
 |------|-------|------|
 | **1** | Start the MCP HTTP endpoint via Supergateway | 3 min |
-| **2** | Validate with curl — health, MCP handshake, real cluster read | 3–4 min |
+| **2** | Validate with curl — health, initialize, kubectl_get via `/mcp` | 3–4 min |
 
 Each demo is one clear beat. Students go from "no MCP" to "curl-validated HTTP endpoint" in under 7 minutes.
 
