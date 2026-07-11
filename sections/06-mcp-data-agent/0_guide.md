@@ -1,10 +1,10 @@
-# Guide 0: Understand `simple_mcp_llm.py`
+# Guide 0: Understand `query_agent.py`
 
 **Time Budget:** 4–5 mins
 
-**Narrative:** Three steps, under 60 lines — build a prompt, call MCP to read the cluster, send the result to the LLM, print the answer.
+**Narrative:** Three files, under 80 lines total — load config, let LangChain pick MCP tools, print a plain-English answer.
 
-**Prerequisites:** Section 05 Supergateway running; `.env` with OpenAI-compatible settings.
+**Prerequisites:** Section 05 Supergateway running; `.env` with OpenAI-compatible settings; virtualenv activated.
 
 ---
 
@@ -12,34 +12,39 @@
 
 ```mermaid
 sequenceDiagram
-    participant Script as simple_mcp_llm.py
+    participant Script as query_agent.py
+    participant LC as LangChain_ReAct
     participant MCP as Supergateway_MCP
     participant LLM as OpenAI_Compatible_API
 
-    Script->>MCP: kubectl_get namespaces
-    MCP-->>Script: raw cluster JSON
-    Script->>LLM: prompt + cluster data
+    Script->>LC: prompt + MCP tools
+    LC->>LLM: which tool and args?
+    LLM->>MCP: kubectl_get(...)
+    MCP-->>LLM: cluster data
     LLM-->>Script: plain-English answer
     Script->>Script: print answer
 ```
 
-Open the file:
+Open the files:
 
 ```bash
-cat sections/06-mcp-data-agent/simple_mcp_llm.py
+cat sections/06-mcp-data-agent/mcp_client.py
+cat sections/06-mcp-data-agent/query_agent.py
 ```
 
 ---
 
-### 1) Load configuration from `.env`
+### 1) Shared MCP wiring — `mcp_client.py`
 
 ```python
 load_dotenv(Path(__file__).parents[2] / ".env")
+MCP_URL = os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp")
+tools, cleanup = await convert_mcp_to_langchain_tools(MCP_SERVERS)
 ```
 
-**What it does:** Reads `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL_ID`, and related settings from the repo-root `.env` file.
+**What it does:** Loads the repo-root `.env`, connects to Streamable HTTP at `/mcp`, and converts MCP tools (like `kubectl_get`) into LangChain tools.
 
-> *Talking point: "We never hardcode API keys in the script. Same `.env` pattern we'll reuse in Section 07."*
+> *Talking point: "Both Section 06 scripts share this module — one place for the MCP endpoint."*
 
 ---
 
@@ -49,67 +54,40 @@ load_dotenv(Path(__file__).parents[2] / ".env")
 PROMPT = "list all namespaces"
 ```
 
-**What it does:** A fixed question — list every namespace in the cluster. No command-line args needed.
+**What it does:** A fixed demo question. Change it to anything — "how many pods in payment?", "show deployments in booking-api".
 
-> *Talking point: "One prompt, one MCP call, one answer. Keep the first demo dead simple."*
+> *Talking point: "One prompt in. The LLM decides which MCP tool to call and with what arguments."*
 
 ---
 
-### 3) Connect to MCP and call `kubectl_get`
+### 3) LangChain ReAct agent picks the MCP tool
 
 ```python
-async with streamablehttp_client("http://localhost:8000/mcp") as (read, write, _):
-    async with ClientSession(read, write) as session:
-        await session.initialize()
-        result = await session.call_tool(
-            "kubectl_get",
-            {"resourceType": "namespaces", "allNamespaces": True, "output": "name"},
-        )
-        data = tool_text(result)
+llm = ChatOpenAI(model=..., base_url=..., api_key=...)
+agent = create_agent(llm, tools)
+result = await agent.ainvoke({"messages": [HumanMessage(content=PROMPT)]})
+print(result["messages"][-1].content)
 ```
 
-**What it does:** Opens an MCP session to the Supergateway endpoint from Section 05, then calls `kubectl_get` for all namespaces.
+**What it does:** LangChain's agent loop handles tool choice — LLM chooses `kubectl_get`, MCP executes it, LLM writes the final answer.
 
-**Why `async with streamablehttp_client`?** Section 05 exposes MCP as **Streamable HTTP** at `http://localhost:8000/mcp`. The official `mcp` Python SDK only supports that transport with async code. `streamablehttp_client` is the SDK's way to:
-- open the HTTP connection to `/mcp`
-- run the MCP `initialize` handshake (same as the curl in Section 05)
-- hand back read/write streams for `ClientSession`
-- close the connection when the `async with` block ends
+**Why LangChain here?** Without it you'd hand-write: list tools, map schemas, parse tool calls, invoke MCP, call the LLM again. LangChain collapses that into ~10 lines.
 
-`asyncio.run(main())` at the bottom is the one line that runs this async code from a normal script — students don't need to write async anywhere else.
-
-> *Talking point: "This replaces the curl POST from Section 05. Same gateway, same tool — now in Python."*
+> *Talking point: "Same MCP endpoint we proved with curl in Section 05 — now the LLM drives the tool call."*
 
 ---
 
-### 4) LLM turns data into an answer
+## Compare to `snapshot_collector.py`
 
-```python
-answer = client.chat.completions.create(
-    model=os.environ["OPENAI_MODEL_ID"],
-    messages=[{"role": "user", "content": f"{prompt}\n\nCluster data:\n{data}\n\nAnswer in 2-3 sentences."}],
-    ...
-)
-print(answer.choices[0].message.content)
-```
-
-**What it does:** Sends the prompt plus raw MCP JSON to the LLM. Prints one plain-English summary — that's the only output students see.
-
-> *Talking point: "MCP gives facts; the LLM gives meaning. One MCP call, one LLM call — that's the whole loop."*
-
----
-
-## Compare to `agent.py`
-
-| | `simple_mcp_llm.py` | `agent.py` |
+| | `query_agent.py` | `snapshot_collector.py` |
 |---|---|---|
-| **Scope** | List all namespaces | Every namespace, five resource types |
-| **Output** | Plain-English answer | Full JSON snapshot |
-| **LLM** | Yes (OpenAI-compatible) | No |
+| **Scope** | One natural-language question | Every namespace, five resource types |
+| **Output** | Plain-English answer | Full JSON snapshot with labels |
+| **LLM** | Yes — picks MCP tools | No — deterministic loops |
 | **Use when** | Teaching prompt → MCP → answer | Collecting everything for downstream analysis |
 
-> *Talking point: "`agent.py` is the bulk collector — see `1_guide.md`. `simple_mcp_llm.py` is where students first see prompt → MCP → answer."*
+> *Talking point: "`query_agent.py` asks one question. `snapshot_collector.py` collects everything — see `2_guide.md`."*
 
 ---
 
-**Next:** Run it live and watch the LLM answer → `2_guide.md`
+**Next:** Run the query agent live → `1_guide.md`, then collect the full snapshot → `2_guide.md`

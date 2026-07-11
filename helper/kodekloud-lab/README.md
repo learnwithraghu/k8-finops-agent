@@ -53,11 +53,11 @@ What it does:
 2. Creates a virtual environment at `venv/`
 3. Activates the virtual environment
 4. Installs Section 04 dependencies (`kubernetes`, `pyyaml`, `python-dotenv`)
-5. Installs Section 06 and 07 dependencies (`mcp`, `openai`, `pydantic`, `langchain-openai`, `python-dotenv`)
+5. Installs repo Python dependencies (`mcp`, `openai`, `pydantic`, `langchain-openai`, `langchain-mcp-tools`, `langgraph`, `python-dotenv`)
 
 > **Note:** After a new shell session, re-activate the venv with:
 > ```bash
-> source venv/bin/activate
+> source .venv/bin/activate
 > ```
 
 ---

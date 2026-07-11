@@ -37,33 +37,29 @@ else
 fi
 
 # ── Step 2: Create virtual environment ───────────────────────────────────────
-print_info "Creating virtual environment at ${REPO_ROOT}/venv ..."
-python3 -m venv "${REPO_ROOT}/venv"
+print_info "Creating virtual environment at ${REPO_ROOT}/.venv ..."
+python3 -m venv "${REPO_ROOT}/.venv"
 print_success "Virtual environment created"
 
 # ── Step 3: Activate and install dependencies ─────────────────────────────────
 print_info "Activating virtual environment..."
 # shellcheck disable=SC1091
-source "${REPO_ROOT}/venv/bin/activate"
+source "${REPO_ROOT}/.venv/bin/activate"
 print_success "Virtual environment activated"
 
-print_info "Installing Section 06 MCP data agent dependencies..."
-pip install -r "${REPO_ROOT}/sections/06-mcp-data-agent/requirements.txt"
-print_success "Section 06 dependencies installed"
-
-print_info "Installing Section 07 LLM structured agent dependencies..."
-pip install -r "${REPO_ROOT}/sections/07-llm-structured-agent/requirements.txt"
-print_success "Section 07 dependencies installed"
+print_info "Installing repo dependencies..."
+pip install -r "${REPO_ROOT}/requirements.txt"
+print_success "Dependencies installed"
 
 print_header "Python Setup Complete!"
 echo -e "${GREEN}Virtual environment is active. Run your agents with:${NC}"
 echo ""
-echo "  # Section 06 (prompt -> MCP -> unstructured data)"
-echo "  PYTHONPATH=sections/06-mcp-data-agent python3 -m agent.main"
+echo "  # Section 06 (prompt -> MCP -> plain-English answer)"
+echo "  python3 sections/06-mcp-data-agent/query_agent.py"
 echo ""
-echo "  # Section 07 (snapshot + tagging rules -> structured findings)"
-echo "  PYTHONPATH=sections/07-llm-structured-agent python3 -m agent.main --snapshot /tmp/section06-snapshot.json"
+echo "  # Section 06 (MCP -> structured JSON snapshot)"
+echo "  python3 sections/06-mcp-data-agent/snapshot_collector.py > k8s_metadata.json"
 echo ""
 echo -e "${YELLOW}Note: re-activate the venv in new shells with:${NC}"
-echo "  source venv/bin/activate"
+echo "  source .venv/bin/activate"
 echo ""

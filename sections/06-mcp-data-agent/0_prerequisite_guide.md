@@ -20,15 +20,17 @@ curl -s http://localhost:8000/healthz
 
 ---
 
-## 1) Set up the Python environment
+## 1) Set up the Python virtualenv
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**What it does:** Creates a virtualenv and installs repo deps (including `mcp`, `openai`, and `python-dotenv`).
+**What it does:** Creates a virtualenv at the repo root and installs deps (including `mcp`, `langchain-mcp-tools`, `langgraph`, `openai`, and `python-dotenv`).
+
+> *Re-activate in new shells with: `source .venv/bin/activate`*
 
 ---
 
@@ -38,21 +40,23 @@ pip install -r requirements.txt
 test -n "$OPENAI_API_KEY" && echo "API key is set" || echo "OPENAI_API_KEY is not set"
 ```
 
-**What it does:** Checks that the OpenAI API key environment variable is present. The script needs this to call the LLM.
+**What it does:** Checks that the OpenAI API key environment variable is present. `query_agent.py` needs this to call the LLM.
 
 > *If using a `.env` file, confirm it exists at the repo root: `grep OPENAI .env`*
 
 ---
 
-## 3) Inspect the agent code
+## 3) Inspect the scripts
 
 ```bash
-cat sections/06-mcp-data-agent/simple_mcp_llm.py
+cat sections/06-mcp-data-agent/mcp_client.py
+cat sections/06-mcp-data-agent/query_agent.py
+cat sections/06-mcp-data-agent/snapshot_collector.py
 ```
 
-**What it does:** Shows the minimal agent — LLM picks `kubectl_get`, MCP reads the cluster, LLM returns a plain-English answer.
+**What it does:** Shows the three files — shared MCP wiring, LLM query agent, and deterministic snapshot collector.
 
-> *Talking point: "Under fifty lines. No logger, no try/except — just prompt → tool call → answer. This is the loop students need to understand before Section 07."*
+> *Talking point: "Under eighty lines total across the two scripts. LangChain handles tool choice in `query_agent.py`; `snapshot_collector.py` is a reliable bulk collector for Section 07."*
 
 ---
 
@@ -60,10 +64,9 @@ cat sections/06-mcp-data-agent/simple_mcp_llm.py
 
 When setup passes, start the live walkthrough with:
 
-- `0_guide.md` — Walk through `simple_mcp_llm.py`
-- `2_guide.md` — Run it and observe the LLM answer
-
-**Optional:** `1_guide.md` — full snapshot collector via `agent.py` (no LLM)
+- `0_guide.md` — Walk through `query_agent.py`
+- `1_guide.md` — Run `query_agent.py` and observe the LLM answer
+- `2_guide.md` — Run `snapshot_collector.py`, inspect labels
 
 ## Reset for another run (optional)
 
@@ -71,4 +74,4 @@ When setup passes, start the live walkthrough with:
 rm -f k8s_metadata.json
 ```
 
-**What it does:** Cleans up output files from previous `agent.py` runs.
+**What it does:** Cleans up output files from previous `snapshot_collector.py` runs.

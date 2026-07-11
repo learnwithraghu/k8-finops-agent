@@ -15,6 +15,8 @@ pydantic>=2.5.0
 pyyaml>=6.0.0
 
 # LangChain for LLM orchestration
+langchain>=0.3.0
 langchain-openai>=0.1.0
 langchain-core>=0.1.0
 langchain-mcp-tools>=0.3.0
+langgraph>=0.2.0

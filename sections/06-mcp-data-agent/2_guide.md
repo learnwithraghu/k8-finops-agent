@@ -1,10 +1,10 @@
-# Demo 2: Run `simple_mcp_llm.py` and Observe the Answer
+# Demo 2: Run the Snapshot Collector
 
-**Time Budget:** 3–4 mins
+**Time Budget:** 3 mins
 
-**Narrative:** One prompt — "list all namespaces". MCP reads the cluster, the LLM returns a plain-English summary.
+**Narrative:** The query agent answers one question. FinOps needs every resource with labels — `snapshot_collector.py` connects to MCP, loops through namespaces and resource types, and writes a JSON snapshot. Deterministic — same input, same output every time.
 
-**Prerequisites:** [`0_guide.md`](0_guide.md) — understand the code first.
+**Prerequisites:** [`1_guide.md`](1_guide.md) — query agent working; virtualenv activated.
 
 ---
 
@@ -14,60 +14,49 @@
 curl -s http://localhost:8000/healthz
 ```
 
-**What it does:** Quick health check before running the agent. If this fails, Supergateway is not running.
+**What it does:** Quick health check before running the collector. If this fails, Supergateway is not running.
 
 > *Expected: `ok`*
 
 ---
 
-### 2) Confirm LLM configuration
+### 2) Peek at the collector code
 
 ```bash
-grep OPENAI .env
+cat sections/06-mcp-data-agent/snapshot_collector.py
 ```
 
-**What it does:** Shows the OpenAI-compatible endpoint settings. The script reads these at startup.
+**What it does:** Shows the difference from `query_agent.py` — no LLM, just deterministic `kubectl_get` loops via the same `mcp_client.py`.
 
-> *Talking point: "The LLM endpoint is separate from MCP. MCP reads the cluster; the LLM reads the MCP result and writes the answer."*
+> *Talking point: "Same MCP tools, different job. The query agent asks one question; the collector gathers everything for downstream analysis."*
 
 ---
 
-### 3) Run the script
+### 3) Run the collector
 
 ```bash
-python3 sections/06-mcp-data-agent/simple_mcp_llm.py
+source .venv/bin/activate
+python3 sections/06-mcp-data-agent/snapshot_collector.py > k8s_metadata.json
 ```
 
-**What it does:** Calls `kubectl_get` for all namespaces through MCP, then prints a short LLM summary.
+**What it does:** Connects to MCP via `mcp_client.py`, lists namespaces, fetches resources per namespace, and writes the snapshot to `k8s_metadata.json`.
 
-> *Expected: A few sentences listing airline namespaces like `booking-api`, `flight-search`, `inventory`, `payment`.*
-
-> *Talking point: "Same `kubectl_get` tool we proved with curl in Section 05 — now driven from Python."*
+> *Talking point: "Same `kubectl_get` tool we validated with curl — Python automates the loop across every namespace."*
 
 ---
 
-### 4) Spot-check against kubectl
+### 4) Review labels in the output
 
 ```bash
-kubectl get ns
+cat k8s_metadata.json | jq '.resources[] | {name, namespace, kind, labels}' | head -n 30
 ```
 
-**What it does:** Confirms the LLM's answer matches what kubectl shows.
+**What it does:** Shows resource names, namespaces, kinds, and **labels** — the raw material for FinOps analysis in Section 07.
 
-> *Talking point: "The LLM summarized real cluster data — MCP is the source of truth."*
+> *Expected: JSON with `scanned_at`, `cluster`, `namespaces`, and `resources` keys. Resources include deployments, pods, services, PVCs, and configmaps from the airline namespaces.*
 
----
-
-### 5) What we learned
-
-- **Prompt in** → `list all namespaces`
-- **MCP out** → raw namespace JSON
-- **LLM** → plain-English answer
-
-> *Talking point: "This answer is useful but unstructured — no severity, no tickets, no policy. Section 07 adds tagging rules and structured findings."*
+> *Talking point: "This is structured data with labels attached. No compliance verdicts yet — Section 07 adds tagging rules and structured findings."*
 
 ---
-
-**Optional:** For a full cluster snapshot without the LLM, see `1_guide.md` (`agent.py`).
 
 **Next:** Add policy and structured output → `sections/07-llm-structured-agent`

@@ -23,6 +23,3 @@ kubectl get services -A --show-labels
 ```
 > *Talking point: Compare labels across namespaces to show inconsistency.*
 
----
-
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to assemble the **audit board** — inspection lens, green baseline, and red problem column. Use **Need a hint?** if stuck, then press **Run Audit** to validate.

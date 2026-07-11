@@ -55,6 +55,4 @@ kubectl get pods -n payment
 
 ---
 
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to assemble the cluster foundation flow from memory — drag components into the correct slots, use **Need a hint?** if stuck, then press **Run Flow** to validate. Placed components move to **On canvas** so you can reassign them.
-
 **Next:** Foundation done. Next section deploys the airline app → `sections/02-airline-app-deployment`

@@ -342,5 +342,5 @@ sections/
 
 For issues or questions:
 - Check logs with `--log-level DEBUG`
-- Review agent code in `sections/06-mcp-data-agent/agent.py`
+- Review Section 06 scripts in `sections/06-mcp-data-agent/query_agent.py` and `snapshot_collector.py`
 - Check configuration in `sections/07-llm-structured-agent/config/`

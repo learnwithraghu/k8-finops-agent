@@ -59,6 +59,4 @@ cat sections/07-llm-structured-agent/config/tagging-rules.yaml
 
 ---
 
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to wire the **before/after analysis** pipeline — messy snapshot and policy in, structured ticket fields out. Use **Need a hint?** if stuck, then press **Run Analysis** to validate.
-
 **Next:** Analysis complete. Next we stand up the issue tracker to receive these findings as tickets → `sections/08-issue-tracker-service`

@@ -73,6 +73,4 @@ curl -X POST http://localhost:8085/create-issue \
 
 ---
 
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to build the **tracker bridge** — REST and MCP inputs feed the same Kanban board. Use **Need a hint?** if stuck, then press **Create Ticket** to validate.
-
 **Next:** Tickets work via REST. Next we automate the full flow — agent posts findings directly → `sections/09-agent-to-tracker-integration`

@@ -66,6 +66,4 @@ Switch to the Supergateway terminal and press `Ctrl-C` to stop it.
 
 ---
 
-**Try it:** Open [`architecture_builder/index.html`](architecture_builder/index.html) in your browser to stack the **gateway layers** bottom-up and complete the **curl proof ladder**. Use **Need a hint?** if stuck, then press **Test Gateway** to validate.
-
 **Next:** MCP endpoint validated. Next we build a Python agent that calls it → `sections/06-mcp-data-agent`
