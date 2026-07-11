@@ -1,4 +1,4 @@
-# Video: Standalone MCP vs Supergateway
+# Video 1: Standalone MCP vs Supergateway
 
 **Time Budget:** 1:30
 

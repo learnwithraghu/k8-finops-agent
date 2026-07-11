@@ -20,7 +20,7 @@ docker run --rm -p 8000:8000 --network kind \
 
 2. Install deps from the repo root: `pip install -r requirements.txt`
 
-3. Validate MCP (no curl) — see `4_guide.md`:
+3. Validate MCP (no curl) — see `2_guide.md` (Part B):
 
 ```bash
 python3 sections/06-mcp-data-agent/code/validate_mcp.py
@@ -30,19 +30,18 @@ python3 sections/06-mcp-data-agent/code/validate_mcp.py
 
 ```bash
 python3 sections/06-mcp-data-agent/code/query_agent.py
-python3 sections/06-mcp-data-agent/code/snapshot_collector.py
+python3 sections/06-mcp-data-agent/code/label_auditor.py
 ```
 
 Both scripts load LLM settings from the repo-root `.env` via `mcp_client.py`.
 
 ## Guide order
 
-| Guide | File |
-|-------|------|
-| 0 | `0_prerequisite_guide.md` (instructor) |
-| 1 | `1_guide.md` — standalone vs Supergateway transcript |
-| 2 | `2_guide.md` — start MCP container |
-| 3 | `3_guide.md` — `mcp_client.py` walkthrough |
-| 4 | `4_guide.md` — `validate_mcp.py` |
-| 5 | `5_guide.md` — `query_agent.py` |
-| 6 | `6_guide.md` — `snapshot_collector.py` |
+| Guide | File | Video title |
+|-------|------|-------------|
+| 0 | `0_prerequisite_guide.md` | *(instructor only)* |
+| 1 | `1_guide.md` | Standalone MCP vs Supergateway |
+| 2 | `2_guide.md` | Start and Validate MCP |
+| 3 | `3_guide.md` | LangChain Agent Shared Wiring |
+| 4 | `4_guide.md` | Your First LangChain MCP Agent |
+| 5 | `5_guide.md` | Audit Kubernetes Labels via MCP Agent |

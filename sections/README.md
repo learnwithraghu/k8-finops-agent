@@ -18,7 +18,7 @@ This directory is the curriculum skeleton for the repo.
 - `sections/02b-introduction-to-finops/` → FinOps framework
 - `sections/04-finops-architecture-design/` → Section 04 (architecture whiteboarding; `1_guide.md`–`3_guide.md`)
 - `sections/05-mcp-k8-agent/` → Section 05 (prebuilt MCP setup and curl validation)
-- `sections/06-mcp-data-agent/code/` → Section 06 (`validate_mcp.py`, `query_agent.py`, `snapshot_collector.py`)
+- `sections/06-mcp-data-agent/code/` → Section 06 (`validate_mcp.py`, `query_agent.py`, `label_auditor.py`)
 - `sections/07-llm-structured-agent/agent/` and `config/` → Section 07 (snapshot + tagging rules → structured findings)
 - `sections/08-issue-tracker-service/service/` → Section 08
 - `sections/09-agent-to-tracker-integration/agent/` → Section 09
@@ -41,7 +41,7 @@ This directory is the curriculum skeleton for the repo.
 6. **03** — FinOps problems: tagging, orphaned resources, ownership gaps
 7. **04** — FinOps AI architecture design (whiteboarding)
 8. **05** — Prebuilt MCP setup and curl validation
-9. **06** — First MCP data agent: prompt → MCP → unstructured data
+9. **06** — LangChain MCP agents: prompt → MCP → unstructured data
 10. **07** — LLM structured agent: snapshot + tagging rules → structured findings
 11. **08** — Issue tracker service
 12. **09** — Agent to tracker integration

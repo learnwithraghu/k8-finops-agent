@@ -68,12 +68,12 @@ test -n "$OPENAI_API_KEY" && echo "API key is set" || echo "OPENAI_API_KEY is no
 cat sections/06-mcp-data-agent/code/mcp_client.py
 cat sections/06-mcp-data-agent/code/validate_mcp.py
 cat sections/06-mcp-data-agent/code/query_agent.py
-cat sections/06-mcp-data-agent/code/snapshot_collector.py
+cat sections/06-mcp-data-agent/code/label_auditor.py
 ```
 
-**What it does:** Shows the four files in the section's `code/` folder — shared MCP wiring, validation script, query agent, and inventory agent.
+**What it does:** Shows the four files in the section's `code/` folder — shared MCP wiring, validation script, query agent, and label audit agent.
 
-> *Talking point: "For students, Guide 1 sets up the standalone-vs-Supergateway story, Guide 2 is where they start the container live, and Guides 3 through 6 walk through each script."*
+> *Talking point: "For students, Video 1 sets up the standalone-vs-Supergateway story, Video 2 is start-and-validate live, Video 3 walks the shared wiring, Video 4 runs the first agent, and Video 5 audits labels via MCP."*
 
 ---
 
@@ -81,11 +81,10 @@ cat sections/06-mcp-data-agent/code/snapshot_collector.py
 
 When setup passes, start the live walkthrough with:
 
-- `1_guide.md` — Standalone MCP vs Supergateway (video transcript)
-- `2_guide.md` — Start persistent MCP container
-- `3_guide.md` — Walk through `code/mcp_client.py`
-- `4_guide.md` — Run `code/validate_mcp.py`
-- `5_guide.md` — Run `code/query_agent.py` (change prompt to `kube-system`)
-- `6_guide.md` — Run `code/snapshot_collector.py`
+- `1_guide.md` — **Standalone MCP vs Supergateway**
+- `2_guide.md` — **Start and Validate MCP**
+- `3_guide.md` — **LangChain Agent Shared Wiring**
+- `4_guide.md` — **Your First LangChain MCP Agent**
+- `5_guide.md` — **Audit Kubernetes Labels via MCP Agent**
 
 Do **not** start the MCP container during this prereq — students do that live in Guide 2.

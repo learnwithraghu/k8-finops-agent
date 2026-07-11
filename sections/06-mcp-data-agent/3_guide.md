@@ -1,10 +1,10 @@
-# Guide 3: Trainer Notes — `code/mcp_client.py`
+# Video 3: LangChain Agent Shared Wiring
 
 **Time Budget:** 4–5 mins
 
-**Narrative:** Every Section 06 script shares one module for MCP connection, LLM setup, and the LangChain agent loop. Walk trainers through it block by block before running any script.
+**Narrative:** Every Section 06 script shares one module for MCP connection, LLM setup, and the LangChain agent loop. Walk through `mcp_client.py` block by block before running any agent script.
 
-**Prerequisites:** [`2_guide.md`](2_guide.md) — MCP container running on port 8000.
+**Prerequisites:** [`2_guide.md`](2_guide.md) — MCP container running; `validate_mcp.py` passed.
 
 ---
 
@@ -16,7 +16,7 @@ cat sections/06-mcp-data-agent/code/mcp_client.py
 
 ---
 
-## Block 1 — Module docstring (lines 1–5)
+### Block 1 — Module docstring (lines 1–5)
 
 ```python
 """Shared LangChain + MCP helpers for Section 06 scripts.
@@ -32,7 +32,7 @@ http://localhost:8000/mcp). No Supergateway required.
 
 ---
 
-## Block 2 — Imports (lines 6–16)
+### Block 2 — Imports (lines 6–16)
 
 ```python
 from dotenv import load_dotenv
@@ -49,7 +49,7 @@ from langchain_mcp_tools import convert_mcp_to_langchain_tools
 
 ---
 
-## Block 3 — Load `.env` and MCP config (lines 18–26)
+### Block 3 — Load `.env` and MCP config (lines 18–26)
 
 ```python
 load_dotenv(Path(__file__).parents[3] / ".env")
@@ -69,7 +69,7 @@ MCP_SERVERS = {
 
 ---
 
-## Block 4 — `decode_tool_result` (lines 29–38)
+### Block 4 — `decode_tool_result` (lines 29–38)
 
 ```python
 def decode_tool_result(result: Any) -> dict:
@@ -82,7 +82,7 @@ def decode_tool_result(result: Any) -> dict:
 
 ---
 
-## Block 5 — `tool_by_name` (lines 41–45)
+### Block 5 — `tool_by_name` (lines 41–45)
 
 ```python
 def tool_by_name(tools: list[BaseTool], name: str) -> BaseTool:
@@ -95,7 +95,7 @@ def tool_by_name(tools: list[BaseTool], name: str) -> BaseTool:
 
 ---
 
-## Block 6 — `get_mcp_tools` (lines 48–49)
+### Block 6 — `get_mcp_tools` (lines 48–49)
 
 ```python
 async def get_mcp_tools():
@@ -108,7 +108,7 @@ async def get_mcp_tools():
 
 ---
 
-## Block 7 — `build_llm` (lines 52–59)
+### Block 7 — `build_llm` (lines 52–59)
 
 ```python
 def build_llm(max_tokens: int | None = None) -> ChatOpenAI:
@@ -120,13 +120,13 @@ def build_llm(max_tokens: int | None = None) -> ChatOpenAI:
     )
 ```
 
-**Highlight:** Reads OpenAI-compatible settings from `.env`. `max_tokens` can be overridden for longer inventory summaries.
+**Highlight:** Reads OpenAI-compatible settings from `.env`. `max_tokens` can be overridden for longer label audit reports.
 
 > *Talking point: "MCP handles reading the cluster; the LLM picks which tools to call and writes the answer. Two separate pieces working together."*
 
 ---
 
-## Block 8 — `run_agent` (lines 62–69)
+### Block 8 — `run_agent` (lines 62–69)
 
 ```python
 async def run_agent(prompt: str, max_tokens: int | None = None) -> str:
@@ -141,8 +141,8 @@ async def run_agent(prompt: str, max_tokens: int | None = None) -> str:
 
 **Highlight:** The full agent loop in one function — connect, run ReAct agent, return the final LLM message, always cleanup.
 
-> *Talking point: "Both `query_agent.py` and `snapshot_collector.py` are just thin wrappers around this — change the prompt, not the plumbing."*
+> *Talking point: "Both `query_agent.py` and `label_auditor.py` are just thin wrappers around this — change the prompt, not the plumbing."*
 
 ---
 
-**Next:** Validate MCP with Python → `4_guide.md`
+**Next:** Run your first agent → `4_guide.md`

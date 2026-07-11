@@ -1,17 +1,17 @@
-# Guide 4: Trainer Notes — `code/validate_mcp.py`
+# Video 4: Your First LangChain MCP Agent
 
-**Time Budget:** 3–4 mins
+**Time Budget:** 4–5 mins
 
-**Narrative:** Before any LLM call, prove the standalone MCP endpoint works with a direct `kubectl_get` — no curl, no agent. This is the Python equivalent of Section 05's curl validation.
+**Narrative:** The smallest possible agent script — one prompt constant, one call to `run_agent`. The LLM picks MCP tools and writes a plain-English answer.
 
-**Prerequisites:** [`2_guide.md`](2_guide.md) — MCP container running; [`3_guide.md`](3_guide.md) — understand `mcp_client.py`.
+**Prerequisites:** [`3_guide.md`](3_guide.md) — understand `mcp_client.py`; MCP container running; virtualenv activated.
 
 ---
 
 Open the file:
 
 ```bash
-cat sections/06-mcp-data-agent/code/validate_mcp.py
+cat sections/06-mcp-data-agent/code/query_agent.py
 ```
 
 ---
@@ -19,10 +19,10 @@ cat sections/06-mcp-data-agent/code/validate_mcp.py
 ## Block 1 — Module docstring (line 1)
 
 ```python
-"""Validate the Section 06 persistent MCP HTTP endpoint (no curl)."""
+"""Prompt -> LangChain agent -> MCP tools -> plain-text answer."""
 ```
 
-**Highlight:** Purpose — health check for the HTTP MCP server, not an agent demo.
+**Highlight:** The four-step flow in one line — this is the Section 06 learning goal.
 
 ---
 
@@ -31,110 +31,123 @@ cat sections/06-mcp-data-agent/code/validate_mcp.py
 ```python
 import asyncio
 
-from mcp_client import decode_tool_result, get_mcp_tools, tool_by_name
+from mcp_client import run_agent
 ```
 
-**Highlight:** Reuses three helpers from `mcp_client.py` — connect, find tool, parse result.
+**Highlight:** The entire agent loop lives in `mcp_client.py`. This script only supplies a prompt.
 
-> *Talking point: "Same wiring the agents use — we're just calling `kubectl_get` directly instead of letting the LLM choose."*
+> *Talking point: "We kept this deliberately thin so students can see the hard part lives in one place — it's shared, not repeated in every script."*
 
 ---
 
-## Block 3 — `main` — connect and find tool (lines 7–10)
+## Block 3 — The prompt (line 6)
+
+```python
+PROMPT = "list all namespaces"
+```
+
+**Highlight:** The only thing you change for a different question. Fixed demo string for the first run.
+
+> *Talking point: "You give it one string, and the LLM figures out which MCP tool to call and what arguments to pass."*
+
+---
+
+## Block 4 — `main` (lines 9–10)
 
 ```python
 async def main() -> None:
-    tools, cleanup = await get_mcp_tools()
-    try:
-        kubectl_get = tool_by_name(tools, "kubectl_get")
+    print(await run_agent(PROMPT))
 ```
 
-**Highlight:** `get_mcp_tools()` opens the MCP session; `tool_by_name` grabs the namespace-listing tool by name.
-
-> *Talking point: "If you see 'MCP tool not found', the handshake worked but the tool list is off — worth checking the container image."*
+**Highlight:** `run_agent` handles connect → ReAct loop → cleanup → final answer. This script just prints it.
 
 ---
 
-## Block 4 — `main` — invoke and parse (lines 11–15)
-
-```python
-        result = await kubectl_get.ainvoke({"resourceType": "namespaces", "allNamespaces": True})
-        payload = decode_tool_result(result)
-        namespaces = [item["name"] for item in payload.get("items", []) if item.get("name")]
-        if not namespaces:
-            raise RuntimeError("kubectl_get returned no namespaces — check MCP container and kubeconfig")
-```
-
-**Highlight:** Deterministic tool call — list all namespaces. Empty list raises a clear error.
-
-> *Talking point: "Same `kubectl_get` tool Section 05 called with curl — here Python invokes it through LangChain's tool wrapper."*
-
----
-
-## Block 5 — `main` — print results (lines 17–21)
-
-```python
-        print(f"MCP OK — {len(namespaces)} namespaces via {kubectl_get.name}")
-        for name in namespaces:
-            print(f"  - {name}")
-    finally:
-        await cleanup()
-```
-
-**Highlight:** Success line plus indented namespace list. `finally` always closes the MCP session.
-
----
-
-## Block 6 — Entry point (lines 24–25)
+## Block 5 — Entry point (lines 13–14)
 
 ```python
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-**Highlight:** Standard async entry — same pattern as the agent scripts.
+**Highlight:** Same async pattern as `validate_mcp.py`.
 
 ---
 
-## Run it
-
-In a **second terminal** (MCP container still running in the first):
+## Run it — default prompt
 
 ```bash
 source .venv/bin/activate
 python3 sections/06-mcp-data-agent/code/validate_mcp.py
+python3 sections/06-mcp-data-agent/code/query_agent.py
 ```
 
-**What it does:** Connects to `http://localhost:8000/mcp`, calls `kubectl_get` for namespaces, prints the list.
+**What it does:** LangChain ReAct agent picks `kubectl_get` through MCP, then prints a short plain-English summary.
 
 ---
 
-## Expected output
+## Expected output (default prompt)
 
 ```text
-MCP OK — 9 namespaces via kubectl_get
-  - airline
-  - booking-api
-  - default
-  - flight-search
-  - inventory
-  - kube-node-lease
-  - kube-public
-  - kube-system
-  - payment
+The cluster has the following namespaces: airline, booking-api, default,
+flight-search, inventory, kube-node-lease, kube-public, kube-system, and payment.
 ```
 
 **How to read the logs:**
 
-| Line | Meaning |
-|------|---------|
-| `MCP OK — N namespaces via kubectl_get` | HTTP handshake succeeded; tool call returned data |
-| `  - <name>` | Each namespace from the cluster — same data kubectl would show |
-| *(no output, traceback)* | Container not running, wrong port, or kubeconfig mount broken — restart from `2_guide.md` |
-| `kubectl_get returned no namespaces` | MCP connected but cluster returned empty — check kubeconfig inside the container |
+| What you see | Meaning |
+|--------------|---------|
+| A few sentences listing namespaces | LLM received MCP data and summarized it |
+| Airline namespaces named (`booking-api`, `flight-search`, etc.) | Real cluster data — not hallucinated |
+| LangChain debug / tool-call traces (if logging enabled) | Agent chose `kubectl_get` with namespace-related args |
+| `Connection refused` or MCP errors | Container stopped — restart from `2_guide.md` |
+| OpenAI / API errors | Check `grep OPENAI .env` — LLM endpoint is separate from MCP |
 
-> *Talking point: "If this passes, you've proven the read path works. The agents in the next guides just add the LLM on top of the same endpoint."*
+Spot-check against kubectl:
+
+```bash
+kubectl get ns
+```
+
+> *Talking point: "The LLM is summarizing real cluster data here — MCP is the source of truth, not the model's memory."*
 
 ---
 
-**Next:** Walk through the query agent → `5_guide.md`
+## Change the prompt — `kube-system` demo
+
+Show how easy it is to ask a different question. Edit line 6 in `query_agent.py`:
+
+```python
+PROMPT = "how many pods are running in kube-system?"
+```
+
+Save and run again:
+
+```bash
+python3 sections/06-mcp-data-agent/code/query_agent.py
+```
+
+**What it does:** Same script, same `run_agent` wiring — only the prompt changed. The LLM should call `kubectl_get` for pods in `kube-system` and count them.
+
+**Expected output (kube-system prompt):**
+
+```text
+There are N pods running in the kube-system namespace: <pod-1>, <pod-2>, ...
+```
+
+Verify:
+
+```bash
+kubectl get pods -n kube-system
+```
+
+> *Talking point: "Change one line and you get a completely different question — that's the agent pattern: prompt in, MCP out, answer back."*
+
+Other prompts to try live:
+
+- `"what deployments exist in booking-api?"`
+- `"list configmaps in the payment namespace"`
+
+---
+
+**Next:** Run the label audit agent → `5_guide.md`
