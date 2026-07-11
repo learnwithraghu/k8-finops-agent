@@ -1,93 +1,97 @@
-# Guide 0: Understand `query_agent.py`
+# Guide 0: Start the Persistent MCP Server and Validate
 
 **Time Budget:** 4–5 mins
 
-**Narrative:** Three files, under 80 lines total — load config, let LangChain pick MCP tools, print a plain-English answer.
+**Narrative:** Section 05 used Supergateway because curl cannot speak stdio MCP. Section 06 upgrades to a single Docker container that exposes native Streamable HTTP — no gateway, no curl. Leave it running; the agents connect over HTTP.
 
-**Prerequisites:** Section 05 Supergateway running; `.env` with OpenAI-compatible settings; virtualenv activated.
+**Prerequisites:** Sections 01–05 complete; Kind cluster reachable via kubectl; repo-root `.env` and virtualenv from root `requirements.txt`.
 
 ---
 
-## The flow
-
-```mermaid
-sequenceDiagram
-    participant Script as query_agent.py
-    participant LC as LangChain_ReAct
-    participant MCP as Supergateway_MCP
-    participant LLM as OpenAI_Compatible_API
-
-    Script->>LC: prompt + MCP tools
-    LC->>LLM: which tool and args?
-    LLM->>MCP: kubectl_get(...)
-    MCP-->>LLM: cluster data
-    LLM-->>Script: plain-English answer
-    Script->>Script: print answer
-```
-
-Open the files:
+### 1) Confirm kubectl works
 
 ```bash
-cat sections/06-mcp-data-agent/mcp_client.py
-cat sections/06-mcp-data-agent/query_agent.py
+kubectl get ns
 ```
 
+**What it does:** Verifies cluster access. The MCP container uses the same kubeconfig.
+
+> *Expected: airline namespaces like `booking-api`, `flight-search`, `inventory`, `payment`.*
+
 ---
 
-### 1) Shared MCP wiring — `mcp_client.py`
+### 2) Pull the MCP image (if needed)
 
-```python
-load_dotenv(Path(__file__).parents[2] / ".env")
-MCP_URL = os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp")
-tools, cleanup = await convert_mcp_to_langchain_tools(MCP_SERVERS)
+```bash
+docker pull mcp/kubernetes:latest
 ```
 
-**What it does:** Loads the repo-root `.env`, connects to Streamable HTTP at `/mcp`, and converts MCP tools (like `kubectl_get`) into LangChain tools.
-
-> *Talking point: "Both Section 06 scripts share this module — one place for the MCP endpoint."*
+**What it does:** Downloads the same Kubernetes MCP image from Section 05 — now run with native HTTP instead of Supergateway.
 
 ---
 
-### 2) The prompt
+### 3) Resolve kubeconfig path
 
-```python
-PROMPT = "list all namespaces"
+```bash
+export KUBECONFIG_FILE="${KUBECONFIG:-$HOME/.kube/config}"
+test -f "$KUBECONFIG_FILE" && echo "Using $KUBECONFIG_FILE"
 ```
 
-**What it does:** A fixed demo question. Change it to anything — "how many pods in payment?", "show deployments in booking-api".
-
-> *Talking point: "One prompt in. The LLM decides which MCP tool to call and with what arguments."*
+**What it does:** Sets the path Docker will mount read-only into the MCP container.
 
 ---
 
-### 3) LangChain ReAct agent picks the MCP tool
+### 4) Start the persistent MCP server
 
-```python
-llm = ChatOpenAI(model=..., base_url=..., api_key=...)
-agent = create_agent(llm, tools)
-result = await agent.ainvoke({"messages": [HumanMessage(content=PROMPT)]})
-print(result["messages"][-1].content)
+In a **dedicated terminal** (leave it running for the whole section):
+
+**Kind cluster (`finops-cluster`) — recommended for this course:**
+
+```bash
+kind get kubeconfig --name finops-cluster --internal > /tmp/kubeconfig-docker.yaml
+
+docker run --rm -p 8000:8000 --network kind \
+  -v /tmp/kubeconfig-docker.yaml:/home/appuser/.kube/config:ro \
+  -e ENABLE_UNSAFE_STREAMABLE_HTTP_TRANSPORT=1 \
+  -e PORT=8000 \
+  -e HOST=0.0.0.0 \
+  -e ALLOW_ONLY_READONLY_TOOLS=true \
+  mcp/kubernetes:latest
 ```
 
-**What it does:** LangChain's agent loop handles tool choice — LLM chooses `kubectl_get`, MCP executes it, LLM writes the final answer.
+**Other clusters (standard kubeconfig mount):**
 
-**Why LangChain here?** Without it you'd hand-write: list tools, map schemas, parse tool calls, invoke MCP, call the LLM again. LangChain collapses that into ~10 lines.
+```bash
+docker run --rm -p 8000:8000 \
+  -v "${KUBECONFIG_FILE}:/home/appuser/.kube/config:ro" \
+  -e ENABLE_UNSAFE_STREAMABLE_HTTP_TRANSPORT=1 \
+  -e PORT=8000 \
+  -e HOST=0.0.0.0 \
+  -e ALLOW_ONLY_READONLY_TOOLS=true \
+  mcp/kubernetes:latest
+```
 
-> *Talking point: "Same MCP endpoint we proved with curl in Section 05 — now the LLM drives the tool call."*
+**What it does:** Starts `mcp/kubernetes` with Streamable HTTP on port 8000 at `/mcp`. Read-only tools only — safe for demos. The Kind variant joins the `kind` Docker network so the container can reach the control plane.
 
----
-
-## Compare to `snapshot_collector.py`
-
-| | `query_agent.py` | `snapshot_collector.py` |
-|---|---|---|
-| **Scope** | One natural-language question | Every namespace, five resource types |
-| **Output** | Plain-English answer | Full JSON snapshot with labels |
-| **LLM** | Yes — picks MCP tools | No — deterministic loops |
-| **Use when** | Teaching prompt → MCP → answer | Collecting everything for downstream analysis |
-
-> *Talking point: "`query_agent.py` asks one question. `snapshot_collector.py` collects everything — see `2_guide.md`."*
+> *Talking point: "One container, one port. No Supergateway, no npx. Python agents connect directly."*
 
 ---
 
-**Next:** Run the query agent live → `1_guide.md`, then collect the full snapshot → `2_guide.md`
+### 5) Validate with Python (no curl)
+
+In a **second terminal**:
+
+```bash
+source .venv/bin/activate
+python3 sections/06-mcp-data-agent/code/validate_mcp.py
+```
+
+**What it does:** Connects to `http://localhost:8000/mcp`, calls `kubectl_get` for namespaces, and prints the list.
+
+> *Expected: `MCP OK — N namespaces via kubectl_get` followed by namespace names.*
+
+> *Talking point: "Same `kubectl_get` tool from Section 05 — we just proved it with Python instead of curl."*
+
+---
+
+**Next:** Walk through the agent code → `1_guide.md`

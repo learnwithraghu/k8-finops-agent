@@ -1,62 +1,71 @@
-# Demo 2: Run the Snapshot Collector
+# Demo 2: Run `code/query_agent.py` and Observe the Answer
 
-**Time Budget:** 3 mins
+**Time Budget:** 3–4 mins
 
-**Narrative:** The query agent answers one question. FinOps needs every resource with labels — `snapshot_collector.py` connects to MCP, loops through namespaces and resource types, and writes a JSON snapshot. Deterministic — same input, same output every time.
+**Narrative:** One prompt — "list all namespaces". The LangChain agent picks MCP tools, reads the cluster, and returns the LLM's final answer.
 
-**Prerequisites:** [`1_guide.md`](1_guide.md) — query agent working; virtualenv activated.
-
----
-
-### 1) Confirm MCP endpoint is alive
-
-```bash
-curl -s http://localhost:8000/healthz
-```
-
-**What it does:** Quick health check before running the collector. If this fails, Supergateway is not running.
-
-> *Expected: `ok`*
+**Prerequisites:** [`1_guide.md`](1_guide.md) — understand the code first; MCP container running; virtualenv activated.
 
 ---
 
-### 2) Peek at the collector code
-
-```bash
-cat sections/06-mcp-data-agent/snapshot_collector.py
-```
-
-**What it does:** Shows the difference from `query_agent.py` — no LLM, just deterministic `kubectl_get` loops via the same `mcp_client.py`.
-
-> *Talking point: "Same MCP tools, different job. The query agent asks one question; the collector gathers everything for downstream analysis."*
-
----
-
-### 3) Run the collector
+### 1) Confirm MCP is still reachable
 
 ```bash
 source .venv/bin/activate
-python3 sections/06-mcp-data-agent/snapshot_collector.py > k8s_metadata.json
+python3 sections/06-mcp-data-agent/code/validate_mcp.py
 ```
 
-**What it does:** Connects to MCP via `mcp_client.py`, lists namespaces, fetches resources per namespace, and writes the snapshot to `k8s_metadata.json`.
-
-> *Talking point: "Same `kubectl_get` tool we validated with curl — Python automates the loop across every namespace."*
+**What it does:** Quick Python check that the persistent MCP container is still up. If this fails, restart the container from `0_guide.md`.
 
 ---
 
-### 4) Review labels in the output
+### 2) Confirm LLM configuration
 
 ```bash
-cat k8s_metadata.json | jq '.resources[] | {name, namespace, kind, labels}' | head -n 30
+grep OPENAI .env
 ```
 
-**What it does:** Shows resource names, namespaces, kinds, and **labels** — the raw material for FinOps analysis in Section 07.
+**What it does:** Shows the OpenAI-compatible endpoint settings. `code/mcp_client.py` loads these from the repo-root `.env`.
 
-> *Expected: JSON with `scanned_at`, `cluster`, `namespaces`, and `resources` keys. Resources include deployments, pods, services, PVCs, and configmaps from the airline namespaces.*
-
-> *Talking point: "This is structured data with labels attached. No compliance verdicts yet — Section 07 adds tagging rules and structured findings."*
+> *Talking point: "The LLM endpoint is separate from MCP. MCP reads the cluster; the LLM chooses tools and writes the answer."*
 
 ---
 
-**Next:** Add policy and structured output → `sections/07-llm-structured-agent`
+### 3) Run the script
+
+```bash
+python3 sections/06-mcp-data-agent/code/query_agent.py
+```
+
+**What it does:** LangChain ReAct agent picks `kubectl_get` through MCP, then prints a short plain-English summary.
+
+> *Expected: A few sentences listing airline namespaces like `booking-api`, `flight-search`, `inventory`, `payment`.*
+
+> *Talking point: "The LLM chose the tool — we didn't hardcode `kubectl_get`. Change `PROMPT` in `code/query_agent.py` to ask anything about the cluster."*
+
+---
+
+### 4) Spot-check against kubectl
+
+```bash
+kubectl get ns
+```
+
+**What it does:** Confirms the LLM's answer matches what kubectl shows.
+
+> *Talking point: "The LLM summarized real cluster data — MCP is the source of truth."*
+
+---
+
+### 5) What we learned
+
+- **Prompt in** → `list all namespaces`
+- **LLM** → picks MCP tool + arguments
+- **MCP out** → raw cluster data
+- **LLM** → plain-English answer
+
+> *Talking point: "This answer is useful but small — one question at a time. The next demo uses the same agent wiring with a broader inventory prompt."*
+
+---
+
+**Next:** Run the inventory agent → `3_guide.md`

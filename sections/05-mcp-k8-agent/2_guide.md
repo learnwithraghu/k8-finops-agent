@@ -66,4 +66,4 @@ Switch to the Supergateway terminal and press `Ctrl-C` to stop it.
 
 ---
 
-**Next:** MCP endpoint validated. Next we build a Python agent that calls it → `sections/06-mcp-data-agent`
+**Next:** MCP endpoint validated with curl. Section 06 upgrades to a persistent HTTP MCP container (no Supergateway) and Python agents → `sections/06-mcp-data-agent`. Stop Supergateway before Section 06 if port 8000 is still in use.

@@ -1,7 +1,7 @@
 # Section 05 Goal: curl-Validated MCP Server for Local K8s Access
 
 ## Goal
-Run a prebuilt Kubernetes MCP server against the local Kind cluster, expose it as a plain HTTP endpoint with Supergateway, and validate the whole chain with curl — no client SDK required. This is the seam that Sections 06+ plug into.
+Run a prebuilt Kubernetes MCP server against the local Kind cluster, expose it as a plain HTTP endpoint with Supergateway, and validate the whole chain with curl — no client SDK required. Section 06 upgrades to native HTTP MCP (no Supergateway); Section 05 proves the protocol with curl.
 
 ## Prerequisites
 Sections 01, 02, 02a, and 04 complete.
@@ -49,4 +49,4 @@ The learner can:
 1. Start a prebuilt MCP server exposed over HTTP using `npx supergateway`
 2. `curl` its HTTP endpoint and receive a valid MCP `initialize` response
 3. `curl` the `kubectl_get` tool and confirm it returns namespaces from the local Kind cluster
-4. Explain how this curl-validated setup becomes the input seam for Sections 06 and 07
+4. Explain how Section 06 reuses the same MCP tools via native HTTP without Supergateway

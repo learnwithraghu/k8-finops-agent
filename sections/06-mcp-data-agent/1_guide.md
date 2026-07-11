@@ -1,73 +1,93 @@
-# Demo 1: Run `query_agent.py` and Observe the Answer
+# Guide 1: Understand the Agent Code
 
-**Time Budget:** 3–4 mins
+**Time Budget:** 4–5 mins
 
-**Narrative:** One prompt — "list all namespaces". The LangChain agent picks MCP tools, reads the cluster, and returns a plain-English summary.
+**Narrative:** The Section 06 code lives in `code/` — load root config, connect to the persistent MCP HTTP endpoint, let LangChain pick tools, print the LLM's final answer.
 
-**Prerequisites:** [`0_guide.md`](0_guide.md) — understand the code first; virtualenv activated.
+**Prerequisites:** [`0_guide.md`](0_guide.md) — MCP container running; `validate_mcp.py` passed; virtualenv activated.
 
 ---
 
-### 1) Confirm MCP endpoint is alive
+## The flow
 
-```bash
-curl -s http://localhost:8000/healthz
+```mermaid
+sequenceDiagram
+    participant Script as code/query_agent.py
+    participant LC as LangChain_ReAct
+    participant MCP as MCP_HTTP_Docker
+    participant LLM as OpenAI_Compatible_API
+
+    Script->>LC: prompt + MCP tools
+    LC->>LLM: which tool and args?
+    LLM->>MCP: kubectl_get(...)
+    MCP-->>LLM: cluster data
+    LLM-->>Script: plain-English answer
+    Script->>Script: print answer
 ```
 
-**What it does:** Quick health check before running the agent. If this fails, Supergateway is not running.
-
-> *Expected: `ok`*
-
----
-
-### 2) Confirm LLM configuration
+Open the files:
 
 ```bash
-grep OPENAI .env
+cat sections/06-mcp-data-agent/code/mcp_client.py
+cat sections/06-mcp-data-agent/code/query_agent.py
 ```
 
-**What it does:** Shows the OpenAI-compatible endpoint settings. The script reads these at startup via `mcp_client.py` and `query_agent.py`.
-
-> *Talking point: "The LLM endpoint is separate from MCP. MCP reads the cluster; the LLM chooses tools and writes the answer."*
-
 ---
 
-### 3) Run the script
+### 1) Shared MCP wiring — `code/mcp_client.py`
 
-```bash
-source .venv/bin/activate
-python3 sections/06-mcp-data-agent/query_agent.py
+```python
+load_dotenv(Path(__file__).parents[3] / ".env")
+MCP_URL = os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp")
+tools, cleanup = await convert_mcp_to_langchain_tools(MCP_SERVERS)
 ```
 
-**What it does:** LangChain ReAct agent picks `kubectl_get` through MCP, then prints a short plain-English summary.
+**What it does:** Loads the repo-root `.env`, connects to Streamable HTTP at `/mcp` on the persistent Docker container, and converts MCP tools like `kubectl_get` into LangChain tools.
 
-> *Expected: A few sentences listing airline namespaces like `booking-api`, `flight-search`, `inventory`, `payment`.*
-
-> *Talking point: "The LLM chose the tool — we didn't hardcode `kubectl_get`. Change `PROMPT` to ask anything about the cluster."*
+> *Talking point: "Both Section 06 scripts share this module — one place for the MCP endpoint."*
 
 ---
 
-### 4) Spot-check against kubectl
+### 2) The prompt
 
-```bash
-kubectl get ns
+```python
+PROMPT = "list all namespaces"
 ```
 
-**What it does:** Confirms the LLM's answer matches what kubectl shows.
+**What it does:** A fixed demo question. Change it to anything — "how many pods in payment?", "show deployments in booking-api".
 
-> *Talking point: "The LLM summarized real cluster data — MCP is the source of truth."*
-
----
-
-### 5) What we learned
-
-- **Prompt in** → `list all namespaces`
-- **LLM** → picks MCP tool + arguments
-- **MCP out** → raw cluster data
-- **LLM** → plain-English answer
-
-> *Talking point: "This answer is useful but unstructured — one question at a time. FinOps needs a full snapshot with labels — that's `snapshot_collector.py` in Demo 2."*
+> *Talking point: "One prompt in. The LLM decides which MCP tool to call and with what arguments."*
 
 ---
 
-**Next:** Collect a structured cluster snapshot → `2_guide.md`
+### 3) LangChain ReAct agent picks the MCP tool
+
+```python
+llm = ChatOpenAI(model=..., base_url=..., api_key=...)
+agent = create_agent(llm, tools)
+result = await agent.ainvoke({"messages": [HumanMessage(content=PROMPT)]})
+print(result["messages"][-1].content)
+```
+
+**What it does:** LangChain's agent loop handles tool choice — LLM chooses `kubectl_get`, MCP executes it, LLM writes the final answer.
+
+**Why LangChain here?** Without it you'd hand-write: list tools, map schemas, parse tool calls, invoke MCP, call the LLM again. LangChain collapses that into ~10 lines.
+
+> *Talking point: "Section 05 proved MCP with curl. Now the LLM drives the same tool calls over HTTP."*
+
+---
+
+## Compare to `snapshot_collector.py`
+
+| | `code/query_agent.py` | `code/snapshot_collector.py` |
+|---|---|---|
+| **Scope** | One natural-language question | Broader cluster inventory request |
+| **Output** | Plain-English answer | LLM-written inventory summary |
+| **LLM** | Yes — picks MCP tools | Yes — picks MCP tools |
+| **Use when** | Teaching prompt → MCP → answer | Showing a larger agent task with the same code path |
+
+> *Talking point: "Same agent wiring, different prompt size. Section 07 is where we turn this kind of output into structured data."*
+
+---
+
+**Next:** Run the query agent live → `2_guide.md`, then run the inventory agent → `3_guide.md`
