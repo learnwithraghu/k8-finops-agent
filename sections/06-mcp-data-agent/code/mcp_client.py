@@ -1,6 +1,6 @@
 """Shared LangChain + MCP helpers for Section 06 scripts.
 
-Expects the persistent HTTP MCP container from Guide 0 (native Streamable HTTP on
+Expects the persistent HTTP MCP container from Guide 2 (native Streamable HTTP on
 http://localhost:8000/mcp). No Supergateway required.
 """
 import json

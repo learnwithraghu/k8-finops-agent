@@ -19,26 +19,20 @@ You should already have:
 - `mcp/kubernetes:latest` Docker image available
 
 ## Instructor setup (before the live demo)
-Run `0_prerequisite_guide.md` before teaching. It pulls the MCP image, sets up the venv, and inspects the scripts. Do not walk students through pip install during the live demo. Students start the MCP container live in Guide 0.
+Run `0_prerequisite_guide.md` before teaching. It pulls the MCP image, sets up the venv, and inspects the scripts. Do not walk students through pip install during the live demo. Students start the MCP container live in Guide 2.
 
-## Video structure (3 videos)
-| Video | Focus | Time |
+## Guide structure (7 parts)
+| Guide | Focus | Time |
 |-------|------------|-------|
-| **0** | Upgrade from Section 05 — persistent HTTP MCP, Python validation | 3–4 min |
-| **1** | Agent loop; LLM tool choice; MCP execution | 3–4 min |
-| **2** | Agent-driven inventory collection; LLM final summary | 3–4 min |
+| **0** (`0_prerequisite_guide.md`) | Instructor prereq — image, venv, API key | 2–3 min |
+| **1** | Standalone MCP vs Supergateway (video transcript) | 1:30 |
+| **2** | Start persistent MCP Docker container | 4–5 min |
+| **3** | Trainer notes — `code/mcp_client.py` block by block | 4–5 min |
+| **4** | Trainer notes — `code/validate_mcp.py`; run and read output | 3–4 min |
+| **5** | Trainer notes — `code/query_agent.py`; run; change prompt to `kube-system` | 4–5 min |
+| **6** | Trainer notes — `code/snapshot_collector.py`; run and read output | 4–5 min |
 
-Transcripts: `transcript/0.md`, `transcript/1.md`, `transcript/2.md`
-
-## Demo structure (4 parts)
-| Demo | Focus | Time |
-|------|-------|------|
-| **0** | Start persistent MCP container; validate with `code/validate_mcp.py` | 4–5 min |
-| **1** | Walk through agent code in `code/` | 4–5 min |
-| **2** | Run `code/query_agent.py`, spot-check with kubectl | 3–4 min |
-| **3** | Run `code/snapshot_collector.py`, inspect the LLM inventory summary | 3 min |
-
-Students go from "Section 05 curl + Supergateway" to "direct HTTP MCP + LangChain agents" in under 15 minutes.
+Students go from "Section 05 curl + Supergateway" to "direct HTTP MCP + LangChain agents" in under 25 minutes.
 
 ## Scope
 - Start `mcp/kubernetes:latest` with native Streamable HTTP on port 8000 (no Supergateway)
@@ -57,13 +51,14 @@ Students go from "Section 05 curl + Supergateway" to "direct HTTP MCP + LangChai
 The learner can:
 1. Start the persistent MCP Docker container and validate it with `code/validate_mcp.py`
 2. Run `code/query_agent.py` against the local Kind cluster and get a plain-English answer
-3. Run `code/snapshot_collector.py` and get an LLM-written inventory summary
-4. Explain why Section 06 drops Supergateway but keeps the same `kubectl_get` tools over HTTP
+3. Change the query prompt (e.g. to a `kube-system` question) and re-run without changing plumbing
+4. Run `code/snapshot_collector.py` and get an LLM-written inventory summary
+5. Explain why Section 06 drops Supergateway but keeps the same `kubectl_get` tools over HTTP
 
 ## Artifacts
 | File | Purpose |
 |---|---|
-| `code/mcp_client.py` | Shared MCP URL, root `.env` load, LangChain tool bootstrap |
+| `code/mcp_client.py` | Shared MCP URL, root `.env` load, LangChain tool bootstrap, `run_agent` |
 | `code/validate_mcp.py` | Python MCP validation (no curl) |
 | `code/query_agent.py` | Natural-language cluster query agent |
 | `code/snapshot_collector.py` | Broader inventory prompt; prints the LLM's final output |
