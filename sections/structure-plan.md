@@ -144,7 +144,7 @@ sections/
   - deliberately unstructured output
   - why structure is added in Section 07, not here
 
-### Section 07: Policy Label Audit
+### Section 07: LLM Policy-Aware Label Audit
 - Keep:
   - `code/mcp_client.py`, `code/structured_auditor.py`
   - `config/tagging-rules.yaml`

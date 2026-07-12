@@ -19,7 +19,7 @@ This directory is the curriculum skeleton for the repo.
 - `sections/04-finops-architecture-design/` → Section 04 (architecture whiteboarding; `1_guide.md`–`3_guide.md`)
 - `sections/05-mcp-k8-agent/` → Section 05 (prebuilt MCP setup and curl validation)
 - `sections/06-mcp-data-agent/code/` → Section 06 (`validate_mcp.py`, `query_agent.py`, `label_auditor.py`)
-- `sections/07-llm-structured-agent/code/` and `config/` → Section 07 (tagging rules file + policy label audit)
+- `sections/07-llm-structured-agent/code/` and `config/` → Section 07 (LLM policy-aware label audit + tagging rules file)
 - `sections/08-issue-tracker-service/service/` → Section 08
 - `sections/09-agent-to-tracker-integration/agent/` → Section 09
 - `sections/10-agent-refactoring-best-practices/` → Section 10 (modular agent architecture)
@@ -42,7 +42,7 @@ This directory is the curriculum skeleton for the repo.
 7. **04** — FinOps AI architecture design (whiteboarding)
 8. **05** — Prebuilt MCP setup and curl validation
 9. **06** — LangChain MCP agents: prompt → MCP → unstructured data
-10. **07** — LLM structured agent: snapshot + tagging rules → structured findings
+10. **07** — LLM policy-aware label audit: tagging rules from file → policy-grounded agent answer
 11. **08** — Issue tracker service
 12. **09** — Agent to tracker integration
 13. **10** — Agent refactoring best practices

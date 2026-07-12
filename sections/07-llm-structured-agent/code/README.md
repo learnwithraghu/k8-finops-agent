@@ -1,4 +1,4 @@
-# Section 07 Code
+# Section 07 Code — LLM Policy-Aware Label Audit
 
 Ask a LangChain agent to audit cluster labels against tagging rules and print a plain-English audit.
 
@@ -43,3 +43,4 @@ Loads LLM settings from the repo-root `.env` via `mcp_client.py`. Reads policy f
 | 2 | `2_guide.md` | Walk the Rules File |
 | 3 | `3_guide.md` | Walk the Policy Auditor |
 | 4 | `4_guide.md` | Run the Policy Auditor |
+| 5 | `5_guide.md` | Fix Truncated Audit Output |

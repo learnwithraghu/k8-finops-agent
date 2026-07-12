@@ -49,18 +49,28 @@ You are auditing Kubernetes resource labels for FinOps governance through MCP to
 
 Use the available Kubernetes MCP tools to:
 1. List all namespaces.
-2. For each application namespace (skip kube-* and excluded namespaces from the rules),
-   fetch deployments, configmaps, and persistent volume claims.
+2. For each application namespace (skip only namespaces listed in excluded_namespaces;
+   also skip kube-* namespaces), fetch deployments, configmaps, and persistent volume claims.
 3. Report each resource's name, namespace, kind, and labels exactly as returned by the tools.
 4. Evaluate each resource against the tagging rules provided separately.
 5. Flag resources that violate required tags or label mappings.
-6. Summarize the label audit in plain English, grouped by namespace.
+6. Summarize the full label audit in plain English, grouped by namespace. Cover every
+   audited namespace and resource — do not truncate mid-report.
+
+Evaluation rules (follow strictly; do not invent policy):
+- A required tag is present if ANY key listed under that tag in label_mappings appears
+  on the resource (for example, `app` satisfies `application`).
+- Do not call a mapped key non-standard, legacy, or invalid when it is in label_mappings.
+- Use only required_tags, label_mappings, cost_centers, environments, tiers,
+  compliance_levels, resource_types, and excluded_namespaces from the rules.
+- Do not invent exclusions, bonus labels, recommended tags, or extra commentary
+  beyond what the rules define.
 
 Use only data returned by the tools. Do not invent labels or resources.
 """
 ```
 
-Instruction only — what to do. No YAML here. Compare to Section 06's `label_auditor.py`: same steps, but step 4 now says "evaluate against the tagging rules provided separately."
+Instruction only — what to do. No YAML here. The evaluation block forces the agent to honor `label_mappings` as written (so `app` counts for `application`) and not invent policy outside the rules file.
 
 ---
 
@@ -85,7 +95,7 @@ async def main() -> None:
         await run_agent(
             PROMPT,
             tagging_rules=load_tagging_rules(),
-            max_tokens=2048,
+            max_tokens=4096,
         )
     )
 ```
@@ -100,11 +110,11 @@ Three pieces: instruction prompt, rules from file, print the answer. Inside `mcp
 async def run_agent(prompt, max_tokens=None, tagging_rules=None) -> str:
     ...
     if tagging_rules:
-        messages.append(SystemMessage(content="Apply the tagging rules below...\n" + tagging_rules))
+        messages.append(SystemMessage(content="Apply the tagging rules below... Do not invent extra policy...\n" + tagging_rules))
     messages.append(HumanMessage(content=prompt))
 ```
 
-This is the only plumbing change from Section 06. Rules arrive as a separate system message — not embedded in the prompt constant.
+This is the only plumbing change from Section 06. Rules arrive as a separate system message — not embedded in the prompt constant — and the system text also tells the agent not to invent policy beyond the YAML.
 
 ---
 

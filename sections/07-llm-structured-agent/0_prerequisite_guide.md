@@ -118,3 +118,4 @@ When setup passes, start the live walkthrough with:
 - `2_guide.md` — Theory: walk the rules file
 - `3_guide.md` — Demo: walk `structured_auditor.py`
 - `4_guide.md` — Demo: run and read screen output
+- `5_guide.md` — Demo: raise `max_tokens` when the audit truncates

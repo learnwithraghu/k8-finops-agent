@@ -11,12 +11,22 @@ You are auditing Kubernetes resource labels for FinOps governance through MCP to
 
 Use the available Kubernetes MCP tools to:
 1. List all namespaces.
-2. For each application namespace (skip kube-* and excluded namespaces from the rules),
-   fetch deployments, configmaps, and persistent volume claims.
+2. For each application namespace (skip only namespaces listed in excluded_namespaces;
+   also skip kube-* namespaces), fetch deployments, configmaps, and persistent volume claims.
 3. Report each resource's name, namespace, kind, and labels exactly as returned by the tools.
 4. Evaluate each resource against the tagging rules provided separately.
 5. Flag resources that violate required tags or label mappings.
-6. Summarize the label audit in plain English, grouped by namespace.
+6. Summarize the full label audit in plain English, grouped by namespace. Cover every
+   audited namespace and resource — do not truncate mid-report.
+
+Evaluation rules (follow strictly; do not invent policy):
+- A required tag is present if ANY key listed under that tag in label_mappings appears
+  on the resource (for example, `app` satisfies `application`).
+- Do not call a mapped key non-standard, legacy, or invalid when it is in label_mappings.
+- Use only required_tags, label_mappings, cost_centers, environments, tiers,
+  compliance_levels, resource_types, and excluded_namespaces from the rules.
+- Do not invent exclusions, bonus labels, recommended tags, or extra commentary
+  beyond what the rules define.
 
 Use only data returned by the tools. Do not invent labels or resources.
 """
@@ -33,7 +43,7 @@ async def main() -> None:
         await run_agent(
             PROMPT,
             tagging_rules=load_tagging_rules(),
-            max_tokens=2048,
+            max_tokens=4096,
         )
     )
 

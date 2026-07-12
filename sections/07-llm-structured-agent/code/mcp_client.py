@@ -50,7 +50,9 @@ async def run_agent(
             messages.append(
                 SystemMessage(
                     content=(
-                        "Apply the tagging rules below when evaluating cluster resources.\n\n"
+                        "Apply the tagging rules below when evaluating cluster resources. "
+                        "Treat label_mappings as the only accepted keys for each required tag. "
+                        "Do not invent extra policy, exclusions, or judgments beyond this YAML.\n\n"
                         f"Tagging rules (YAML):\n{tagging_rules}"
                     )
                 )
