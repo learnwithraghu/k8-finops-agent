@@ -1,4 +1,4 @@
-# Section 08 Goal: From Findings to Tickets — Issue Tracker & Agent Integration
+# Section 08 Goal: From Findings to Actionable Tickets
 
 ## Goal
 Stand up a lightweight FinOps issue tracker, understand its REST and MCP APIs, and wire the Section 06 MCP agent to post per-finding tickets automatically — closing the loop from cluster scan to actionable work.

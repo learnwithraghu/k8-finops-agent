@@ -1,6 +1,6 @@
 # Service
 
-This folder contains the local issue tracker for Section 08 (From Findings to Tickets).
+This folder contains the local issue tracker for Section 08 (From Findings to Actionable Tickets).
 
 ## What it is
 A simple Jira-style Kanban board built with FastAPI, HTML, CSS, and JavaScript.

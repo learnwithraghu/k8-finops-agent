@@ -58,13 +58,13 @@ Flow legend: Video -> Video -> Video -> Demo -> Quiz
 | 07 LLM Structured Agent | 3 | Video | Schemas that keep LLM output auditable | 3 to 4 min |
 | 07 LLM Structured Agent | 4 | Demo | Feed Section 06 snapshot + rules to the LLM and read structured findings | 7 to 8 min |
 | 07 LLM Structured Agent | 5 | Quiz | Why separate collection (06) from analysis (07)? How do tagging rules constrain the LLM? Which field ties a finding to a rule? | 2 to 3 min |
-| 08 From Findings to Tickets | 1 | Video | The Issue Tracker Landscape: Jira, Linear, GitHub Issues, and Custom | 3 to 4 min |
-| 08 From Findings to Tickets | 2 | Demo | Launch the FinOps Issue Tracker | 2 to 3 min |
-| 08 From Findings to Tickets | 3 | Demo | Tracker Backend Walkthrough: REST, MCP, and the Ticket Schema | 4 to 5 min |
-| 08 From Findings to Tickets | 4 | Video | Whiteboard: Wiring the MCP Agent to the Tracker | 3 to 4 min |
-| 08 From Findings to Tickets | 5 | Demo | Agent Walkthrough: Post Per-Finding Tickets Instead of Printing | 4 to 5 min |
-| 08 From Findings to Tickets | 6 | Video | Architecture Update: The Closed-Loop FinOps Pipeline | 3 to 4 min |
-| 08 From Findings to Tickets | 7 | Quiz | What fields are mandatory in a FinOps issue? Why per-finding beats one blob? What closes the loop from alert to action? | 2 to 3 min |
+| 08 From Findings to Actionable Tickets | 1 | Video | The Issue Tracker Landscape: Jira, Linear, GitHub Issues, and Custom | 3 to 4 min |
+| 08 From Findings to Actionable Tickets | 2 | Demo | Launch the FinOps Issue Tracker | 2 to 3 min |
+| 08 From Findings to Actionable Tickets | 3 | Demo | Tracker Backend Walkthrough: REST, MCP, and the Ticket Schema | 4 to 5 min |
+| 08 From Findings to Actionable Tickets | 4 | Video | Whiteboard: Wiring the MCP Agent to the Tracker | 3 to 4 min |
+| 08 From Findings to Actionable Tickets | 5 | Demo | Agent Walkthrough: Post Per-Finding Tickets Instead of Printing | 4 to 5 min |
+| 08 From Findings to Actionable Tickets | 6 | Video | Architecture Update: The Closed-Loop FinOps Pipeline | 3 to 4 min |
+| 08 From Findings to Actionable Tickets | 7 | Quiz | What fields are mandatory in a FinOps issue? Why per-finding beats one blob? What closes the loop from alert to action? | 2 to 3 min |
 | 09 Agent Refactoring Best Practices | 1 | Video | collector / analyzer / tracker modules; testability | 3 to 4 min |
 | 09 Agent Refactoring Best Practices | 2 | Demo | Run the refactored modular agent | 7 to 8 min |
 | 09 Agent Refactoring Best Practices | 3 | Quiz | Why separate collection from analysis? What belongs in tracker.py? How does modularity help testing? | 2 to 3 min |

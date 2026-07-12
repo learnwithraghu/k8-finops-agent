@@ -1,4 +1,4 @@
-# Slide Presentation Guide: Section 08 — From Findings to Tickets
+# Slide Presentation Guide: Section 08 — From Findings to Actionable Tickets
 
 ## Video-to-slide mapping
 

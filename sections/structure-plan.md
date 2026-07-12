@@ -156,7 +156,7 @@ sections/
   - loading tagging rules from file (not embedded in the prompt)
   - plain-English policy-aware audit printed to screen
 
-### Section 08: From Findings to Tickets — Issue Tracker & Agent Integration
+### Section 08: From Findings to Actionable Tickets
 - Keep:
   - `service/` — Dockerized FastAPI tracker (REST + MCP + Kanban UI)
   - `agent/` — minimal Section 06 fork (`mcp_client.py`, `structure.py`, `tracker_client.py`, `tracker_auditor.py`)

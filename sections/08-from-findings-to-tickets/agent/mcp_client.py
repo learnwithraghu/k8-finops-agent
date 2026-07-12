@@ -17,15 +17,13 @@ from langchain_mcp_tools import convert_mcp_to_langchain_tools
 
 load_dotenv(Path(__file__).parents[3] / ".env")
 
-TRACKER_MCP_URL = os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse")
-
 MCP_SERVERS = {
     "k8s": {
         "url": os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp"),
         "transport": "streamable_http",
     },
     "tracker": {
-        "url": TRACKER_MCP_URL,
+        "url": os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse"),
         "transport": "sse",
     },
 }
