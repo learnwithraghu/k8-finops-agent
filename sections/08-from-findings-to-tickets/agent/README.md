@@ -7,6 +7,7 @@ Unified LangChain agent with both K8s MCP and issue tracker MCP tools.
 | File | Purpose |
 |---|---|
 | `mcp_client.py` | LangChain wiring for K8s MCP + tracker MCP (both tool sets) |
+| `list_tracker_tools.py` | Connect to tracker MCP and print discovered tools |
 | `tracker_auditor.py` | Unified prompt: audit cluster and call `create_issue` per finding |
 
 ## Prerequisites
@@ -18,6 +19,7 @@ Unified LangChain agent with both K8s MCP and issue tracker MCP tools.
 ## Run
 
 ```bash
+python3 sections/08-from-findings-to-tickets/agent/list_tracker_tools.py
 python3 sections/08-from-findings-to-tickets/agent/tracker_auditor.py
 ```
 

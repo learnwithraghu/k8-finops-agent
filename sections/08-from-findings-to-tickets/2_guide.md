@@ -22,7 +22,7 @@ Open these files in your editor:
 - `create_issue` MCP tool maps directly to the `/create-issue` REST handler
 - Tickets get keys like `FINOPS-0001` and land in the backlog column
 
-> *Talking point: "Agents call MCP on port 8086. Humans use REST on 8085. Same ticket, different door."*
+> *Talking point: "Agents call MCP on port 8086. Humans use REST on 8085. Same ticket, different door. Run `list_tracker_tools.py` to show the MCP tool catalog live."*
 
 ---
 

@@ -37,7 +37,21 @@ Open `http://localhost:8085/docs` in your browser.
 
 **What it does:** Shows the FastAPI Swagger UI — interactive API documentation. You can test endpoints directly from the browser.
 
-> *Talking point: "The docs show every endpoint the tracker exposes. The `/create-issue` POST is the one agents use to create tickets."*
+> *Talking point: "The docs show every REST endpoint the tracker exposes. The `/create-issue` POST is the one agents use to create tickets — when calling over HTTP."*
+
+---
+
+### 4) List MCP tools from the agent
+
+In a **second terminal** (repo root):
+
+```bash
+python3 sections/08-from-findings-to-tickets/agent/list_tracker_tools.py
+```
+
+**What it does:** Connects to the tracker MCP server on port 8086 the same way the agent does, then prints the discovered tools (`create_issue`, `list_issues`, `get_issue`, `update_issue`).
+
+> *Talking point: "Swagger is for REST on 8085. Agents discover tools over MCP on 8086 — this script shows that catalog live."*
 
 ---
 

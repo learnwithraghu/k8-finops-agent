@@ -17,15 +17,21 @@ from langchain_mcp_tools import convert_mcp_to_langchain_tools
 
 load_dotenv(Path(__file__).parents[3] / ".env")
 
+TRACKER_MCP_URL = os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse")
+
 MCP_SERVERS = {
     "k8s": {
         "url": os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp"),
         "transport": "streamable_http",
     },
     "tracker": {
-        "url": os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse"),
+        "url": TRACKER_MCP_URL,
         "transport": "sse",
     },
+}
+
+TRACKER_MCP_SERVERS = {
+    "tracker": MCP_SERVERS["tracker"],
 }
 
 
@@ -50,6 +56,10 @@ def tool_by_name(tools: list[BaseTool], name: str) -> BaseTool:
 
 async def get_mcp_tools():
     return await convert_mcp_to_langchain_tools(MCP_SERVERS)
+
+
+async def get_tracker_mcp_tools():
+    return await convert_mcp_to_langchain_tools(TRACKER_MCP_SERVERS)
 
 
 def build_llm(max_tokens: int | None = None) -> ChatOpenAI:

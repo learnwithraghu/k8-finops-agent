@@ -80,11 +80,60 @@ def update_issue(
     return issue.model_dump(mode="json")
 
 
+MCP_LANDING_HTML = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FinOps Issue Tracker MCP</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #0f172a; }
+    p, li { line-height: 1.5; color: #475569; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+    a { color: #2563eb; }
+    .note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 16px; }
+  </style>
+</head>
+<body>
+  <h1>MCP transport (port 8086)</h1>
+  <p class="note">
+    This port is for <strong>agents</strong>, not a browser UI.
+    A <code>GET /</code> returns this page; tool calls go over SSE at <code>/sse</code>.
+  </p>
+  <h2>Endpoints</h2>
+  <ul>
+    <li><code>GET /sse</code> — agent connection (long-lived stream)</li>
+    <li><code>POST /messages/</code> — tool invocations from the agent client</li>
+  </ul>
+  <h2>Human-friendly docs</h2>
+  <ul>
+    <li><a href="http://localhost:8085/">Kanban board</a> (port 8085)</li>
+    <li><a href="http://localhost:8085/docs">REST Swagger</a> (port 8085)</li>
+    <li><code>python3 sections/08-from-findings-to-tickets/agent/list_tracker_tools.py</code></li>
+  </ul>
+</body>
+</html>"""
+
+
+def build_app():
+    from starlette.applications import Starlette
+    from starlette.responses import HTMLResponse
+    from starlette.routing import Mount, Route
+
+    async def landing(_request):
+        return HTMLResponse(MCP_LANDING_HTML)
+
+    return Starlette(
+        routes=[
+            Route("/", landing),
+            Mount("/", app=mcp.sse_app()),
+        ]
+    )
+
+
 def main() -> None:
     import uvicorn
 
-    app = mcp.sse_app()
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(build_app(), host="0.0.0.0", port=8001)
 
 
 if __name__ == "__main__":
