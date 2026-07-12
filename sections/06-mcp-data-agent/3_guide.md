@@ -2,17 +2,17 @@
 
 **Time Budget:** 4–5 mins
 
-**Narrative:** Every Section 06 script shares one module for MCP connection, LLM setup, and the LangChain agent loop. Walk through `mcp_client.py` block by block before running any agent script.
-
 **Prerequisites:** [`2_guide.md`](2_guide.md) — MCP container running; `validate_mcp.py` passed.
+
+> **Legend:** Blockquote lines are on-screen actions — do not read them aloud. Everything else is your script.
 
 ---
 
-Open the file:
+### Opening (~20 sec)
 
-```bash
-cat sections/06-mcp-data-agent/code/mcp_client.py
-```
+In Video 2 we started the MCP server and validated it with Python. Before we run any agent, let's walk through the one file every Section 06 script shares — `mcp_client.py`. This is the bridge between our prompts and the cluster. The agents never talk to kubectl directly.
+
+> **Do:** Open `sections/06-mcp-data-agent/code/mcp_client.py` in the editor.
 
 ---
 
@@ -26,15 +26,18 @@ http://localhost:8000/mcp). No Supergateway required.
 """
 ```
 
-**Highlight:** The contract — standalone HTTP MCP, not Supergateway.
-
-> *Talking point: "Think of this file as the bridge between our scripts and the cluster — the agents never talk to kubectl directly."*
+This docstring is the contract for the whole section. We expect the standalone HTTP MCP container from Guide 2 — native Streamable HTTP, no Supergateway in the middle. Every script in this folder imports from here.
 
 ---
 
 ### Block 2 — Imports (lines 6–16)
 
 ```python
+import json
+import os
+from pathlib import Path
+from typing import Any
+
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
@@ -43,9 +46,7 @@ from langchain_openai import ChatOpenAI
 from langchain_mcp_tools import convert_mcp_to_langchain_tools
 ```
 
-**Highlight:** `convert_mcp_to_langchain_tools` — turns MCP tools into LangChain tools the agent can call.
-
-> *Talking point: "We don't hand-write tool schemas — the converter picks them up automatically from the MCP handshake."*
+These imports split into three jobs. Standard library for paths and JSON. LangChain for the agent loop and the OpenAI-compatible LLM. And `langchain-mcp-tools` — that's the piece that converts MCP tools into LangChain tools the agent can call. We don't hand-write tool schemas. The converter discovers them from the MCP handshake automatically.
 
 ---
 
@@ -63,9 +64,9 @@ MCP_SERVERS = {
 }
 ```
 
-**Highlight:** `parents[3]` reaches the repo root from `code/`. `streamable_http` matches the standalone container from Guide 2.
+First we load the repo-root `.env` — `parents[3]` walks up from `code/` to the project root. Same API keys and model settings as the rest of the course.
 
-> *Talking point: "Same `.env` as the rest of the course — you'd only override `K8S_MCP_URL` if the endpoint moves somewhere else."*
+Then we define where MCP lives. `MCP_URL` defaults to the container we started in Guide 2. You'd only override `K8S_MCP_URL` if the endpoint moves. The transport is `streamable_http` — that matches the standalone container, not the Supergateway setup from Section 05.
 
 ---
 
@@ -73,12 +74,20 @@ MCP_SERVERS = {
 
 ```python
 def decode_tool_result(result: Any) -> dict:
-    ...
+    if isinstance(result, dict):
+        return result
+    text = str(result).strip()
+    if not text:
+        return {"items": []}
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"items": []}
 ```
 
-**Highlight:** MCP tool output may arrive as a dict or a JSON string. This normalizes it so callers can always use `.get("items", [])`.
+MCP tool output can arrive as a dict or as a JSON string depending on how it was called. This helper normalizes either shape so callers can always do `.get("items", [])`.
 
-> *Talking point: "The validation scripts use this helper. Agents usually get structured data through LangChain, but when you call a tool directly you need to parse the result yourself."*
+`validate_mcp.py` uses this when it calls `kubectl_get` directly. The LangChain agent usually gets structured data through the framework — but when you call a tool yourself, you parse the result here.
 
 ---
 
@@ -86,12 +95,15 @@ def decode_tool_result(result: Any) -> dict:
 
 ```python
 def tool_by_name(tools: list[BaseTool], name: str) -> BaseTool:
-    ...
+    tool = next((t for t in tools if t.name == name), None)
+    if tool is None:
+        raise RuntimeError(f"MCP tool not found: {name}")
+    return tool
 ```
 
-**Highlight:** Looks up a tool by name — `validate_mcp.py` uses this to grab `kubectl_get` without going through the LLM.
+Simple lookup — find a tool by name in the list MCP returned. `validate_mcp.py` uses this to grab `kubectl_get` without going through the LLM.
 
-> *Talking point: "Need deterministic behavior? Call a tool by name. Want flexibility? Let the agent figure it out."*
+Two patterns in this section: need deterministic behavior, call a tool by name. Want flexibility, let the agent choose. Same connection, different caller.
 
 ---
 
@@ -102,9 +114,7 @@ async def get_mcp_tools():
     return await convert_mcp_to_langchain_tools(MCP_SERVERS)
 ```
 
-**Highlight:** Opens the MCP session and returns `(tools, cleanup)`. Always call `cleanup` in a `finally` block.
-
-> *Talking point: "This is where we actually connect — HTTP handshake, discover the tools, wrap them for LangChain."*
+This is where we actually connect. HTTP handshake, discover the tools, wrap them for LangChain. It returns a tuple — the tools list and a cleanup callback. Always call cleanup in a `finally` block so the session closes cleanly.
 
 ---
 
@@ -116,13 +126,14 @@ def build_llm(max_tokens: int | None = None) -> ChatOpenAI:
         model=os.environ["OPENAI_MODEL_ID"],
         base_url=os.environ["OPENAI_BASE_URL"],
         api_key=os.environ["OPENAI_API_KEY"],
-        ...
+        temperature=float(os.getenv("OPENAI_TEMPERATURE", "0.3")),
+        max_tokens=max_tokens or int(os.getenv("OPENAI_MAX_TOKENS", "512")),
     )
 ```
 
-**Highlight:** Reads OpenAI-compatible settings from `.env`. `max_tokens` can be overridden for longer label audit reports.
+This builds the LLM from `.env` — model, base URL, API key. Temperature and max tokens have sensible defaults, but callers can override `max_tokens` for longer answers. The label auditor in Video 5 passes a higher limit because label reports run longer than a one-line namespace list.
 
-> *Talking point: "MCP handles reading the cluster; the LLM picks which tools to call and writes the answer. Two separate pieces working together."*
+MCP reads the cluster. The LLM decides which tools to call and writes the answer. Two separate pieces, one shared module.
 
 ---
 
@@ -139,10 +150,14 @@ async def run_agent(prompt: str, max_tokens: int | None = None) -> str:
         await cleanup()
 ```
 
-**Highlight:** The full agent loop in one function — connect, run ReAct agent, return the final LLM message, always cleanup.
+This is the full agent loop in one function. Connect to MCP, create the LangChain agent with the LLM and tools, invoke it with your prompt, return the final message, and always clean up.
 
-> *Talking point: "Both `query_agent.py` and `label_auditor.py` are just thin wrappers around this — change the prompt, not the plumbing."*
+Both `query_agent.py` and `label_auditor.py` are thin wrappers around this — you change the prompt, not the plumbing. That's the pattern for the rest of the section.
 
 ---
 
-**Next:** Run your first agent → `4_guide.md`
+### Close (~10 sec)
+
+That's the shared wiring. Next we run the smallest possible agent — one prompt, one call to `run_agent`. Open `4_guide.md`.
+
+> **Do:** Save the file. Keep the MCP container running.
