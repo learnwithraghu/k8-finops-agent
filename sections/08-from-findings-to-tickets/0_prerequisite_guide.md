@@ -45,7 +45,7 @@ docker build -t finops-issue-tracker:latest sections/08-from-findings-to-tickets
 ls sections/08-from-findings-to-tickets/agent/
 ```
 
-**What it does:** Shows the minimal agent fork — `mcp_client.py` (from Section 06), `tracker_auditor.py`, `structure.py`, `tracker_client.py`.
+**What it does:** Shows the unified agent — `mcp_client.py` (K8s + tracker MCP) and `tracker_auditor.py`.
 
 ---
 

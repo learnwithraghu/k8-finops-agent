@@ -34,8 +34,8 @@ Transcripts: `transcript/1.md` (V1), `transcript/2.md` (V4), `transcript/3.md` (
 - Run the tracker container locally (REST on port 8085, MCP on port 8086)
 - Serve a Kanban board UI and expose `/create-issue` REST endpoint
 - Expose MCP tools: `create_issue`, `list_issues`, `get_issue`, `update_issue`
-- Copy Section 06 `mcp_client.py` and extend with `structure.py` + `tracker_client.py`
-- Post per-finding tickets via tracker MCP instead of printing to console
+- Extend `mcp_client.py` with both K8s and tracker MCP servers
+- Run a unified LangChain agent that audits the cluster and calls `create_issue` per finding
 
 ## Out of scope
 - Kubernetes scan logic re-teaching (Sections 05–06)
@@ -49,5 +49,5 @@ The learner can:
 1. Run the tracker container and access the board UI
 2. Create a ticket through `/create-issue` and explain the payload schema
 3. Run `agent/tracker_auditor.py` and see per-finding tickets on the board
-4. Explain the flow: K8s MCP → LLM audit → structure → tracker MCP → Kanban
+4. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
 5. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 → 10)

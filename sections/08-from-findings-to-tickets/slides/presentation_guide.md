@@ -6,7 +6,7 @@
 |-------|------------|-------|
 | **V1** — Issue tracker landscape | `slide1_tracker_landscape.svg` | Jira, Linear, GitHub Issues, custom tracker comparison |
 | **V3** — Tracker backend walkthrough | `slide2_tracker_architecture.svg` | FastAPI internals, REST + MCP, IssueCreate fields |
-| **V4** — Integration whiteboard | `slide4_integration_whiteboard.svg` | Section 06 → structure → tracker MCP flow |
+| **V4** — Integration whiteboard | `slide4_integration_whiteboard.svg` | One agent, two MCP servers (K8s + tracker) |
 | **V6** — Closed-loop pipeline | `slide5_closed_loop_pipeline.svg` | Full S05–S10 architecture update |
 
 Videos V2 and V5 are live demos — no dedicated slides. Use the running board UI and agent code in the editor.

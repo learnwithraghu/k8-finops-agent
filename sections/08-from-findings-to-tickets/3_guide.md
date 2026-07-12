@@ -3,7 +3,7 @@
 **Time Budget:** 3–4 mins  
 **Video:** V5 — Agent Walkthrough: Post Per-Finding Tickets Instead of Printing
 
-**Narrative:** The agent uses the same MCP collection path as Section 06, then structures the audit into tickets and posts them to the tracker. One command closes the loop.
+**Narrative:** One LangChain agent with both K8s MCP and tracker MCP tools audits the cluster and calls `create_issue` for each finding. No separate posting step.
 
 ---
 
@@ -16,7 +16,7 @@ curl -s http://localhost:8085/health
 
 **What it does:** Quick health checks — K8s MCP (Section 06) and Issue Tracker (REST). Both should respond.
 
-> *Talking point: "The agent needs the K8s MCP for collection and the tracker MCP for posting. Confirm both before running."*
+> *Talking point: "The agent connects to both MCP servers — K8s for collection and tracker for posting. Confirm both before running."*
 
 ---
 
@@ -24,16 +24,15 @@ curl -s http://localhost:8085/health
 
 Open these files:
 
-- `agent/mcp_client.py` — copied unchanged from Section 06
-- `agent/tracker_auditor.py` — same audit prompt; replaces `print()` with structure + post
-- `agent/structure.py` — LLM converts audit text → `TicketBatch`
-- `agent/tracker_client.py` — calls tracker MCP `create_issue` for each ticket
+- `agent/mcp_client.py` — registers **both** MCP servers in `MCP_SERVERS` (K8s + tracker)
+- `agent/tracker_auditor.py` — unified prompt: audit labels, call `create_issue` per finding
 
 **What to look for:**
 
-- Collection is identical to Section 06 — only the output destination changed
-- `structure.py` is the small bridge between plain-English audit and typed tickets
-- Tagging rules load from Section 07's `config/tagging-rules.yaml` by reference
+- `MCP_SERVERS` has `k8s` (streamable HTTP on :8000) and `tracker` (SSE on :8086)
+- `convert_mcp_to_langchain_tools` exposes `kubectl_get` and `create_issue` in one tool list
+- Tagging rules load from Section 07's `config/tagging-rules.yaml` via `SystemMessage`
+- No separate structure or posting files — the ReAct loop handles everything
 
 ---
 
@@ -43,9 +42,9 @@ Open these files:
 python3 sections/08-from-findings-to-tickets/agent/tracker_auditor.py
 ```
 
-**What it does:** Connects to K8s MCP, runs the label audit, structures findings, and posts each one to the tracker via MCP.
+**What it does:** One agent loop: fetch cluster data via K8s MCP, evaluate against tagging rules, call tracker `create_issue` for each finding.
 
-> *Expected: Log lines for MCP connection, structuring, and ticket creation. Final line: "Posted N ticket(s) to the issue tracker".*
+> *Expected: Log lines showing both `kubectl_get` and `create_issue` tool calls. Final line: "Done. Verify tickets at http://localhost:8085".*
 
 ---
 
@@ -64,9 +63,9 @@ Click a ticket to inspect the reasoning field — the LLM's explanation of why i
 ### 5) Explain the full flow
 
 > *Talking point: "Let's trace the closed loop:*
-> 1. *Section 06: MCP agent collects cluster data via LangChain*
+> 1. *Section 06: LangChain + MCP pattern for cluster access*
 > 2. *Section 07: Tagging rules shape what counts as a finding*
-> 3. *Section 08: Structure the audit → post per-finding tickets → Kanban board*
+> 3. *Section 08: Same agent pattern, but now with tracker MCP tools — audit and post in one loop*
 >
 > *Next, Section 09 refactors this into maintainable modules before we deploy to Kubernetes in Section 10."*
 

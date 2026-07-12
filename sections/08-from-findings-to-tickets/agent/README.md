@@ -1,16 +1,13 @@
 # Section 08 Agent
 
-Minimal fork of the Section 06 label auditor that posts per-finding tickets to the issue tracker.
+Unified LangChain agent with both K8s MCP and issue tracker MCP tools.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `mcp_client.py` | Copied from Section 06 — LangChain + K8s MCP wiring |
-| `tracker_auditor.py` | Audit prompt, structure, post (replaces console-only output) |
-| `structure.py` | LLM call: audit text → `TicketBatch` |
-| `tracker_client.py` | MCP client: calls tracker `create_issue` tool |
-| `models.py` | `TrackerTicket` / `TicketBatch` schema |
+| `mcp_client.py` | LangChain wiring for K8s MCP + tracker MCP (both tool sets) |
+| `tracker_auditor.py` | Unified prompt: audit cluster and call `create_issue` per finding |
 
 ## Prerequisites
 
