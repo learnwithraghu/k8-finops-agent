@@ -146,8 +146,8 @@ Spot-check against kubectl:
 kubectl get deploy,configmap,pvc -A --show-labels
 ```
 
-> *Talking point: "We see label gaps in plain English. Section 07 applies tagging rules and produces structured findings — severity, tickets, and policy scoring."*
+> *Talking point: "We see label gaps in plain English. Section 07 loads tagging rules from a file and applies the full policy — not just owner and cost-center hard-coded in the prompt."*
 
 ---
 
-**Next:** Add policy and structured output → `sections/07-llm-structured-agent`
+**Next:** Add policy from file → `sections/07-llm-structured-agent`

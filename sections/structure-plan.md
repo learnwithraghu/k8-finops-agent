@@ -144,15 +144,14 @@ sections/
   - deliberately unstructured output
   - why structure is added in Section 07, not here
 
-### Section 07: LLM structured agent (snapshot + tagging rules → structured findings)
+### Section 07: Policy Label Audit
 - Keep:
-  - `agent/analyser.py`, `agent/models.py`, `agent/main.py` (starting point, moved from the previous advanced pipeline)
+  - `code/mcp_client.py`, `code/structured_auditor.py`
   - `config/tagging-rules.yaml`
 - Output should teach:
-  - consuming the Section 06 snapshot
-  - injecting tagging rules into the LLM prompt
-  - producing structured findings
-  - why analysis is separate from collection
+  - same ReAct agent path as Section 06 (`run_agent` with optional tagging rules)
+  - loading tagging rules from file (not embedded in the prompt)
+  - plain-English policy-aware audit printed to screen
 
 ### Section 08: Issue tracker service
 - Future content:

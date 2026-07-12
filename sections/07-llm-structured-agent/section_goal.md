@@ -1,51 +1,55 @@
-# Section 07 Goal: LLM Structured Agent (Snapshot + Tagging Rules → Structured Findings)
+# Section 07 Goal: Policy Label Audit
 
 ## Goal
-Take the unstructured cluster snapshot from Section 06, add tagging rules as policy, send both to an LLM, and produce structured FinOps findings. This is the MCP → LLM → structured data step that was missing.
+Take the free-text label audit from Section 06, load `config/tagging-rules.yaml` as policy, and let the agent evaluate cluster labels against those rules. Same agent path as Section 06 — prompt in, MCP tools out — with rules read from file and a plain-English answer on screen.
 
 ## Prerequisites
 Sections 01–06 complete.
 
 You should already have:
 - a working Kind cluster (`finops-cluster`)
-- Supergateway running from Section 05 (port 8000)
-- Section 06 snapshot understood
+- the Section 06 MCP container running on `http://localhost:8000/mcp`
+- repo-root `.env` with OpenAI-compatible endpoint settings
+- Python virtualenv with `pip install -r requirements.txt`
 
 ## Instructor setup (before the live demo)
-Run `0_prerequisite_guide.md` before teaching. It confirms Supergateway is alive, installs Python deps, and inspects the agent code. Do not walk students through pip install during the live demo.
+Run `0_prerequisite_guide.md` before teaching. It confirms the cluster is healthy, starts the MCP service, validates the endpoint, and inspects the policy auditor code. Do not walk students through pip install during the live demo.
 
-## Video structure (3 videos)
-| Video | Focus | Time |
-|-------|------------|-------|------|
-| **1** | Policy in tagging-rules.yaml; context reasoning | 3–4 min |
-| **2** | ChatOpenAI + Pydantic; auditable TicketBatch | 3–4 min |
-| **3** | Side-by-side: snapshot vs structured findings | 3–4 min |
+## Guide structure (5 parts)
+| Guide | Type | Video title | Time |
+|-------|------|-------------|------|
+| **0** (`0_prerequisite_guide.md`) | Instructor | *(prereq only)* | 3–4 min |
+| **1** (`1_guide.md`) | Theory | Free Text Plus Rules | ~2 min |
+| **2** (`2_guide.md`) | Theory | Walk the Rules File | 3–4 min |
+| **3** (`3_guide.md`) | Demo | Walk the Policy Auditor | 4–5 min |
+| **4** (`4_guide.md`) | Demo | Run the Policy Auditor | 3–4 min |
 
-Transcripts: `transcript/1.md`, `transcript/2.md`, `transcript/3.md`
+Transcripts: `transcript/1.md`, `transcript/2.md`
 
-## Demo structure (2 parts)
-| Demo | Focus | Time |
-|------|-------|------|
-| **1** | Run the structured agent, see findings appear | 3 min |
-| **2** | Audit the findings JSON, map to rules | 3–4 min |
-
-Each demo is one clear beat. Students go from "unstructured snapshot" to "structured ticket-shaped findings" in under 7 minutes.
+Students go from "Section 06 free-text label audit" to "policy-aware label audit on screen" in under 15 minutes.
 
 ## Scope
-- Consume the Section 06 raw snapshot as input
-- Inject `config/tagging-rules.yaml` into the LLM prompt as policy context
-- Produce deterministic structured findings (missing tags, ownership gaps, severity)
-- Keep the agent prompt and schema together in this section
+- Reuse Section 06 HTTP MCP wiring (`code/mcp_client.py`; validate via Section 06 `validate_mcp.py`)
+- Let the LangChain agent call MCP tools (same pattern as `label_auditor.py`)
+- Load `config/tagging-rules.yaml` from file and pass it separately to the agent
+- Print the agent's plain-English audit to screen
 
 ## Out of scope
-- Collecting cluster data directly (Section 06)
-- Posting findings to the issue tracker (Section 09)
-- Building or recreating the MCP server (Section 05)
-- Multi-cluster scale or metrics-server cost telemetry
+- Ticketing, Jira, or issue-tracker integration (Sections 08–09)
+- Pydantic schemas or structured JSON output
+- Supergateway (Section 05 only)
+- Building or recreating the MCP server (Section 05–06)
 
 ## Success criteria
 The learner can:
-1. Run the structured agent and see `TicketBatch` output
-2. Explain how tagging rules shape the LLM's structured output
-3. Read the structured findings JSON and confirm each finding maps to a rule violation
-4. Articulate why collection (06) and analysis (07) are separate steps
+1. Run `code/structured_auditor.py` and see a policy-aware label audit on screen
+2. Explain how tagging rules loaded from file shape the agent's answer
+3. Articulate what Section 07 adds on top of Section 06's `label_auditor.py`
+
+## Artifacts
+| File | Purpose |
+|---|---|
+| `code/mcp_client.py` | Shared MCP URL, root `.env` load, `run_agent` with optional tagging rules |
+| `code/structured_auditor.py` | Thin prompt + load rules from file + print agent answer |
+| `config/tagging-rules.yaml` | FinOps tagging policy — required tags, label mappings, exclusions |
+| `code/README.md` | Quick reference for MCP startup and policy auditor runs |

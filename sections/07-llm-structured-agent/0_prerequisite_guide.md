@@ -1,76 +1,120 @@
-# Instructor Prerequisite: Supergateway, Python Environment & API Key
+# Instructor Prerequisite: Cluster, MCP Service & Python Environment
 
-**Audience:** Instructor only — run this before `1_guide.md`. Do not walk students through pip install during the live demo.
+**Audience:** Instructor only — run this before `1_guide.md`. Do not walk students through Docker pulls or pip install during the live demo.
 
-**Time Budget:** 2–3 mins
+**Time Budget:** 3–4 mins
 
 ---
 
 ## Before you start
 
-Confirm Supergateway from Section 05 is still running:
+Confirm the Kind cluster and airline workloads are healthy:
 
 ```bash
-curl -s http://localhost:8000/healthz
+kubectl cluster-info
+kubectl get namespaces
+kubectl get deploy,svc -A
 ```
 
-**What it does:** Checks the MCP endpoint is alive. Should return `ok`.
+**What it does:** Verifies kubectl access and that application namespaces and services are present. You should see airline namespaces such as `booking-api`, `flight-search`, `inventory`, and `payment`, with deployments and services in `Running` / available state.
 
-> *If this fails, restart Supergateway using the command in `sections/05-mcp-k8-agent/0_prerequisite_guide.md` step 3.*
+> *If namespaces or workloads are missing, complete Sections 01–02 before continuing.*
 
 ---
 
-## 1) Set up the Python environment
+## 1) Start the MCP service
+
+In a **dedicated terminal** (leave it running for Section 07):
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r sections/07-llm-structured-agent/requirements.txt
+kind get kubeconfig --name finops-cluster --internal > /tmp/kubeconfig-docker.yaml
+
+docker run --rm -p 8000:8000 --network kind \
+  -v /tmp/kubeconfig-docker.yaml:/home/appuser/.kube/config:ro \
+  -e ENABLE_UNSAFE_STREAMABLE_HTTP_TRANSPORT=1 \
+  -e PORT=8000 \
+  -e HOST=0.0.0.0 \
+  -e ALLOW_ONLY_READONLY_TOOLS=true \
+  mcp/kubernetes:latest
 ```
 
-**What it does:** Creates a virtualenv and installs LangChain, OpenAI, Pydantic, and MCP client dependencies.
+**What it does:** Starts the Kubernetes MCP server with native Streamable HTTP on port 8000. Same container as Section 06 — no Supergateway.
+
+> *Talking point: "One container, one port. The policy auditor connects straight over HTTP."*
 
 ---
 
-## 2) Confirm API key is set
+## 2) Validate MCP is reachable
+
+In a **second terminal** (repo root, virtualenv activated):
+
+```bash
+python3 sections/06-mcp-data-agent/code/validate_mcp.py
+```
+
+**What it does:** Connects to `http://localhost:8000/mcp` and lists namespaces via `kubectl_get`. Confirms the MCP service can read the same cluster you checked with kubectl.
+
+> *Expected: `MCP OK — N namespaces via kubectl_get` with the same namespace list.*
+
+> *If this fails, confirm the MCP container terminal is still running and port 8000 is free.*
+
+---
+
+## 3) Set up the Python environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**What it does:** Creates a virtualenv at the repo root and installs LangChain, OpenAI, and MCP client dependencies.
+
+> *Re-activate in new shells with: `source .venv/bin/activate`*
+
+---
+
+## 4) Confirm API key is set
 
 ```bash
 test -n "$OPENAI_API_KEY" && echo "API key is set" || echo "OPENAI_API_KEY is not set"
 ```
 
-**What it does:** Checks that the OpenAI API key environment variable is present. The agent needs this to call the LLM.
+**What it does:** Checks that the OpenAI API key environment variable is present. The policy auditor needs this to call the LLM.
 
-> *If using a `.env` file, confirm it exists at the repo root: `cat .env | grep OPENAI`*
+> *If using a `.env` file, confirm it exists at the repo root: `grep OPENAI .env`*
 
 ---
 
-## 3) Inspect the agent code
+## 5) Inspect the policy auditor code
 
 ```bash
-cat sections/07-llm-structured-agent/agent.py
+cat sections/07-llm-structured-agent/code/structured_auditor.py
 ```
 
-**What it does:** Shows the agent — it collects data via MCP (same as Section 06), then sends it to an LLM with tagging rules to produce structured findings.
+**What it does:** Shows the agent — same thin pattern as Section 06's `label_auditor.py`. It loads tagging rules from file, lets the LLM call MCP tools, and prints a plain-English audit.
 
-> *Talking point: "We took the collection logic from Section 06 and added LangChain/OpenAI on top. Same data in, structured findings out."*
+> *Talking point: "Same agent path as Section 06. We add a rules file read from disk."*
 
 ---
 
-## 4) Inspect the tagging rules
+## 6) Inspect the tagging rules
 
 ```bash
 cat sections/07-llm-structured-agent/config/tagging-rules.yaml
 ```
 
-**What it does:** Shows the policy the LLM uses to judge resources. This defines required labels, ownership rules, and severity levels.
+**What it does:** Shows the policy the agent uses to judge resources. This defines required labels, label mappings, and excluded namespaces.
 
-> *Talking point: "The tagging rules are the policy. The LLM applies them to the snapshot. Without rules, the LLM has no standard to check against."*
+> *Talking point: "The tagging rules are the policy. The agent applies them to cluster data returned by MCP."*
 
 ---
 
-## 5) Ready to teach
+## 7) Ready to teach
 
 When setup passes, start the live walkthrough with:
 
-- `1_guide.md` — Run the structured agent
-- `2_guide.md` — Audit the findings
+- `1_guide.md` — Theory: free text plus rules file
+- `2_guide.md` — Theory: walk the rules file
+- `3_guide.md` — Demo: walk `structured_auditor.py`
+- `4_guide.md` — Demo: run and read screen output

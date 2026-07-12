@@ -132,7 +132,7 @@ echo "  │  For Sections 06–07 (Python agents) in Alpine-based labs:        �
 echo "  │   • Install Python and dependencies:                            │"
 echo "  │     apk update && apk add python3 py3-pip && \                  │"
 echo "  │     python3 -m venv venv && source venv/bin/activate && \       │"
-echo "  │     pip install -r sections/07-llm-structured-agent/requirements.txt│"
+echo "  │     pip install -r requirements.txt                             │"
 echo "  │                                                                 │"
 echo "  │  To tear everything down:                                       │"
 echo "  │     bash helper/kodekloud-lab/cleanup.sh                        │"

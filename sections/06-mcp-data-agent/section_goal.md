@@ -42,8 +42,7 @@ Students go from "Section 05 curl + Supergateway" to "direct HTTP MCP + LangChai
 
 ## Out of scope
 - Supergateway (Section 05 only)
-- Structured JSON snapshots / Pydantic ticket schema (Section 07)
-- Tagging rules / compliance evaluation (Section 07)
+- Tagging rules / compliance evaluation from file (Section 07)
 - Posting to the issue tracker (Section 09)
 
 ## Success criteria
