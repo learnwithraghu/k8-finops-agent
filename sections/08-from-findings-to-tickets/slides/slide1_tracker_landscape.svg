@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#4285F4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 1: The Issue Tracker Landscape</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 08  From Findings to Tickets</text>
+
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Findings must become trackable work</text>
+  <line x1="40" y1="130" x2="480" y2="130" stroke="#4285F4" stroke-width="3"/>
+
+  <rect x="40" y="160" width="270" height="120" rx="10" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="175" y="195" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">Jira</text>
+  <text x="175" y="220" fill="#475569" font-size="12" text-anchor="middle">Enterprise workflows,</text>
+  <text x="175" y="238" fill="#475569" font-size="12" text-anchor="middle">ITSM integrations</text>
+  <text x="175" y="262" fill="#64748B" font-size="11" text-anchor="middle">Heavy, familiar at scale</text>
+
+  <rect x="340" y="160" width="270" height="120" rx="10" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="475" y="195" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">Linear</text>
+  <text x="475" y="220" fill="#475569" font-size="12" text-anchor="middle">Fast, dev-focused</text>
+  <text x="475" y="238" fill="#475569" font-size="12" text-anchor="middle">Ownership assignment</text>
+  <text x="475" y="262" fill="#64748B" font-size="11" text-anchor="middle">Less FinOps-specific</text>
+
+  <rect x="640" y="160" width="270" height="120" rx="10" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="775" y="195" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">GitHub Issues</text>
+  <text x="775" y="220" fill="#475569" font-size="12" text-anchor="middle">GitOps-native loop</text>
+  <text x="775" y="238" fill="#475569" font-size="12" text-anchor="middle">Issues beside manifests</text>
+  <text x="775" y="262" fill="#64748B" font-size="11" text-anchor="middle">Tight for platform teams</text>
+
+  <rect x="940" y="160" width="300" height="120" rx="10" fill="#4285F4" stroke="#2563EB"/>
+  <text x="1090" y="195" fill="#FFFFFF" font-size="16" font-weight="700" text-anchor="middle">Custom Tracker (ours)</text>
+  <text x="1090" y="220" fill="#E0E7FF" font-size="12" text-anchor="middle">FastAPI + Kanban + MCP</text>
+  <text x="1090" y="238" fill="#E0E7FF" font-size="12" text-anchor="middle">FinOps ticket schema</text>
+  <text x="1090" y="262" fill="#C7D2FE" font-size="11" text-anchor="middle">No SaaS dependency</text>
+
+  <rect x="40" y="320" width="1200" height="140" rx="10" fill="#FFFBEB" stroke="#F59E0B"/>
+  <text x="60" y="355" fill="#92400E" font-size="16" font-weight="700">Why trackers, not reports?</text>
+  <text x="60" y="385" fill="#78350F" font-size="14">Reports disappear. Trackers create accountability: assignee, priority, status, history.</text>
+  <text x="60" y="410" fill="#78350F" font-size="14">FinOps is Operate-phase work  you need work items, not one-off alerts.</text>
+  <text x="60" y="435" fill="#78350F" font-size="14">Agents post via MCP; humans triage on the Kanban board via REST.</text>
+
+  <text x="40" y="520" fill="#1B2A4A" font-size="18" font-weight="700">Two interfaces, one schema</text>
+  <text x="40" y="550" fill="#475569" font-size="14">REST (:8085) for humans and curl demos  |  MCP (:8086) for agent automation</text>
+  <text x="40" y="580" fill="#475569" font-size="14">Same IssueCreate payload  different door into the tracker</text>
+</svg>

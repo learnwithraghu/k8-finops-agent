@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 3: Tracker Service Architecture</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 08  From Findings to Tickets</text>
+
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">FastAPI service  REST + MCP + Kanban UI</text>
+  <line x1="40" y1="130" x2="520" y2="130" stroke="#10B981" stroke-width="3"/>
+
+  <rect x="480" y="180" width="320" height="200" rx="12" fill="#1B2A4A"/>
+  <text x="640" y="220" fill="#FFFFFF" font-size="18" font-weight="700" text-anchor="middle">FinOps Issue Tracker</text>
+  <text x="640" y="250" fill="#94A3B8" font-size="13" text-anchor="middle">service/app/main.py</text>
+  <text x="640" y="280" fill="#E2E8F0" font-size="12" text-anchor="middle">POST /create-issue</text>
+  <text x="640" y="300" fill="#E2E8F0" font-size="12" text-anchor="middle">GET /api/issues</text>
+  <text x="640" y="320" fill="#E2E8F0" font-size="12" text-anchor="middle">Kanban UI at /</text>
+  <text x="640" y="350" fill="#94A3B8" font-size="12" text-anchor="middle">mcp_server.py  create_issue tool</text>
+
+  <rect x="80" y="210" width="160" height="80" rx="8" fill="#4285F4"/>
+  <text x="160" y="245" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Human / curl</text>
+  <text x="160" y="268" fill="#E0E7FF" font-size="11" text-anchor="middle">REST :8085</text>
+  <line x1="240" y1="250" x2="475" y2="250" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="80" y="320" width="160" height="80" rx="8" fill="#10B981"/>
+  <text x="160" y="355" fill="#FFFFFF" font-size="14" font-weight="700" text-anchor="middle">Agent MCP</text>
+  <text x="160" y="378" fill="#D1FAE5" font-size="11" text-anchor="middle">SSE :8086</text>
+  <line x1="240" y1="360" x2="475" y2="300" stroke="#10B981" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="900" y="210" width="200" height="80" rx="8" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="1000" y="245" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">models.py</text>
+  <text x="1000" y="268" fill="#475569" font-size="11" text-anchor="middle">IssueCreate schema</text>
+  <line x1="800" y1="250" x2="895" y2="250" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="900" y="320" width="200" height="80" rx="8" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="1000" y="355" fill="#1B2A4A" font-size="14" font-weight="700" text-anchor="middle">store.py</text>
+  <text x="1000" y="378" fill="#475569" font-size="11" text-anchor="middle">JSON persistence</text>
+  <line x1="800" y1="300" x2="895" y2="355" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="440" width="1200" height="220" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="60" y="475" fill="#1B2A4A" font-size="16" font-weight="700">IssueCreate key fields</text>
+  <text x="60" y="505" fill="#475569" font-size="13" font-family="monospace">title, summary, body, namespace, resource_name, resource_kind</text>
+  <text x="60" y="530" fill="#475569" font-size="13" font-family="monospace">category, priority, cost_impact, suggested_owner, reasoning, source</text>
+  <text x="60" y="570" fill="#64748B" font-size="13">Tickets get keys like FINOPS-0001 and land in the backlog column on the Kanban board.</text>
+  <text x="60" y="610" fill="#64748B" font-size="13">Docker: finops-issue-tracker:latest  ports 8085 (REST/UI) and 8086 (MCP)</text>
+</svg>

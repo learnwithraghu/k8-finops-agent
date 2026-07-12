@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#F97316"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 4: Integration Whiteboard</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 08  From Findings to Tickets</text>
+
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Minimal change from Section 06  new output destination</text>
+  <line x1="40" y1="130" x2="620" y2="130" stroke="#F97316" stroke-width="3"/>
+
+  <rect x="40" y="170" width="150" height="70" rx="8" fill="#0EA5E9"/>
+  <text x="115" y="200" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">K8s MCP</text>
+  <text x="115" y="220" fill="#E0F2FE" font-size="11" text-anchor="middle">:8000/mcp</text>
+
+  <rect x="240" y="170" width="170" height="70" rx="8" fill="#1B2A4A"/>
+  <text x="325" y="200" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">run_agent()</text>
+  <text x="325" y="220" fill="#94A3B8" font-size="11" text-anchor="middle">mcp_client.py (unchanged)</text>
+
+  <rect x="460" y="170" width="170" height="70" rx="8" fill="#F97316"/>
+  <text x="545" y="200" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">structure.py</text>
+  <text x="545" y="220" fill="#FFEDD5" font-size="11" text-anchor="middle">audit text ’ TicketBatch</text>
+
+  <rect x="680" y="170" width="170" height="70" rx="8" fill="#10B981"/>
+  <text x="765" y="200" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">tracker_client.py</text>
+  <text x="765" y="220" fill="#D1FAE5" font-size="11" text-anchor="middle">MCP create_issue</text>
+
+  <rect x="900" y="170" width="170" height="70" rx="8" fill="#4285F4"/>
+  <text x="985" y="200" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">Kanban Board</text>
+  <text x="985" y="220" fill="#E0E7FF" font-size="11" text-anchor="middle">:8085</text>
+
+  <line x1="190" y1="205" x2="235" y2="205" stroke="#0EA5E9" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="410" y1="205" x2="455" y2="205" stroke="#F97316" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="630" y1="205" x2="675" y2="205" stroke="#F97316" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <line x1="850" y1="205" x2="895" y2="205" stroke="#10B981" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+
+  <rect x="40" y="290" width="580" height="180" rx="10" fill="#FEF3C7" stroke="#F59E0B"/>
+  <text x="60" y="325" fill="#92400E" font-size="16" font-weight="700">Payload contract</text>
+  <text x="60" y="355" fill="#78350F" font-size="13">TrackerTicket (agent) ” IssueCreate (tracker)</text>
+  <text x="60" y="380" fill="#78350F" font-size="13">One ticket per finding  title, namespace, resource, priority, reasoning</text>
+  <text x="60" y="405" fill="#78350F" font-size="13">Tagging rules from Section 07 passed into structure step (by reference)</text>
+  <text x="60" y="440" fill="#78350F" font-size="13">No re-collection  Section 06 MCP wiring survives unchanged</text>
+
+  <rect x="660" y="290" width="580" height="180" rx="10" fill="#FEE2E2" stroke="#EF4444"/>
+  <text x="680" y="325" fill="#991B1B" font-size="16" font-weight="700">What we drop (old Section 09 monolith)</text>
+  <text x="680" y="355" fill="#7F1D1D" font-size="13"> collect_snapshot()  duplicates Section 06</text>
+  <text x="680" y="380" fill="#7F1D1D" font-size="13"> analyze_snapshot() on raw JSON  duplicates Section 07</text>
+  <text x="680" y="405" fill="#7F1D1D" font-size="13"> Supergateway dependency in agent path</text>
+  <text x="680" y="440" fill="#7F1D1D" font-size="13"> ~4 focused files: collect ’ structure ’ post</text>
+
+  <text x="40" y="530" fill="#1B2A4A" font-size="18" font-weight="700">tracker_auditor.py  the only orchestration change</text>
+  <text x="40" y="560" fill="#475569" font-size="14" font-family="monospace">audit_text = await run_agent(PROMPT)  ’  batch = structure_findings(audit_text)  ’  await post_tickets(batch)</text>
+</svg>

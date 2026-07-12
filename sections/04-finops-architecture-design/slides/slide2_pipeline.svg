@@ -166,6 +166,6 @@
   <!-- Bottom insight -->
   <rect x="40" y="565" width="1200" height="80" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
   <text x="640" y="595" fill="#1B2A4A" font-size="16" font-weight="700" text-anchor="middle">Why MCP everywhere?</text>
-  <text x="640" y="618" fill="#475569" font-size="13" text-anchor="middle">Standard protocol. Same interface for collection (Section 06) and tracker (Section 09).</text>
+  <text x="640" y="618" fill="#475569" font-size="13" text-anchor="middle">Standard protocol. Same interface for collection (Section 06) and tracker (Section 08).</text>
   <text x="640" y="635" fill="#475569" font-size="13" text-anchor="middle">Any client — Python, curl, VS Code — can call the same tools. No custom client code.</text>
 </svg>

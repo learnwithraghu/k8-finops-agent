@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#8B5CF6"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">Video 6: The Closed-Loop FinOps Pipeline</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 08  From Findings to Tickets</text>
+
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Updated architecture  cluster to tickets to deploy</text>
+  <line x1="40" y1="130" x2="560" y2="130" stroke="#8B5CF6" stroke-width="3"/>
+
+  <rect x="40" y="170" width="130" height="60" rx="8" fill="#64748B"/>
+  <text x="105" y="205" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S05 MCP</text>
+
+  <rect x="200" y="170" width="130" height="60" rx="8" fill="#0EA5E9"/>
+  <text x="265" y="205" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S06 Collect</text>
+
+  <rect x="360" y="170" width="130" height="60" rx="8" fill="#F97316"/>
+  <text x="425" y="205" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S07 Policy</text>
+
+  <rect x="520" y="160" width="180" height="80" rx="8" fill="#10B981" stroke="#059669" stroke-width="3"/>
+  <text x="610" y="195" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S08 Tracker +</text>
+  <text x="610" y="215" fill="#D1FAE5" font-size="12" font-weight="700" text-anchor="middle">Integrate </text>
+
+  <rect x="730" y="170" width="130" height="60" rx="8" fill="#8B5CF6"/>
+  <text x="795" y="205" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S09 Refactor</text>
+
+  <rect x="890" y="170" width="130" height="60" rx="8" fill="#1B2A4A"/>
+  <text x="955" y="205" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">S10 Helm</text>
+
+  <line x1="170" y1="200" x2="195" y2="200" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <line x1="330" y1="200" x2="355" y2="200" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <line x1="490" y1="200" x2="515" y2="200" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <line x1="700" y1="200" x2="725" y2="200" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <line x1="860" y1="200" x2="885" y2="200" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+
+  <rect x="40" y="290" width="380" height="160" rx="10" fill="#ECFDF5" stroke="#10B981"/>
+  <text x="60" y="325" fill="#065F46" font-size="15" font-weight="700">Section 08 delivers two halves</text>
+  <text x="60" y="355" fill="#047857" font-size="13">1. Tracker service  Kanban, REST, MCP</text>
+  <text x="60" y="380" fill="#047857" font-size="13">2. Agent integration  structure + post</text>
+  <text x="60" y="405" fill="#047857" font-size="13">Loop closed: cluster ’ findings ’ tickets</text>
+  <text x="60" y="430" fill="#047857" font-size="13">Human triage on the board completes the Operate phase</text>
+
+  <rect x="460" y="290" width="380" height="160" rx="10" fill="#F5F3FF" stroke="#8B5CF6"/>
+  <text x="480" y="325" fill="#5B21B6" font-size="15" font-weight="700">Composable, not monolithic</text>
+  <text x="480" y="355" fill="#6D28D9" font-size="13">Section 06 mcp_client.py survives unchanged</text>
+  <text x="480" y="380" fill="#6D28D9" font-size="13">Section 07 rules referenced, not duplicated</text>
+  <text x="480" y="405" fill="#6D28D9" font-size="13">Section 09 splits into modules as features grow</text>
+  <text x="480" y="430" fill="#6D28D9" font-size="13">Section 10 deploys the pipeline in-cluster</text>
+
+  <rect x="880" y="290" width="360" height="160" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="900" y="325" fill="#1B2A4A" font-size="15" font-weight="700">Key insight</text>
+  <text x="900" y="360" fill="#475569" font-size="13">Each section adds one capability</text>
+  <text x="900" y="385" fill="#475569" font-size="13">without rewriting previous work.</text>
+  <text x="900" y="420" fill="#475569" font-size="13">Collect ’ Analyze ’ Act ’</text>
+  <text x="900" y="445" fill="#475569" font-size="13">Refactor ’ Deploy</text>
+
+  <text x="40" y="520" fill="#1B2A4A" font-size="18" font-weight="700">Next: Section 09  refactor into collector / analyzer / tracker modules</text>
+  <text x="40" y="550" fill="#475569" font-size="14">Then Section 10  Helm chart and in-cluster CronJob deployment</text>
+</svg>

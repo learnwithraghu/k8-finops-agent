@@ -20,17 +20,16 @@ This directory is the curriculum skeleton for the repo.
 - `sections/05-mcp-k8-agent/` → Section 05 (prebuilt MCP setup and curl validation)
 - `sections/06-mcp-data-agent/code/` → Section 06 (`validate_mcp.py`, `query_agent.py`, `label_auditor.py`)
 - `sections/07-llm-structured-agent/code/` and `config/` → Section 07 (LLM policy-aware label audit + tagging rules file)
-- `sections/08-issue-tracker-service/service/` → Section 08
-- `sections/09-agent-to-tracker-integration/agent/` → Section 09
-- `sections/10-agent-refactoring-best-practices/` → Section 10 (modular agent architecture)
-- `sections/11-k8-native-agent/` (docker, helm) → Section 11
+- `sections/08-from-findings-to-tickets/service/` and `agent/` → Section 08 (tracker + agent integration)
+- `sections/09-agent-refactoring-best-practices/` → Section 09 (modular agent architecture)
+- `sections/10-k8-native-agent/` (docker, helm) → Section 10
 
 ## Section index (learning flow)
 
 ```text
 00 Intro → 02a Incident → 02b FinOps → 01 Cluster → 02 Deploy → 03 Pain
-    → 04 Design → 05 MCP → 06 Collect → 07 Analyze → 08 Tracker
-    → 09 Integrate → 10 Refactor → 11 Helm
+    → 04 Design → 05 MCP → 06 Collect → 07 Analyze → 08 Tracker+Integrate
+    → 09 Refactor → 10 Helm
 ```
 
 1. **00** — Course introduction (SkyLine Air, course arc)
@@ -43,7 +42,6 @@ This directory is the curriculum skeleton for the repo.
 8. **05** — Prebuilt MCP setup and curl validation
 9. **06** — LangChain MCP agents: prompt → MCP → unstructured data
 10. **07** — LLM policy-aware label audit: tagging rules from file → policy-grounded agent answer
-11. **08** — Issue tracker service
-12. **09** — Agent to tracker integration
-13. **10** — Agent refactoring best practices
-14. **11** — Kubernetes-native agent (Helm)
+11. **08** — From findings to tickets: issue tracker service + agent integration
+12. **09** — Agent refactoring best practices
+13. **10** — Kubernetes-native agent (Helm)

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="step-gradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#028090"/>
+      <stop offset="100%" stop-color="#00A896"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#028090"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="#F8F9FA"/>
+  
+  <!-- Title -->
+  <text x="640" y="60" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="#0F1689" text-anchor="middle">Deployment Workflow</text>
+  
+  <!-- Vertical Timeline -->
+  <!-- Timeline line -->
+  <line x1="200" y1="140" x2="200" y2="660" stroke="#028090" stroke-width="4" stroke-dasharray="8 4"/>
+  
+  <!-- Step 1: Build Image -->
+  <circle cx="200" cy="140" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="152" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+  <rect x="270" y="100" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="130" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Build Image</text>
+  <text x="290" y="162" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    docker build -f docker/Dockerfile -t finops-agent:latest .
+  </text>
+  
+  <!-- Step 2: Load into Kind -->
+  <circle cx="200" cy="225" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="237" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+  <rect x="270" y="185" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="215" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Load into Kind</text>
+  <text x="290" y="247" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    kind load docker-image finops-agent:latest --name &lt;cluster&gt;
+  </text>
+  
+  <!-- Step 3: Create Secret -->
+  <circle cx="200" cy="310" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="322" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">3</text>
+  <rect x="270" y="270" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="300" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Create Secret</text>
+  <text x="290" y="332" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    kubectl create secret generic finops-agent-llm --from-literal=...
+  </text>
+  
+  <!-- Step 4: Lint Chart -->
+  <circle cx="200" cy="395" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="407" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+  <rect x="270" y="355" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="385" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Lint Chart</text>
+  <text x="290" y="417" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    helm lint sections/10-k8-native-agent/helm/
+  </text>
+  
+  <!-- Step 5: Install Chart -->
+  <circle cx="200" cy="480" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="492" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+  <rect x="270" y="440" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="470" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Install Chart</text>
+  <text x="290" y="502" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    helm install finops-agent sections/10-k8-native-agent/helm/
+  </text>
+  
+  <!-- Step 6: Run Test -->
+  <circle cx="200" cy="565" r="32" fill="url(#step-gradient)" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="200" y="577" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">6</text>
+  <rect x="270" y="525" width="950" height="80" rx="8" fill="#FFFFFF" stroke="#028090" stroke-width="2"/>
+  <text x="290" y="555" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0F1689">Run Test</text>
+  <text x="290" y="587" font-family="Consolas, monospace" font-size="15" fill="#5F6368">
+    helm test finops-agent
+  </text>
+  
+  <!-- Success indicator -->
+  <circle cx="200" cy="660" r="28" fill="#34A853"/>
+  <text x="200" y="672" font-family="Arial, sans-serif" font-size="32" fill="#FFFFFF" text-anchor="middle">✓</text>
+</svg>

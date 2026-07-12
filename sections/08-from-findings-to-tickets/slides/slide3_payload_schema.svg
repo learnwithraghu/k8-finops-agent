@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B2A4A"/>
+      <stop offset="100%" stop-color="#4285F4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect width="1280" height="80" fill="url(#headerGrad)"/>
+  <text x="40" y="52" fill="#FFFFFF" font-size="28" font-weight="700">IssueCreate Payload Schema</text>
+  <text x="1240" y="52" fill="#FFFFFF" font-size="14" text-anchor="end" opacity="0.7">Section 08  Video 3 supplement</text>
+
+  <text x="40" y="120" fill="#1B2A4A" font-size="22" font-weight="700">Shared by REST and MCP  one schema, two interfaces</text>
+
+  <rect x="40" y="150" width="580" height="500" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="60" y="185" fill="#1B2A4A" font-size="15" font-weight="700">Required / core fields</text>
+  <text x="60" y="220" fill="#334155" font-size="13" font-family="monospace">title           "[FinOps] ns/resource - CATEGORY"</text>
+  <text x="60" y="250" fill="#334155" font-size="13" font-family="monospace">namespace       Kubernetes namespace</text>
+  <text x="60" y="280" fill="#334155" font-size="13" font-family="monospace">resource_name   deployment, PVC, etc.</text>
+  <text x="60" y="310" fill="#334155" font-size="13" font-family="monospace">resource_kind   Deployment, PVC, ConfigMap</text>
+  <text x="60" y="340" fill="#334155" font-size="13" font-family="monospace">category        unallocated, missing-owner, orphaned</text>
+  <text x="60" y="370" fill="#334155" font-size="13" font-family="monospace">priority        critical | high | medium | low</text>
+  <text x="60" y="400" fill="#334155" font-size="13" font-family="monospace">reasoning       LLM explanation for human triage</text>
+
+  <text x="60" y="440" fill="#1B2A4A" font-size="15" font-weight="700">Optional enrichment</text>
+  <text x="60" y="470" fill="#334155" font-size="13" font-family="monospace">summary, body, cost_impact, suggested_owner</text>
+  <text x="60" y="500" fill="#334155" font-size="13" font-family="monospace">suggested_cost_center, labels, source</text>
+
+  <text x="60" y="540" fill="#64748B" font-size="12">Response includes: id, key (FINOPS-0001), status, timestamps</text>
+  <text x="60" y="565" fill="#64748B" font-size="12">Agent TrackerTicket maps 1:1 to IssueCreate</text>
+  <text x="60" y="590" fill="#64748B" font-size="12">MCP tool: create_issue  same payload as POST /create-issue</text>
+
+  <rect x="660" y="150" width="580" height="500" rx="10" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="680" y="185" fill="#1E40AF" font-size="15" font-weight="700">Example ticket title</text>
+  <text x="680" y="230" fill="#1E3A8A" font-size="13" font-family="monospace">[FinOps] payment/payment-processor</text>
+  <text x="680" y="255" fill="#1E3A8A" font-size="13" font-family="monospace">  - UNALLOCATED ($8.47/month)</text>
+
+  <text x="680" y="310" fill="#1E40AF" font-size="15" font-weight="700">Kanban columns</text>
+  <text x="680" y="345" fill="#334155" font-size="13">backlog ’ todo ’ in_progress ’ done</text>
+  <text x="680" y="375" fill="#64748B" font-size="12">New tickets land in backlog by default</text>
+
+  <text x="680" y="430" fill="#1E40AF" font-size="15" font-weight="700">Endpoints</text>
+  <text x="680" y="465" fill="#334155" font-size="13" font-family="monospace">POST /create-issue      create ticket</text>
+  <text x="680" y="495" fill="#334155" font-size="13" font-family="monospace">GET  /api/issues        list all</text>
+  <text x="680" y="525" fill="#334155" font-size="13" font-family="monospace">PATCH /issue/{id}       update status</text>
+  <text x="680" y="555" fill="#334155" font-size="13" font-family="monospace">MCP  create_issue       agent automation</text>
+</svg>

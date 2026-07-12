@@ -36,7 +36,7 @@ Students go from "Section 06 free-text label audit" to "policy-aware label audit
 - Print the agent's plain-English audit to screen
 
 ## Out of scope
-- Ticketing, Jira, or issue-tracker integration (Sections 08–09)
+- Ticketing or issue-tracker integration (Section 08)
 - Pydantic schemas or structured JSON output
 - Supergateway (Section 05 only)
 - Building or recreating the MCP server (Section 05–06)

@@ -43,7 +43,7 @@ Students go from "Section 05 curl + Supergateway" to "direct HTTP MCP + LangChai
 ## Out of scope
 - Supergateway (Section 05 only)
 - Tagging rules / compliance evaluation from file (Section 07)
-- Posting to the issue tracker (Section 09)
+- Posting to the issue tracker (Section 08)
 
 ## Success criteria
 The learner can:

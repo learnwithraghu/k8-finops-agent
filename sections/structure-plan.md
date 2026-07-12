@@ -58,17 +58,20 @@ sections/
 │   ├── requirements.txt
 │   ├── agent/
 │   └── config/
-├── 08-issue-tracker-service/
+├── 08-from-findings-to-tickets/
 │   ├── section_goal.md
-│   ├── guide.md
+│   ├── 0_prerequisite_guide.md
+│   ├── 1_guide.md
+│   ├── 2_guide.md
+│   ├── 3_guide.md
 │   ├── service/
-│   └── slides/
-├── 09-agent-to-tracker-integration/
-│   ├── section_goal.md
-│   ├── guide.md
-│   ├── agent.md
 │   ├── agent/
-│   └── config/
+│   ├── slides/
+│   └── transcript/
+├── 09-agent-refactoring-best-practices/
+│   ├── section_goal.md
+│   ├── 1_guide.md
+│   └── ...
 └── 10-k8-native-agent/
     ├── section_goal.md
     ├── guide.md
@@ -153,24 +156,22 @@ sections/
   - loading tagging rules from file (not embedded in the prompt)
   - plain-English policy-aware audit printed to screen
 
-### Section 08: Issue tracker service
-- Future content:
-  - Dockerized FastAPI service
-  - `/raise-issue` endpoint
-  - OpenAPI docs
-- Output should teach:
-  - payload contract
-  - issue lifecycle basics
-
-### Section 09: Agent to tracker integration
+### Section 08: From Findings to Tickets — Issue Tracker & Agent Integration
 - Keep:
-  - `agent/tracker.py` (moved from the previous advanced pipeline)
-  - `agent/main.py` integration orchestrator
-  - metadata mapping logic
-- Note: this section's agent is being retargeted to consume Section 07's `TicketBatch` structured findings. The legacy scanner-based code currently present is transitional; the agent rewrite happens in the follow-up "work on 1st agent" session.
+  - `service/` — Dockerized FastAPI tracker (REST + MCP + Kanban UI)
+  - `agent/` — minimal Section 06 fork (`mcp_client.py`, `structure.py`, `tracker_client.py`, `tracker_auditor.py`)
 - Output should teach:
-  - K8 metadata collection → LLM → issue translation
-  - create issue end-to-end
+  - issue tracker landscape (Jira, Linear, GitHub, custom)
+  - tracker service launch and API walkthrough
+  - integration whiteboard: agent → structure → tracker MCP
+  - per-finding ticket posting end-to-end
+
+### Section 09: Agent refactoring best practices
+- Keep:
+  - `collector.py`, `analyzer.py`, `tracker.py`, `models.py`, `main.py`
+- Output should teach:
+  - separation of concerns for production agents
+  - testability and maintainability patterns
 
 ### Section 10: Kubernetes-native agent (Helm)
 - Keep:
