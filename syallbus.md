@@ -65,9 +65,11 @@ Flow legend: Video -> Video -> Video -> Demo -> Quiz
 | 08 From Findings to Actionable Tickets | 5 | Demo | Agent Walkthrough: Post Per-Finding Tickets Instead of Printing | 4 to 5 min |
 | 08 From Findings to Actionable Tickets | 6 | Video | Architecture Update: The Closed-Loop FinOps Pipeline | 3 to 4 min |
 | 08 From Findings to Actionable Tickets | 7 | Quiz | What fields are mandatory in a FinOps issue? Why per-finding beats one blob? What closes the loop from alert to action? | 2 to 3 min |
-| 09 Agent Refactoring Best Practices | 1 | Video | collector / analyzer / tracker modules; testability | 3 to 4 min |
-| 09 Agent Refactoring Best Practices | 2 | Demo | Run the refactored modular agent | 7 to 8 min |
-| 09 Agent Refactoring Best Practices | 3 | Quiz | Why separate collection from analysis? What belongs in tracker.py? How does modularity help testing? | 2 to 3 min |
+| 09 Observability with LangSmith | 1 | Video | Why Trace the FinOps Agent | ~2 min |
+| 09 Observability with LangSmith | 2 | Demo | LangSmith Project & `.env` | ~3 min |
+| 09 Observability with LangSmith | 3 | Demo | Same Auditor, Now Observable | 3 to 4 min |
+| 09 Observability with LangSmith | 4 | Demo | Read the Trace in LangSmith | 3 to 4 min |
+| 09 Observability with LangSmith | 5 | Quiz | Why env-only tracing? What appears in a LangSmith run? Where do MCP tool calls show up? | 2 to 3 min |
 | 10 Kubernetes-Native Agent | 1 | Video | Containerizing the agent runtime | 3 to 4 min |
 | 10 Kubernetes-Native Agent | 2 | Video | Helm chart patterns for scheduled scans | 3 to 4 min |
 | 10 Kubernetes-Native Agent | 3 | Video | Config and secret handling in-cluster | 3 to 4 min |

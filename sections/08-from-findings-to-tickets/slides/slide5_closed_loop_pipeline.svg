@@ -52,16 +52,16 @@
   <text x="480" y="325" fill="#5B21B6" font-size="15" font-weight="700">Composable, not monolithic</text>
   <text x="480" y="355" fill="#6D28D9" font-size="13">One agent with K8s + tracker MCP tools</text>
   <text x="480" y="380" fill="#6D28D9" font-size="13">Section 07 rules referenced, not duplicated</text>
-  <text x="480" y="405" fill="#6D28D9" font-size="13">Section 09 splits into modules as features grow</text>
-  <text x="480" y="430" fill="#6D28D9" font-size="13">Section 10 deploys the pipeline in-cluster</text>
+  <text x="480" y="405" fill="#6D28D9" font-size="13">Section 09 adds LangSmith tracing via env</text>
+  <text x="480" y="430" fill="#6D28D9" font-size="13">Observe the agent without rewriting it</text>
 
   <rect x="880" y="290" width="360" height="160" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
   <text x="900" y="325" fill="#1B2A4A" font-size="15" font-weight="700">Key insight</text>
   <text x="900" y="360" fill="#475569" font-size="13">Each section adds one capability</text>
   <text x="900" y="385" fill="#475569" font-size="13">without rewriting previous work.</text>
   <text x="900" y="420" fill="#475569" font-size="13">Collect - Analyze - Act -</text>
-  <text x="900" y="445" fill="#475569" font-size="13">Refactor - Deploy</text>
+  <text x="900" y="445" fill="#475569" font-size="13">Observe</text>
 
-  <text x="40" y="520" fill="#1B2A4A" font-size="18" font-weight="700">Next: Section 09 - refactor into collector / analyzer / tracker modules</text>
-  <text x="40" y="550" fill="#475569" font-size="14">Then Section 10 - Helm chart and in-cluster CronJob deployment</text>
+  <text x="40" y="520" fill="#1B2A4A" font-size="18" font-weight="700">Next: Section 09 - Observability with LangSmith</text>
+  <text x="40" y="550" fill="#475569" font-size="14">Same auditor as Section 07 — tracing on via .env only</text>
 </svg>

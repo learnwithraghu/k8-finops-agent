@@ -166,12 +166,14 @@ sections/
   - integration whiteboard: agent → structure → tracker MCP
   - per-finding ticket posting end-to-end
 
-### Section 09: Agent refactoring best practices
+### Section 09: Observability with LangSmith
 - Keep:
-  - `collector.py`, `analyzer.py`, `tracker.py`, `models.py`, `main.py`
+  - copied Section 07 `code/` + `config/` (no new Python modules)
+  - `.env` / `.env.example` LangSmith keys (`LANGSMITH_TRACING`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`)
 - Output should teach:
-  - separation of concerns for production agents
-  - testability and maintainability patterns
+  - why MCP + LLM agents need traces beyond terminal output
+  - env-only LangSmith enablement
+  - reading LLM and tool-call spans in the LangSmith UI
 
 ### Section 10: Kubernetes-native agent (Helm)
 - Keep:

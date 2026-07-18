@@ -40,8 +40,8 @@ Transcripts: `transcript/1.md` (V1), `transcript/2.md` (V4), `transcript/3.md` (
 ## Out of scope
 - Kubernetes scan logic re-teaching (Sections 05–06)
 - Tagging rule authoring (Section 07)
-- Agent refactoring into modules (Section 09)
-- Kubernetes-native deployment (Section 10)
+- LangSmith observability (Section 09)
+- Kubernetes-native deployment (later section)
 - Idempotency / deduplication across runs
 
 ## Success criteria
@@ -50,4 +50,4 @@ The learner can:
 2. Create a ticket through `/create-issue` and explain the payload schema
 3. Run `agent/tracker_auditor.py` and see per-finding tickets on the board
 4. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
-5. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 → 10)
+5. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 observability)

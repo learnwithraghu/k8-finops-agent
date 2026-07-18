@@ -67,7 +67,7 @@ Click a ticket to inspect the reasoning field — the LLM's explanation of why i
 > 2. *Section 07: Tagging rules shape what counts as a finding*
 > 3. *Section 08: Same agent pattern, but now with tracker MCP tools — audit and post in one loop*
 >
-> *Next, Section 09 refactors this into maintainable modules before we deploy to Kubernetes in Section 10."*
+> *Next, Section 09 turns on LangSmith tracing for the same agent path — observability without a rewrite."*
 
 ---
 
@@ -79,4 +79,4 @@ Stop the tracker when done:
 docker stop finops-issue-tracker
 ```
 
-**Next:** End-to-end flow complete. Section 09 covers refactoring the agent into collector / analyzer / tracker modules.
+**Next:** End-to-end flow complete. Section 09 covers LangSmith observability for the FinOps agent.

@@ -1,0 +1,76 @@
+# Tagging Rules Configuration
+# Airline booking context tagging standards
+
+required_tags:
+  - owner
+  - environment
+  - cost-center
+  - application
+  - tier
+  - slack-channel
+
+label_mappings:
+  owner:
+    - app.kubernetes.io/owner
+    - owner
+  environment:
+    - app.kubernetes.io/env
+    - environment
+    - env
+  cost-center:
+    - app.kubernetes.io/cost-center
+    - cost-center
+    - costcenter
+  application:
+    - app.kubernetes.io/name
+    - app
+    - application
+  tier:
+    - app.kubernetes.io/tier
+    - tier
+  compliance:
+    - compliance-level
+    - compliance
+  slack-channel:
+    - app.kubernetes.io/slack-channel
+    - slack-channel
+    - slack_channel
+
+cost_centers:
+  - booking-engine
+  - payment
+  - inventory
+  - customer-service
+  - analytics
+  - platform
+
+environments:
+  - dev
+  - staging
+  - prod
+
+tiers:
+  - frontend
+  - backend
+  - database
+  - cache
+  - messaging
+
+compliance_levels:
+  - pci-dss
+  - sox
+  - standard
+
+resource_types:
+  - Deployment
+  - Service
+  - ConfigMap
+  - PersistentVolumeClaim
+  - Ingress
+  - Pod
+
+excluded_namespaces:
+  - kube-system
+  - kube-public
+  - kube-node-lease
+  - local-path-storage

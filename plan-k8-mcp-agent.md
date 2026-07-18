@@ -17,7 +17,7 @@ Current curriculum split:
 - Section 06: first MCP data agent (prompt → MCP → unstructured data)
 - Section 07: LLM structured agent (snapshot + tagging rules → policy-aware audit)
 - Section 08: issue tracker service + agent integration (from findings to tickets)
-- Section 09: agent refactoring best practices
+- Section 09: observability with LangSmith (env-only tracing on copied Section 07 auditor)
 - Section 10: Kubernetes-native agent (Helm)
 
 ## Why This Section Exists
