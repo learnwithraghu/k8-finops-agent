@@ -16,7 +16,7 @@ You should already have:
 ## Instructor setup (before the live demo)
 Run `0_prerequisite_guide.md` before teaching. It confirms the cluster and MCP service, verifies LangSmith env vars, and checks the copied auditor. Do not walk students through account signup during the live demo.
 
-## Guide structure (5 parts)
+## Guide structure (6 parts)
 | Guide | Type | Video title | Time |
 |-------|------|-------------|------|
 | **0** (`0_prerequisite_guide.md`) | Instructor | *(prereq only)* | ~3 min |
@@ -24,8 +24,9 @@ Run `0_prerequisite_guide.md` before teaching. It confirms the cluster and MCP s
 | **2** (`2_guide.md`) | Demo | LangSmith Project & `.env` | ~3 min |
 | **3** (`3_guide.md`) | Demo | Same Auditor, Now Observable | 3–4 min |
 | **4** (`4_guide.md`) | Demo | Read the Trace in LangSmith | 3–4 min |
+| **5** (`5_guide.md`) | Demo *(optional)* | Minimal LangSmith Trace Example | 2–3 min |
 
-Students go from "Section 07 audit on screen" to "same audit with a full LangSmith trace" in under 15 minutes.
+Students go from "Section 07 audit on screen" to "same audit with a full LangSmith trace" in under 15 minutes. Guide 5 is an optional quick demo — no MCP — to confirm LangSmith env and nested `@traceable` spans.
 
 ## Scope
 - Copy Section 07 `code/` and `config/` into this section
@@ -34,7 +35,7 @@ Students go from "Section 07 audit on screen" to "same audit with a full LangSmi
 - Open the LangSmith UI and walk LLM + tool-call spans
 
 ## Out of scope
-- New Python modules or agent refactoring (deferred)
+- Agent refactoring beyond the optional `example_langsmith.py` teaching script
 - LangSmith evaluations / datasets
 - Custom spans or metadata instrumentation
 - Issue-tracker integration (Section 08)
@@ -54,3 +55,5 @@ The learner can:
 | `code/structured_auditor.py` | Same thin policy auditor as Section 07 |
 | `config/tagging-rules.yaml` | Same FinOps tagging policy |
 | `code/README.md` | Quick reference for MCP + LangSmith-enabled runs |
+| `example_langsmith.py` | Optional minimal trace demo (mock context + `@traceable` spans) |
+| `5_guide.md` | Optional demo walkthrough for `example_langsmith.py` |

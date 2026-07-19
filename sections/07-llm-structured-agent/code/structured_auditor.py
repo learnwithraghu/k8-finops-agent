@@ -43,7 +43,7 @@ async def main() -> None:
         await run_agent(
             PROMPT,
             tagging_rules=load_tagging_rules(),
-            max_tokens=2048,
+            max_tokens=4096,
         )
     )
 

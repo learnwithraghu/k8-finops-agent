@@ -68,6 +68,6 @@ When an audit looks wrong later, start here: wrong tool args, truncated tool out
 
 ### Close (~10 sec)
 
-Section 09 complete: same auditor as Section 07, observability from `.env`, traces readable in LangSmith. No new Python modules required.
+Section 09 complete: same auditor as Section 07, observability from `.env`, traces readable in LangSmith.
 
-> **Do:** Leave LangSmith open if students want to re-run; stop the MCP container when the session ends.
+> **Do:** Leave LangSmith open if students want to re-run; stop the MCP container when the session ends. Optional: open `5_guide.md` for a smaller trace demo with `example_langsmith.py` (no MCP).
