@@ -107,4 +107,4 @@ When setup passes, start the live walkthrough with:
 - `2_guide.md` — Demo: LangSmith project and `.env`
 - `3_guide.md` — Demo: run the same auditor
 - `4_guide.md` — Demo: read the trace in LangSmith
-- `5_guide.md` — *(optional)* Demo: minimal trace with `example_langsmith.py`
+- `5_guide.md` — Demo: full traced policy auditor run (cluster + MCP + audit + LangSmith)

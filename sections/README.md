@@ -21,7 +21,7 @@ This directory is the curriculum skeleton for the repo.
 - `sections/06-mcp-data-agent/code/` → Section 06 (`validate_mcp.py`, `query_agent.py`, `label_auditor.py`)
 - `sections/07-llm-structured-agent/code/` and `config/` → Section 07 (LLM policy-aware label audit + tagging rules file)
 - `sections/08-from-findings-to-tickets/service/` and `agent/` → Section 08 (tracker + agent integration)
-- `sections/09-langsmith-observability/` → Section 09 (LangSmith tracing via `.env`, copied Section 07 auditor, `example_langsmith.py` minimal trace demo)
+- `sections/09-langsmith-observability/` → Section 09 (LangSmith tracing via `.env`, copied Section 07 auditor, full traced run in `5_guide.md`)
 - `sections/10-k8-native-agent/` (docker, helm) → Section 10
 
 ## Section index (learning flow)
@@ -43,5 +43,5 @@ This directory is the curriculum skeleton for the repo.
 9. **06** — LangChain MCP agents: prompt → MCP → unstructured data
 10. **07** — LLM policy-aware label audit: tagging rules from file → policy-grounded agent answer
 11. **08** — From findings to tickets: issue tracker service + agent integration
-12. **09** — Observability with LangSmith (env-only tracing on copied Section 07 auditor; optional `example_langsmith.py` + `5_guide.md` for a minimal nested-span demo)
+12. **09** — Observability with LangSmith (env-only tracing on copied Section 07 auditor; `5_guide.md` for the full traced policy auditor run)
 13. **10** — Kubernetes-native agent (Helm)

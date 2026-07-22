@@ -44,14 +44,6 @@ Loads LLM + LangSmith settings from the repo-root `.env` via `mcp_client.py`. Pr
 
 Open [https://smith.langchain.com](https://smith.langchain.com) → your project → latest run to inspect LLM and tool spans.
 
-## Run the minimal trace example (optional, no MCP)
-
-```bash
-python3 sections/09-langsmith-observability/example_langsmith.py
-```
-
-Loads the same repo-root `.env`. Uses `@traceable` parent/child spans and one LLM call — see `5_guide.md`.
-
 ## Guide order
 
 | Guide | File | Video title |
@@ -61,4 +53,4 @@ Loads the same repo-root `.env`. Uses `@traceable` parent/child spans and one LL
 | 2 | `2_guide.md` | LangSmith Project & `.env` |
 | 3 | `3_guide.md` | Same Auditor, Now Observable |
 | 4 | `4_guide.md` | Read the Trace in LangSmith |
-| 5 | `5_guide.md` | Minimal LangSmith Trace Example *(optional)* |
+| 5 | `5_guide.md` | Full Traced Policy Auditor Run |

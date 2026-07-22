@@ -16,17 +16,18 @@ The code is a copy of Section 07. We are not adding a tracer class or a new scri
 
 ---
 
-### Step 1 — Confirm cluster and MCP (quick)
+### Step 1 — Confirm cluster access (quick)
 
 ```bash
 source .venv/bin/activate
 kubectl get namespaces
-python3 sections/06-mcp-data-agent/code/validate_mcp.py
 ```
 
-**What it does:** Same health checks as Section 07. Skip the long MCP start if the container is already up.
+**What it does:** Confirms kubectl can reach the Kind cluster. The MCP container should already be running from the prerequisite guide — same setup as Sections 06–07.
 
-> **Expected:** Namespaces listed; `MCP OK — N namespaces via kubectl_get`.
+> **Expected:** Application namespaces such as `booking-api`, `flight-search`, `inventory`, and `payment` listed alongside system namespaces.
+
+> **Say:** "If MCP is not running, start it from `0_prerequisite_guide.md` before continuing."
 
 ---
 

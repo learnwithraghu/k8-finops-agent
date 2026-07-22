@@ -24,9 +24,9 @@ Run `0_prerequisite_guide.md` before teaching. It confirms the cluster and MCP s
 | **2** (`2_guide.md`) | Demo | LangSmith Project & `.env` | ~3 min |
 | **3** (`3_guide.md`) | Demo | Same Auditor, Now Observable | 3–4 min |
 | **4** (`4_guide.md`) | Demo | Read the Trace in LangSmith | 3–4 min |
-| **5** (`5_guide.md`) | Demo *(optional)* | Minimal LangSmith Trace Example | 2–3 min |
+| **5** (`5_guide.md`) | Demo | Full Traced Policy Auditor Run | 5–6 min |
 
-Students go from "Section 07 audit on screen" to "same audit with a full LangSmith trace" in under 15 minutes. Guide 5 is an optional quick demo — no MCP — to confirm LangSmith env and nested `@traceable` spans.
+Students go from "Section 07 audit on screen" to "same audit with a full LangSmith trace" in under 15 minutes. Guide 5 consolidates the full hands-on path — cluster check, MCP, auditor run, and trace review — in one place.
 
 ## Scope
 - Copy Section 07 `code/` and `config/` into this section
@@ -55,5 +55,5 @@ The learner can:
 | `code/structured_auditor.py` | Same thin policy auditor as Section 07 |
 | `config/tagging-rules.yaml` | Same FinOps tagging policy |
 | `code/README.md` | Quick reference for MCP + LangSmith-enabled runs |
-| `example_langsmith.py` | Optional minimal trace demo (mock context + `@traceable` spans) |
-| `5_guide.md` | Optional demo walkthrough for `example_langsmith.py` |
+| `example_langsmith.py` | Standalone minimal trace script (mock context + `@traceable` spans; not used in guides) |
+| `5_guide.md` | Full end-to-end demo: cluster + MCP + traced `structured_auditor.py` + LangSmith UI |
