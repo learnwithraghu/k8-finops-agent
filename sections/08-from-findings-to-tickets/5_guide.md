@@ -69,18 +69,8 @@ Click a ticket to inspect the reasoning field — the LLM's explanation of why i
 > 2. *Section 07: Tagging rules shape what counts as a finding*
 > 3. *Section 08: Same agent pattern, but now with tracker MCP tools — audit and post in one loop*
 >
-> *Next, Section 09 turns on LangSmith tracing for the same agent path — observability without a rewrite."*
+> *The prompt currently scans only `payment` so the demo stays reliable. Next we widen that one line."*
 
 ---
 
-### 6) Cleanup
-
-Stop the tracker when done:
-
-```bash
-docker stop finops-issue-tracker
-```
-
-Stop the Kubernetes MCP terminal with Ctrl+C when the session ends.
-
-**Next:** End-to-end flow complete. Section 09 covers LangSmith observability for the FinOps agent.
+**Next:** Widen the prompt to scan all namespaces and fill the board → `6_guide.md`

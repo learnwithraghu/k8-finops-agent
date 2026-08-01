@@ -139,7 +139,8 @@ When both terminals are running and health checks pass, start the live walkthrou
 - `2_guide.md` — Test tracker MCP tools with a tiny LLM prompt (Video 3a)
 - `3_guide.md` — Code walkthrough: what changed vs Section 07 (Video 3b)
 - `4_guide.md` — Tracker backend REST + manual curl (Video 3c)
-- `5_guide.md` — Run agent + verify board (Video 5)
+- `5_guide.md` — Run agent on `payment` + verify board (Video 5)
+- `6_guide.md` — Widen prompt to all namespaces and re-run (Video 5b)
 
 ## Cleanup after the session
 

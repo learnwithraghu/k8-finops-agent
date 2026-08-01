@@ -30,11 +30,11 @@ Required fields:
 Step 4 — Call list_issues once and stop.
 
 Hard rules:
-- Do not call kubectl_get for any namespace other than payment.
+- Follow Step 1's scope exactly — do not invent extra kubectl_get calls.
 - Do not fetch configmaps, PVCs, or individual resources by name.
 - Do not write a plain-English audit report instead of creating tickets.
 - Your run is a failure if you end without at least one create_issue call when
-  non-compliant Deployments exist in payment.
+  non-compliant Deployments exist in the scoped result set.
 """
 
 TAGGING_RULES_PATH = (

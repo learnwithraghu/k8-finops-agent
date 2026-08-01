@@ -9,7 +9,7 @@
 | **V4** — Integration whiteboard | `slide4_integration_whiteboard.svg` | One agent, two MCP servers (K8s + tracker) |
 | **V6** — Closed-loop pipeline | `slide5_closed_loop_pipeline.svg` | Full S05–S10 architecture update |
 
-Videos V2, V3a, V3b, and V5 are live demos — no dedicated slides. Use the running board UI and agent code in the editor.
+Videos V2, V3a, V3b, V5, and V5b are live demos — no dedicated slides. Use the running board UI and agent code in the editor.
 
 ## Demo checkpoints
 
@@ -36,13 +36,21 @@ Tour `service/app/main.py`, `models.py`, `mcp_server.py`. Manual curl to `/creat
 ```bash
 python3 sections/08-from-findings-to-tickets/agent/tracker_auditor.py
 ```
-Verify tickets on `http://localhost:8085`.
+Verify three `payment` tickets on `http://localhost:8085`.
+
+### V5b — Widen prompt (`6_guide.md`)
+Manually change the collect line in `tracker_auditor.py` to:
+```text
+- kubectl_get resourceType=deployments allNamespaces=true output=json
+```
+Re-run the agent and confirm tickets for other namespaces.
 
 ## Instructor tips
 
 - V1 sets context before any code — learners should understand *why* trackers matter
-- Keep **two** MCP terminals running across V2–V5 demos (K8s + tracker)
+- Keep **two** MCP terminals running across V2–V5b demos (K8s + tracker)
 - V3a is the smallest LLM proof before the full agent
 - V3b is the delta talk — what is new vs Section 07
 - V4 whiteboard is the conceptual bridge between tracker service and agent code
+- V5 scopes to `payment` for reliability; V5b is the one-line widen
 - V6 closes the section and previews Sections 09 (observability) and later packaging

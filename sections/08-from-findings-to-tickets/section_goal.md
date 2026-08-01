@@ -21,18 +21,20 @@ Run `0_prerequisite_guide.md` before teaching. It builds the tracker Docker imag
 | **3c** | Tracker backend: REST, MCP, ticket schema + manual curl | Demo + code walk | 3–4 min |
 | **4** | Whiteboard: wiring the MCP agent to the tracker | Transcript + slides | 3–4 min |
 | **5** | Agent walkthrough: post tickets instead of printing | Code walk + demo | 4–5 min |
+| **5b** | Widen prompt: scan all namespaces | Demo | 2–3 min |
 | **6** | Architecture update: the closed-loop FinOps pipeline | Transcript + slides | 3–4 min |
 
 Transcripts: `transcript/1.md` (V1), `transcript/2.md` (V4), `transcript/3.md` (V6)
 
-## Demo structure (5 parts)
+## Demo structure (6 parts)
 | Demo | Guide | Maps to | Time |
 |------|-------|---------|------|
 | **1** | `1_guide.md` | V2 — run tracker, open board | 2–3 min |
 | **2** | `2_guide.md` | V3a — LLM lists tracker MCP tools | 2–3 min |
 | **3** | `3_guide.md` | V3b — agent code delta vs Section 07 | 3–4 min |
 | **4** | `4_guide.md` | V3c — API tour + manual curl | 3–4 min |
-| **5** | `5_guide.md` | V5 — run agent, verify board | 3–4 min |
+| **5** | `5_guide.md` | V5 — run agent on `payment`, verify board | 3–4 min |
+| **6** | `6_guide.md` | V5b — widen prompt to all namespaces | 2–3 min |
 
 ## Scope
 - Run both MCP servers locally (K8s on :8000, tracker REST on :8085 / MCP on :8086)
@@ -55,6 +57,7 @@ The learner can:
 2. Use a tiny LLM script to list tracker MCP tools
 3. Explain what changed in `mcp_client.py` / `tracker_auditor.py` vs Section 07
 4. Create a ticket through `/create-issue` and explain the payload schema
-5. Run `agent/tracker_auditor.py` and see per-finding tickets on the board
-6. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
-7. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 observability)
+5. Run `agent/tracker_auditor.py` (payment-scoped) and see per-finding tickets on the board
+6. Widen one prompt line to scan all namespaces and re-run for more tickets
+7. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
+8. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 observability)
