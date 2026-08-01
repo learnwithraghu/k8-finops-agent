@@ -1,82 +1,90 @@
-# Demo 3: Run the Agent and Verify Tickets on the Board
+# Demo 3: Code Walkthrough — What Changed vs Section 07
 
 **Time Budget:** 3–4 mins  
-**Video:** V5 — Agent Walkthrough: Post Per-Finding Tickets Instead of Printing
+**Video:** V3b — Agent code delta: dual MCP + ticket posting
 
-**Narrative:** One LangChain agent with both K8s MCP and tracker MCP tools audits the cluster and calls `create_issue` for each finding. No separate posting step.
+**Narrative:** Section 07 audits labels and prints a report. Section 08 keeps the same agent pattern and adds tracker MCP tools so findings become tickets. This video walks only what is new.
+
+**Prerequisites:** `2_guide.md` — tracker MCP tools visible to the LLM. Both MCP terminals still running.
 
 ---
 
-### 1) Confirm both services are running
+### 1) Compare the MCP client wiring
 
-```bash
-curl -s http://localhost:8000/mcp -o /dev/null -w "%{http_code}\n"
-curl -s http://localhost:8085/health
+Open side by side:
+
+- Section 07: `sections/07-llm-structured-agent/code/mcp_client.py`
+- Section 08: `sections/08-from-findings-to-tickets/agent/mcp_client.py`
+
+**What is new in Section 08:**
+
+```python
+MCP_SERVERS = {
+    "k8s": {
+        "url": K8S_MCP_URL,          # streamable_http :8000
+        "transport": "streamable_http",
+    },
+    "tracker": {
+        "url": TRACKER_MCP_URL,      # sse :8086  ← NEW
+        "transport": "sse",
+    },
+}
+
+TRACKER_MCP_SERVERS = {
+    "tracker": MCP_SERVERS["tracker"],
+}
 ```
-
-**What it does:** Quick health checks — K8s MCP (Section 06) and Issue Tracker (REST). Both should respond.
-
-> *Talking point: "The agent connects to both MCP servers — K8s for collection and tracker for posting. Confirm both before running."*
-
----
-
-### 2) Walk the agent code (before running)
-
-Open these files:
-
-- `agent/mcp_client.py` — registers **both** MCP servers in `MCP_SERVERS` (K8s + tracker)
-- `agent/tracker_auditor.py` — unified prompt: audit labels, call `create_issue` per finding
 
 **What to look for:**
 
-- `MCP_SERVERS` has `k8s` (streamable HTTP on :8000) and `tracker` (SSE on :8086)
-- `convert_mcp_to_langchain_tools` exposes `kubectl_get` and `create_issue` in one tool list
-- Tagging rules load from Section 07's `config/tagging-rules.yaml` via `SystemMessage`
-- No separate structure or posting files — the ReAct loop handles everything
+- Section 07 registers **one** server (`k8s`)
+- Section 08 registers **two** (`k8s` + `tracker`) with different transports
+- The tiny demos in `2_guide.md` (`list_tracker_tools.py`, `prompt_list_tracker_tools.py`) are **standalone** — they connect to tracker MCP directly and do not import `mcp_client`
+- `get_mcp_tools()` / `run_agent()` still load `.env`, build the LLM, attach tools, and always `cleanup()` — same shape as Section 07
+- Tagging rules still arrive via optional `SystemMessage` in `run_agent`
+
+> *Talking point: "One LangChain agent, two MCP servers. K8s for cluster reads. Tracker for create_issue. Same convert_mcp_to_langchain_tools call — bigger tool list."*
 
 ---
 
-### 3) Run the agent
+### 2) Compare the auditor entrypoint
 
-```bash
-python3 sections/08-from-findings-to-tickets/agent/tracker_auditor.py
+Open side by side:
+
+- Section 07: `sections/07-llm-structured-agent/code/structured_auditor.py`
+- Section 08: `sections/08-from-findings-to-tickets/agent/tracker_auditor.py`
+
+**What changed in the prompt:**
+
+| Section 07 | Section 08 |
+|------------|------------|
+| Audit labels via K8s MCP | Audit labels via K8s MCP |
+| Print a plain-English report | Call tracker `create_issue` per finding |
+| Done when the summary is written | Done when tickets exist; confirm with `list_issues` |
+
+**What to look for in `tracker_auditor.py`:**
+
+- Still a thin wrapper around `run_agent(...)`
+- Still loads Section 07's `config/tagging-rules.yaml` (path points at the previous section)
+- `PROMPT` tells the agent to skip compliant resources and create one ticket per distinct finding
+- `source: "mcp-llm-agent"` marks tickets created by this loop
+- Final print points at `http://localhost:8085` instead of ending on stdout alone
+
+> *Talking point: "We did not invent a second posting client. The ReAct loop already knows how to call tools — we just gave it tracker tools and changed the job description."*
+
+---
+
+### 3) Map the data flow
+
+```
+LangChain agent (tracker_auditor.py)
+  ├── K8s MCP (:8000)      → kubectl_get, etc.
+  └── Tracker MCP (:8086)  → create_issue, list_issues
+         └── Kanban board (:8085)
 ```
 
-**What it does:** One agent loop: fetch cluster data via K8s MCP, evaluate against tagging rules, call tracker `create_issue` for each finding.
-
-> *Expected: Log lines showing both `kubectl_get` and `create_issue` tool calls. Final line: "Done. Verify tickets at http://localhost:8085".*
+> *Talking point: "Section 07 stopped at the English summary. Section 08 closes the loop — same findings, now as backlog tickets."*
 
 ---
 
-### 4) Verify tickets in the UI
-
-Open `http://localhost:8085` in your browser.
-
-**What it does:** Shows the Kanban board. Tickets created by the agent should appear alongside any manual demo ticket.
-
-> *Expected: Multiple tickets — one per finding. Each has title, namespace, resource, category, priority, and reasoning.*
-
-Click a ticket to inspect the reasoning field — the LLM's explanation of why it was flagged.
-
----
-
-### 5) Explain the full flow
-
-> *Talking point: "Let's trace the closed loop:*
-> 1. *Section 06: LangChain + MCP pattern for cluster access*
-> 2. *Section 07: Tagging rules shape what counts as a finding*
-> 3. *Section 08: Same agent pattern, but now with tracker MCP tools — audit and post in one loop*
->
-> *Next, Section 09 turns on LangSmith tracing for the same agent path — observability without a rewrite."*
-
----
-
-### 6) Cleanup
-
-Stop the tracker when done:
-
-```bash
-docker stop finops-issue-tracker
-```
-
-**Next:** End-to-end flow complete. Section 09 covers LangSmith observability for the FinOps agent.
+**Next:** Walk the tracker backend schema and create one ticket by hand with curl → `4_guide.md`

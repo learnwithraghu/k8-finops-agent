@@ -1,67 +1,62 @@
-# Demo 2: Tracker Backend Walkthrough — REST, MCP, and Ticket Schema
+# Demo 2: Test Tracker MCP Tools with a Tiny LLM Prompt
 
-**Time Budget:** 3–4 mins  
-**Video:** V3 — Tracker Backend Walkthrough: REST, MCP, and the Ticket Schema
+**Time Budget:** 2–3 mins  
+**Video:** V3a — Standalone demo: list issue-tracker MCP tools via LLM
 
-**Narrative:** Before the agent posts tickets automatically, we walk the backend code and create one ticket manually. This is the same payload shape the agent sends via MCP.
+**Narrative:** Before we walk the agent code changes, prove the tracker MCP path with the smallest possible LLM script. One prompt. Tracker tools only. No cluster audit. No ticket creation.
 
----
-
-### 1) Tour the backend code
-
-Open these files in your editor:
-
-- `service/app/main.py` — FastAPI REST routes and static UI mount
-- `service/app/models.py` — `IssueCreate` schema (title, namespace, priority, reasoning, etc.)
-- `service/app/mcp_server.py` — MCP tools: `create_issue`, `list_issues`, `get_issue`, `update_issue`
-- `service/app/store.py` — JSON file persistence
-
-**What to look for:**
-
-- REST and MCP share the same `IssueCreate` model — one schema, two interfaces
-- `create_issue` MCP tool maps directly to the `/create-issue` REST handler
-- Tickets get keys like `FINOPS-0001` and land in the backlog column
-
-> *Talking point: "Agents call MCP on port 8086. Humans use REST on 8085. Same ticket, different door. Run `list_tracker_tools.py` to show the MCP tool catalog live."*
+**Prerequisites:** Tracker MCP running on `:8086` (Terminal 2 from `0_prerequisite_guide.md` / `1_guide.md`). Repo-root `.env` with OpenAI settings.
 
 ---
 
-### 2) Create a ticket via curl
+### 1) Confirm the tracker MCP is up
 
 ```bash
-curl -X POST http://localhost:8085/create-issue \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "title": "[FinOps] payment/payment-processor - UNALLOCATED ($8.47/month)",
-    "summary": "Missing cost-center and owner metadata",
-    "body": "The agent flagged this deployment as having no ownership labels.",
-    "namespace": "payment",
-    "resource_name": "payment-processor",
-    "resource_kind": "Deployment",
-    "category": "unallocated",
-    "priority": "high",
-    "cost_impact": 8.47,
-    "suggested_owner": "payment-team",
-    "suggested_cost_center": "payment",
-    "reasoning": "Missing cost-center tag means the workload cannot be billed correctly.",
-    "source": "manual-demo"
-  }'
+python3 sections/08-from-findings-to-tickets/agent/list_tracker_tools.py
 ```
 
-**What it does:** Sends a POST request to create a ticket. The tracker stores it and returns the created ticket with an ID.
+**What it does:** Deterministic catalog check — connects to tracker MCP and prints tool names. No LLM.
 
-> *Expected: JSON response with the ticket details and a generated key (e.g. FINOPS-0001).*
+> *Expected: `Tracker MCP OK — 4 tools via http://localhost:8086/sse` plus `create_issue`, `list_issues`, `get_issue`, `update_issue`.*
 
----
-
-### 3) Verify the ticket on the board
-
-Open `http://localhost:8085` in your browser.
-
-**What it does:** Refreshes the Kanban board. The new ticket should appear in the backlog column.
-
-> *Talking point: "This curl call is what the agent automates via MCP `create_issue`. One ticket per finding."*
+> *Talking point: "`list_tracker_tools.py` is the smoke test. Next we let the LLM see the same tool list."*
 
 ---
 
-**Next:** Manual ticket creation works. Next we wire the Section 06 agent to post findings automatically → `3_guide.md`
+### 2) Run the standalone LLM demo
+
+```bash
+python3 sections/08-from-findings-to-tickets/agent/prompt_list_tracker_tools.py
+```
+
+**What it does:** Connects **only** to the tracker MCP, builds a LangChain agent with those tools, and asks the LLM to list every tool it can use. The prompt explicitly says not to call tools or create issues.
+
+> *Expected: A short LLM answer naming `create_issue`, `list_issues`, `get_issue`, and `update_issue` with one-line descriptions. No tickets created on the board.*
+
+---
+
+### 3) Glance at the script (keep it tiny)
+
+Open `agent/prompt_list_tracker_tools.py`:
+
+- Fully standalone — loads `.env`, connects to tracker MCP only, no `mcp_client` import
+- Creates a LangChain agent with those tools
+- One `HumanMessage` prompt: list tools, do not call them
+- Always `cleanup()` in `finally`
+
+> *Talking point: "This is a demo script, not the FinOps auditor. Same MCP handshake the real agent uses — just the smallest prompt that proves the tracker tools are visible to an LLM."*
+
+---
+
+### 4) Contrast with the deterministic catalog
+
+| Script | Uses LLM? | Purpose |
+|--------|-----------|---------|
+| `list_tracker_tools.py` | No | Print MCP tool catalog |
+| `prompt_list_tracker_tools.py` | Yes | Ask the model to list the same tools |
+
+> *Talking point: "Both hit the same SSE endpoint. One is a connectivity check. The other shows the LLM can see the tracker tools before we wire them into the full auditor."*
+
+---
+
+**Next:** Walk what changed in the agent code vs Section 07 → `3_guide.md`

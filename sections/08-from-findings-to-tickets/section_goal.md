@@ -9,31 +9,36 @@ Stand up a lightweight FinOps issue tracker, understand its REST and MCP APIs, a
 - Repo-root `.env` with OpenAI-compatible endpoint settings
 
 ## Instructor setup (before the live demo)
-Run `0_prerequisite_guide.md` before teaching. It builds the tracker Docker image and confirms the agent code. Do not walk students through Docker build during the live demo.
+Run `0_prerequisite_guide.md` before teaching. It builds the tracker Docker image, starts **both** MCP servers in separate terminals (K8s MCP + issue tracker), and health-checks them. Do not walk students through Docker build during the live demo.
 
-## Video structure (6 videos)
+## Video structure
 | Video | Focus | Type | Time |
 |-------|------------|------|-------|
 | **1** | Issue tracker landscape: Jira, Linear, GitHub Issues, custom | Transcript + slides | 3–4 min |
 | **2** | Launch the FinOps issue tracker | Demo | 2–3 min |
-| **3** | Tracker backend: REST, MCP, ticket schema | Demo + code walk | 4–5 min |
+| **3a** | Test tracker MCP tools with a tiny LLM prompt | Demo | 2–3 min |
+| **3b** | Code walkthrough: what changed vs Section 07 | Code walk | 3–4 min |
+| **3c** | Tracker backend: REST, MCP, ticket schema + manual curl | Demo + code walk | 3–4 min |
 | **4** | Whiteboard: wiring the MCP agent to the tracker | Transcript + slides | 3–4 min |
 | **5** | Agent walkthrough: post tickets instead of printing | Code walk + demo | 4–5 min |
 | **6** | Architecture update: the closed-loop FinOps pipeline | Transcript + slides | 3–4 min |
 
 Transcripts: `transcript/1.md` (V1), `transcript/2.md` (V4), `transcript/3.md` (V6)
 
-## Demo structure (3 parts)
+## Demo structure (5 parts)
 | Demo | Guide | Maps to | Time |
 |------|-------|---------|------|
 | **1** | `1_guide.md` | V2 — run tracker, open board | 2–3 min |
-| **2** | `2_guide.md` | V3 — API tour + manual curl | 3–4 min |
-| **3** | `3_guide.md` | V5 — run agent, verify board | 3–4 min |
+| **2** | `2_guide.md` | V3a — LLM lists tracker MCP tools | 2–3 min |
+| **3** | `3_guide.md` | V3b — agent code delta vs Section 07 | 3–4 min |
+| **4** | `4_guide.md` | V3c — API tour + manual curl | 3–4 min |
+| **5** | `5_guide.md` | V5 — run agent, verify board | 3–4 min |
 
 ## Scope
-- Run the tracker container locally (REST on port 8085, MCP on port 8086)
+- Run both MCP servers locally (K8s on :8000, tracker REST on :8085 / MCP on :8086)
 - Serve a Kanban board UI and expose `/create-issue` REST endpoint
 - Expose MCP tools: `create_issue`, `list_issues`, `get_issue`, `update_issue`
+- Demo tracker MCP discovery with a tiny standalone LLM script
 - Extend `mcp_client.py` with both K8s and tracker MCP servers
 - Run a unified LangChain agent that audits the cluster and calls `create_issue` per finding
 
@@ -46,8 +51,10 @@ Transcripts: `transcript/1.md` (V1), `transcript/2.md` (V4), `transcript/3.md` (
 
 ## Success criteria
 The learner can:
-1. Run the tracker container and access the board UI
-2. Create a ticket through `/create-issue` and explain the payload schema
-3. Run `agent/tracker_auditor.py` and see per-finding tickets on the board
-4. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
-5. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 observability)
+1. Run both MCP terminals and access the board UI
+2. Use a tiny LLM script to list tracker MCP tools
+3. Explain what changed in `mcp_client.py` / `tracker_auditor.py` vs Section 07
+4. Create a ticket through `/create-issue` and explain the payload schema
+5. Run `agent/tracker_auditor.py` and see per-finding tickets on the board
+6. Explain the flow: one LangChain agent with K8s MCP + tracker MCP tools → Kanban
+7. Describe where this section sits in the full FinOps pipeline (Section 06 → 08 → 09 observability)

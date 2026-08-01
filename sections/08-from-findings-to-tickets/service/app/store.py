@@ -44,10 +44,13 @@ class IssueStore:
 
     def list_issues(self) -> List[IssueRecord]:
         with self._lock:
+            # REST and MCP run as separate processes; always re-read the shared JSON file.
+            self._load()
             return list(self._issues)
 
     def get_issue(self, issue_id: int) -> Optional[IssueRecord]:
         with self._lock:
+            self._load()
             for issue in self._issues:
                 if issue.id == issue_id:
                     return issue
@@ -55,6 +58,7 @@ class IssueStore:
 
     def create_issue(self, payload: IssueCreate) -> IssueRecord:
         with self._lock:
+            self._load()
             next_id = max((issue.id for issue in self._issues), default=0) + 1
             issue = IssueRecord.from_create(next_id, payload)
             self._issues.append(issue)
@@ -63,6 +67,7 @@ class IssueStore:
 
     def update_issue(self, issue_id: int, payload: IssueUpdate) -> Optional[IssueRecord]:
         with self._lock:
+            self._load()
             for issue in self._issues:
                 if issue.id == issue_id:
                     if payload.status is not None:
@@ -76,6 +81,7 @@ class IssueStore:
 
     def stats(self) -> dict:
         with self._lock:
+            self._load()
             return {
                 "total": len(self._issues),
                 "backlog": sum(1 for issue in self._issues if issue.status == Status.backlog),

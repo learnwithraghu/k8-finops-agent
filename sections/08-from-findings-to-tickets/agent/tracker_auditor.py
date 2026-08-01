@@ -4,31 +4,37 @@ from pathlib import Path
 
 from mcp_client import run_agent
 
+# Keep the tool surface small so the agent spends steps on create_issue, not discovery.
+ALLOWED_TOOLS = {"kubectl_get", "create_issue", "list_issues"}
+
 PROMPT = """
-You are a FinOps agent with access to Kubernetes MCP tools and issue tracker MCP tools.
+You are a FinOps agent with Kubernetes kubectl_get and issue tracker tools (create_issue, list_issues).
 
-Your job:
-1. Use Kubernetes MCP tools to list namespaces and fetch deployments, configmaps, and
-   persistent volume claims for each application namespace (skip kube-* and local-path-storage).
-2. Evaluate each resource against the tagging rules provided in the system message.
-3. For every non-compliant resource, call the tracker create_issue tool with a complete payload.
-   Do not create tickets for compliant resources.
-4. When finished, call list_issues to confirm tickets were created.
+Execute this exact plan — do not invent extra discovery steps:
 
-create_issue fields (use all that apply):
+Step 1 — Collect (1 kubectl_get call only):
+- kubectl_get resourceType=deployments namespace=payment output=json
+
+Step 2 — Evaluate labels on each Deployment against the tagging rules.
+A required tag is missing when NONE of its label_mappings keys appear on the resource.
+
+Step 3 — For EVERY non-compliant Deployment, call create_issue (one call per resource).
+Required fields:
 - title: "[FinOps] {namespace}/{resource_name} - {CATEGORY}"
-- summary: one-line description of the finding
-- body: details including labels found
-- namespace, resource_name, resource_kind
-- category: e.g. missing-owner, unallocated, orphaned
+- summary, body, namespace, resource_name, resource_kind
+- category: missing-owner | unallocated | orphaned | missing-labels
 - priority: critical | high | medium | low
 - suggested_owner, suggested_cost_center, reasoning
 - source: "mcp-llm-agent"
 
-Rules:
-- Use only data returned by Kubernetes MCP tools. Do not invent resources or labels.
-- Do not finish with a plain-English audit report. Your job is done when tickets are created.
-- Create one ticket per distinct finding.
+Step 4 — Call list_issues once and stop.
+
+Hard rules:
+- Do not call kubectl_get for any namespace other than payment.
+- Do not fetch configmaps, PVCs, or individual resources by name.
+- Do not write a plain-English audit report instead of creating tickets.
+- Your run is a failure if you end without at least one create_issue call when
+  non-compliant Deployments exist in payment.
 """
 
 TAGGING_RULES_PATH = (
@@ -47,6 +53,7 @@ async def main() -> None:
         PROMPT,
         tagging_rules=load_tagging_rules(),
         max_tokens=4096,
+        allowed_tools=ALLOWED_TOOLS,
     )
     print(result)
     print("\n--- Done. Verify tickets at http://localhost:8085 ---")

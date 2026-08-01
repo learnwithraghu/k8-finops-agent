@@ -17,19 +17,18 @@ from langchain_mcp_tools import convert_mcp_to_langchain_tools
 
 load_dotenv(Path(__file__).parents[3] / ".env")
 
+K8S_MCP_URL = os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp")
+TRACKER_MCP_URL = os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse")
+
 MCP_SERVERS = {
     "k8s": {
-        "url": os.getenv("K8S_MCP_URL", "http://localhost:8000/mcp"),
+        "url": K8S_MCP_URL,
         "transport": "streamable_http",
     },
     "tracker": {
-        "url": os.getenv("TRACKER_MCP_URL", "http://localhost:8086/sse"),
+        "url": TRACKER_MCP_URL,
         "transport": "sse",
     },
-}
-
-TRACKER_MCP_SERVERS = {
-    "tracker": MCP_SERVERS["tracker"],
 }
 
 
@@ -56,10 +55,6 @@ async def get_mcp_tools():
     return await convert_mcp_to_langchain_tools(MCP_SERVERS)
 
 
-async def get_tracker_mcp_tools():
-    return await convert_mcp_to_langchain_tools(TRACKER_MCP_SERVERS)
-
-
 def build_llm(max_tokens: int | None = None) -> ChatOpenAI:
     return ChatOpenAI(
         model=os.environ["OPENAI_MODEL_ID"],
@@ -74,9 +69,15 @@ async def run_agent(
     prompt: str,
     max_tokens: int | None = None,
     tagging_rules: str | None = None,
+    allowed_tools: set[str] | None = None,
 ) -> str:
     tools, cleanup = await get_mcp_tools()
     try:
+        if allowed_tools is not None:
+            tools = [tool for tool in tools if tool.name in allowed_tools]
+            missing = allowed_tools - {tool.name for tool in tools}
+            if missing:
+                raise RuntimeError(f"Required MCP tools not found: {sorted(missing)}")
         agent = create_agent(build_llm(max_tokens=max_tokens), tools)
         messages = []
         if tagging_rules:
@@ -91,7 +92,11 @@ async def run_agent(
                 )
             )
         messages.append(HumanMessage(content=prompt))
-        result = await agent.ainvoke({"messages": messages})
+        # Audit + many create_issue calls needs more than the default graph step budget.
+        result = await agent.ainvoke(
+            {"messages": messages},
+            config={"recursion_limit": 100},
+        )
         return result["messages"][-1].content
     finally:
         await cleanup()

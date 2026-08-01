@@ -5,11 +5,17 @@
 
 **Narrative:** We need a place for FinOps findings to become actionable tickets. This service is a lightweight Kanban board with a REST API and an MCP server. Agents post findings here; humans review them on the board.
 
+**Prerequisites:** Both MCP terminals from `0_prerequisite_guide.md` should already be running:
+- **Terminal 1** — Kubernetes MCP on `:8000`
+- **Terminal 2** — Issue tracker on `:8085` (REST/UI) and `:8086` (MCP)
+
+If the tracker is not up yet, start it in Terminal 2 now.
+
 ---
 
-### 1) Run the tracker container
+### 1) Run the tracker container (if not already running)
 
-In a **dedicated terminal**:
+In **Terminal 2**:
 
 ```bash
 docker run --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-issue-tracker:latest
@@ -17,7 +23,7 @@ docker run --rm -p 8085:8000 -p 8086:8001 --name finops-issue-tracker finops-iss
 
 **What it does:** Starts the tracker container. Port 8085 serves the REST API and board UI. Port 8086 serves the MCP server.
 
-> *Expected: FastAPI startup logs, "Uvicorn running on http://0.0.0.0:8000".*
+> *Expected: FastAPI startup logs, "Uvicorn running on http://0.0.0.0:8000". Leave Terminal 1 (K8s MCP) and Terminal 2 (tracker) running for the rest of the section.*
 
 ---
 
@@ -41,18 +47,18 @@ Open `http://localhost:8085/docs` in your browser.
 
 ---
 
-### 4) List MCP tools from the agent
+### 4) Quick connectivity check (no LLM)
 
-In a **second terminal** (repo root):
+In a **working terminal** (repo root, virtualenv activated):
 
 ```bash
 python3 sections/08-from-findings-to-tickets/agent/list_tracker_tools.py
 ```
 
-**What it does:** Connects to the tracker MCP server on port 8086 the same way the agent does, then prints the discovered tools (`create_issue`, `list_issues`, `get_issue`, `update_issue`).
+**What it does:** Connects to the tracker MCP server on port 8086 and prints the discovered tools (`create_issue`, `list_issues`, `get_issue`, `update_issue`). No LLM involved.
 
-> *Talking point: "Swagger is for REST on 8085. Agents discover tools over MCP on 8086 — this script shows that catalog live."*
+> *Talking point: "Swagger is for REST on 8085. Agents discover tools over MCP on 8086 — this script proves the MCP handshake works."*
 
 ---
 
-**Next:** Tracker is running. Next we walk the backend API and create a ticket by hand → `2_guide.md`
+**Next:** Prove the tracker MCP tools through a tiny LLM prompt → `2_guide.md`
