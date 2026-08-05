@@ -11,7 +11,7 @@ Complete Sections 01 and 02.
 |-------|------------|-------|------|
 | **1** | Why YAML for tagging policy (not JSON) | 2 min |
 | **2** | Tagging rules at a glance — keys and values | 2 min |
-| **3** | Missing owner/cost-center; billing blind spots | 3–4 min |
+| **3** | Finding labels in two namespaces | 3–4 min |
 | **4** | PVCs with no pods; idle burn | 3–4 min |
 | **5** | Escalation pain; why grep does not scale | 3–4 min |
 

@@ -1,25 +1,33 @@
-# Demo 3: Pinpointing Ownership Gaps
+# Demo 3: Finding Labels in Two Namespaces
 
 **Time Budget:** 3-4 mins
 
-> **Try it first:** The **Operate** phase in [`game/finops-game-1.html`](game/finops-game-1.html) shows why manual grep does not scale.
+> **Try it first:** Open the SkyLine Air cluster and keep an eye on label differences between namespaces.
 
-### 1) Inspect a good baseline (Inventory)
+### 1) Show the namespaces first
 ```bash
-kubectl get deployment inventory-service -n inventory -o yaml
-kubectl get pvc inventory-data -n inventory -o yaml
+kubectl get namespaces
 ```
+> *Talking point: We are going to compare the same kind of resources in two different namespaces.*
 
-### 2) Inspect partial compliance (Payment)
+### 2) Check labels in the inventory namespace
 ```bash
-kubectl get deployment payment-processor -n payment -o yaml
-kubectl get pvc payment-logs -n payment -o yaml
+kubectl get deployments -n inventory --show-labels
+kubectl get services -n inventory --show-labels
 ```
+> *Talking point: Note the label keys and values you see here.*
 
-### 3) Scan all Deployments and Services for gaps
+### 3) Check labels in the payment namespace
 ```bash
-kubectl get deployments -A --show-labels
-kubectl get services -A --show-labels
+kubectl get deployments -n payment --show-labels
+kubectl get services -n payment --show-labels
 ```
-> *Talking point: Compare labels across namespaces to show inconsistency.*
+> *Talking point: Compare the labels with inventory — same kind of resources, different label patterns.*
+
+### 4) Spot the inconsistency
+```bash
+kubectl describe deployment inventory-service -n inventory
+kubectl describe deployment payment-processor -n payment
+```
+> *Talking point: The issue is not just missing labels; it is that labels vary by namespace, which makes manual review messy.*
 
